@@ -1,0 +1,142 @@
+[
+{
+    "model": "press.article",
+    "pk": 1,
+    "fields": {
+        "date": "2010-12-06",
+        "title": "Participation de la société Cloudy.fr – Carnet de vol en ligne pour tous. Avion, planeur, hélicoptère, ULM, ballon, parachute",
+        "reference": "Startup Academy",
+        "link": "http://startup-academy.net/participation-de-la-socit-cloudy-fr-carnet-de-vol-en-ligne-pour-tous-avion-planeur-hlicoptre-ulm-ballon-parachute/"
+    }
+},
+{
+    "model": "press.article",
+    "pk": 2,
+    "fields": {
+        "date": "2011-01-11",
+        "title": "Cloudy.fr",
+        "reference": "Start in Paris",
+        "link": "http://www.startinparis.com/2011/01/candidatures6/cloudy-fr-2/"
+    }
+},
+{
+    "model": "press.article",
+    "pk": 3,
+    "fields": {
+        "date": "2011-04-15",
+        "title": "Lancement du site cloudy, le carnet de vol en ligne",
+        "reference": "Viadeo",
+        "link": "https://docs.wixstatic.com/ugd/22fb5d_8d09fc9f7c8e4560ad88f53b7bf51dcf.pdf"
+    }
+},
+{
+    "model": "press.article",
+    "pk": 4,
+    "fields": {
+        "date": "2011-04-19",
+        "title": "Cloudy lance un carnet de vol en ligne",
+        "reference": "AeroWeb",
+        "link": "https://docs.wixstatic.com/ugd/22fb5d_79ed50b0c2a14d7e92d490a6192589a3.pdf"
+    }
+},
+{
+    "model": "press.article",
+    "pk": 5,
+    "fields": {
+        "date": "2011-04-25",
+        "title": "Test: Cloudy – Carnet de Vol en Ligne",
+        "reference": "Cockpit View",
+        "link": "https://cockpitview.wordpress.com/2011/04/25/test-cloudy-carnet-de-vol-en-ligne/"
+    }
+},
+{
+    "model": "press.article",
+    "pk": 6,
+    "fields": {
+        "date": "2011-04-27",
+        "title": "Cloudy",
+        "reference": "Start in Paris",
+        "link": "http://www.startinparis.com/2011/04/candidatures-9/cloudy/"
+    }
+},
+{
+    "model": "press.article",
+    "pk": 7,
+    "fields": {
+        "date": "2011-05-03",
+        "title": "Cloudy dématérialise le carnet de vol",
+        "reference": "AéroBuzz",
+        "link": "https://docs.wixstatic.com/ugd/22fb5d_f7fa0a378f814d77b1af945d4ad9da9d.pdf"
+    }
+},
+{
+    "model": "press.article",
+    "pk": 8,
+    "fields": {
+        "date": "2011-05-10",
+        "title": "Demi finalistes SIP - Votes ouverts",
+        "reference": "Start in Paris",
+        "link": "http://www.startinparis.com/2011/05/start-in-paris/demi-finalistes-sip-9/"
+    }
+},
+{
+    "model": "press.article",
+    "pk": 9,
+    "fields": {
+        "date": "2011-05-31",
+        "title": "[CARNETS DE VOL] CLOUDY",
+        "reference": "Planneur.net",
+        "link": "https://docs.wixstatic.com/ugd/22fb5d_cf061e730b2e4c59870873172f52cab1.pdf"
+    }
+},
+{
+    "model": "press.article",
+    "pk": 10,
+    "fields": {
+        "date": "2011-06-23",
+        "title": "Bourget 2011 : Où est Cloudy ?",
+        "reference": "AéroWeb",
+        "link": "https://docs.wixstatic.com/ugd/22fb5d_c6dc29c963de4cb0af6ce44467a90616.pdf"
+    }
+},
+{
+    "model": "press.article",
+    "pk": 11,
+    "fields": {
+        "date": "2011-06-24",
+        "title": "Mais où est Cloudy ?",
+        "reference": "AéroBuzz",
+        "link": "https://docs.wixstatic.com/ugd/22fb5d_411ad36dac4c4c35a7c41b520c81de5a.pdf"
+    }
+},
+{
+    "model": "press.article",
+    "pk": 12,
+    "fields": {
+        "date": "2011-06-24",
+        "title": "Tu es pilote ? Cloudy est le site fait pour toi",
+        "reference": "Best Buzz",
+        "link": "https://docs.wixstatic.com/ugd/22fb5d_52f8a1957dd24bb99ae65df8452d9d9a.pdf"
+    }
+},
+{
+    "model": "press.article",
+    "pk": 13,
+    "fields": {
+        "date": "2012-04-10",
+        "title": "Envolez-vous avec Cloudy",
+        "reference": "Maddyness",
+        "link": "https://docs.wixstatic.com/ugd/22fb5d_2a2e118c644b432287a2be6c9abf588f.pdf"
+    }
+},
+{
+    "model": "press.article",
+    "pk": 14,
+    "fields": {
+        "date": "2015-01-01",
+        "title": "Le carnet de vol électronique",
+        "reference": "InfoPilote",
+        "link": "https://docs.wixstatic.com/ugd/22fb5d_c7611edc72a047bc8f0230cc53e3eb5e.pdf"
+    }
+}
+]

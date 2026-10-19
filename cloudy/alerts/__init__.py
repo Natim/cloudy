@@ -1,0 +1,2 @@
+class NoRecipientPhoneNumber(Exception):
+    pass

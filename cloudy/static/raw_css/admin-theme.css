@@ -1,0 +1,61 @@
+/**
+ * theming admintools style
+ *
+ */
+
+.dashboard #content,
+#content {
+    display: block;
+    width: 960px; !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.breadcrumbs
+{
+    display: block;
+    width: 930px; !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#dashboard-panel ul {
+    display: none;
+    position: relative;
+    left: 0px;
+
+
+}
+
+#header #branding {
+    width: 960px; !important;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+
+#header #branding h1 {
+
+}
+
+div.breadcrumbs {
+    display: block;
+    padding: 10px 15px;
+    border: 0;
+    background-position: 0 -8px;
+    border-bottom: 1px solid #ededed;
+}
+
+div.breadcrumbs a {
+    display: inline;
+}
+
+#header ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    z-index: 9999;
+    width: 960px; !important;
+    margin-left: auto;
+    margin-right: auto;
+}

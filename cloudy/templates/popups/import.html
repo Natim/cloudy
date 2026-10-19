@@ -1,0 +1,49 @@
+<div class="popup" id="import-popup">
+    <div class="head">
+        Importez votre carnet
+        <a href="#" class="close"><img src="{{STATIC_URL}}img/carnet/picto-close-blue.png"/></a>
+    </div>
+    <div class="details">
+         Plusieurs solutions... !
+     </div>
+    <div class="body ct">
+        <div class="choice">
+            <h3 class="import">1. Laissez l'équipe Cloudy s'occuper gratuitement de l'import de vos données existantes sous 48 heures !</h3>
+            <p class="text">Déposez votre fichier existant sous n'importe quel format (xls, cxv, xlsx, xml, etc...) et nous remplissons votre carnet automatiquement.</p>
+            <p class="text">Afin que votre import s'effectue plus rapidement téléchargez le <a href="{{STATIC_URL}}csv_samples/{{logbook.cat}}_import_sample.csv">format d'import Cloudy</a>.</p>
+
+            {% if logbook %}
+
+            <form action="{% url 'logbooks:upload_for_import' logbook.id  %} " method="post" id="import-form1" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="fieldWrapper">
+                    {{ form.data_file.errors }}
+                    {{ form.data_file }}
+                </div>
+
+                <div class="fieldWrapper">
+                        <label class="import-label">Commentaires :</label>
+                    {{ form.coms }}
+
+                    {{ form.coms.errors }}
+                </div>
+
+                <p class="submit">
+                    <input type="submit" value="  Laisser Cloudy importer mon carnet  " class="btn red long">
+                </p>
+         </form>
+         {% endif %}
+
+            <div class="spacer"></div>
+        </div>
+
+        {% if logbook %}
+        <div class="report">
+            <h3 class="report">2. Effectuez un report de vos heures existantes</h3>
+
+            <div><a href="{% url 'logbooks:report' logbook.id %}" class="btn red">Reporter mes heures existantes</a></div>
+        </div>
+        {% endif %}
+    </div>
+</div>

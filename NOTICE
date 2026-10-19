@@ -1,0 +1,122 @@
+Cloudy
+Copyright SAS CLOUDY
+
+The application source is licensed under the GNU Affero General Public License,
+version 3. See the LICENSE file.
+
+The items below are not covered by that license. Each vendored file stays
+under the license named here. Where a minified copy has no header, the
+upstream license is named and marked as such.
+
+cloudy/quotes/
+    Original author: Randall Degges <rdegges@gmail.com>.
+    The file headers state a BSD license. Those files are not relicensed
+    under the AGPL.
+
+Vendored JavaScript in cloudy/static/js/
+
+    chartjs/chart.umd.js
+        Chart.js 4.4.7. MIT. See chartjs/LICENSE.
+
+    leaflet/leaflet.js
+        Leaflet 1.9.4. Copyright 2010-2023 Vladimir Agafonkin,
+        2010-2011 CloudMade. Upstream license: BSD-2-Clause.
+
+    jquery-1.4.2.min.js
+        jQuery 1.4.2. MIT or GPL-2.0.
+
+    jquery-ui.min.js
+        jQuery UI 1.8.14. MIT or GPL-2.0.
+
+    jquery.cycle.min.js
+        jQuery Cycle 2.88. MIT or GPL.
+
+    jquery.scrollTo-1.4.2-min.js
+        jQuery.ScrollTo 1.4.2. MIT or GPL.
+
+    jquery.reveal.js
+        jQuery Reveal 1.0, ZURB. MIT.
+
+    jquery.uniform.js and jquery.uniform.min.js
+        Uniform 1.7.5. MIT.
+
+    jquery.simpletip-1.3.1.min.js
+        jquery.simpletip 1.3.1. GPL-3.0.
+
+    jquery.tools.min.js and overlay.min.js
+        jQuery Tools 1.2.5. The headers state: no copyrights or licenses.
+
+    jquery.geturlvar.js
+        Short URL-parameter helper. No license header in this copy.
+
+    jquery.simpleSlide_min.js
+        simpleSlide. No license header in this copy.
+
+    validation/jquery.validate.js and jquery.validate.pack.js
+        jQuery Validation 1.7, Jörn Zaefferer. MIT or GPL.
+        validation/localization/ is the same project's message catalogs.
+        validation/lib/jquery.metadata.js: MIT or GPL.
+        validation/lib/jquery.form.js: MIT or GPL.
+
+    mustache.js
+        mustache.js 0.3.1-dev. No license header in this copy.
+        Upstream mustache.js is MIT.
+
+    json2.js
+        JSON.org json2.js (2011-02-23). Public domain.
+
+    date.js
+        DateJS, Coolite Inc. MIT.
+
+    fileuploader.js
+        Andrew Valums file uploader. GPL-2.0-or-later and LGPL-2.0-or-later.
+
+    excanvas.min.js
+        ExplorerCanvas. No license header in this minified copy.
+        Upstream license: Apache-2.0.
+
+    mobile/lib/jquery-1.7.1.min.js
+        jQuery 1.7.1. MIT or GPL-2.0.
+
+    mobile/lib/jquery-ui-1.8.16.custom.min.js
+        jQuery UI 1.8.16. MIT or GPL-2.0.
+
+    mobile/lib/underscore-1.3.1.min.js
+        Underscore.js 1.3.1. MIT.
+
+    mobile/lib/backbone-0.9.1.min.js
+        Backbone.js 0.9.1. MIT.
+
+    mobile/lib/iscroll-lite.js
+        iScroll Lite (based on iScroll 4.1.6). MIT.
+
+    mobile/lib/jquery.cookie.js
+        jQuery Cookie plugin. MIT or GPL.
+
+    mobile/lib/activity-indicator.js
+        NETEYE Activity Indicator. MIT.
+
+    mobile/lib/mobiscroll-1.5.3.min.js
+        Mobiscroll 1.5.3. No license header in this minified copy.
+
+    mobile/archive/jquery-mobile.js
+        jQuery Mobile. MIT or GPL-2.0.
+
+    mobile/archive/jquery.ui.datepicker.js and jquery.ui.datepicker.mobile.js
+        jQuery UI datepicker. MIT or GPL-2.0.
+
+    mobile/archive/iscroll.js
+        iScroll 4.1.9. MIT.
+
+    mobile/archive/jquery.mobile.datebox.js and jquery.mobile.datebox.min.js
+        jQuery Mobile Datebox, JTSage. CC BY 3.0.
+
+First-party scripts in that directory (cloudy.js, cloudy_*.js, stats.js,
+stats_selector.js, jquery_ready_guard.js, mobile/cloudy-mobile.js) are
+application source under the AGPL.
+
+cloudy/static/img/, cloudy/static/fonts/, cloudy/static/pdf/
+    Illustrations, photographs, logos, and graphic design are not covered
+    by the AGPL. See README.md and TRADEMARK.md.
+    Archivo Black and Gentium Basic in cloudy/static/fonts/ are under the
+    SIL Open Font License 1.1 (OFL.txt and GentiumBasic-OFL.txt).

@@ -1,0 +1,512 @@
+// This import applies a global reset to any page that imports this stylesheet.
+@import "blueprint/reset";
+
+
+
+
+// To configure blueprint, edit the partials/base.sass file.
+@import "partials/base";
+
+// Import all the default blueprint modules so that we can access their mixins.
+@import "blueprint";
+@import "blueprint/grid";
+@import "blueprint/scaffolding";
+@import "blueprint/debug";
+
+@import "compass/utilities/general/clearfix";
+@import "compass/css3/gradient";
+@import "compass/css3";
+@import "compass/utilities/lists/horizontal-list";
+
+// To generate css equivalent to the blueprint css but with your
+// configuration applied, uncomment:
+// @include blueprint
+
+// But Compass recommends that you scope your blueprint styles
+// So that you can better control what pages use blueprint
+// when stylesheets are concatenated together.
+@include blueprint-scaffolding("body.bp");
+
+@import "common";
+@import "header";
+@import "footer";
+
+
+
+
+@mixin a-style {
+	text-decoration: none;
+	color: $dark-red;
+	&:hover {
+	    text-decoration: underline;
+		color: $dark-red;
+	}
+}
+
+@mixin title
+{
+	font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+	text-align: center;
+	display: block;
+}
+
+#main {
+    @include container;
+
+		.box-top-title {
+		    @include column(24, true);
+		    background: {
+		        image: image-url("../../static/img/box-top-title.png");
+		        repeat:  no-repeat;
+		    };
+		    height: 50px;
+			margin-top: 20px;
+			h2 {
+				color: white;
+				margin: 5px 0px 0px 15px;
+				font-size: 29px;
+      font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+			}
+		}
+		.box-main {
+            @include prepend(1);
+            padding-top: 13px;
+
+            div.txt {
+    		    @include column(16, true);
+                @include prepend(1);
+                font-size: 14px;
+                font-color: #aaa;
+
+            }
+
+			.btn{
+				@include border-radius(4px, 4px);
+				@include box-shadow(#ddd, 0px, 0px, 2px);
+				display:inline-block;
+				text-decoration:none;
+				cursor:pointer;
+				width: 400px;
+				height: 25px;
+				font-size: 16px;
+				text-align: center;
+				padding-top: 5px;
+				margin: 10px 0px 15px 110px ;
+			}
+			.btn:hover{
+				@include box-shadow(#999, 0px, 0px, 3px);
+			}
+			.red{
+				border:1px solid $dark-red;
+				background-color:$dark-red-start;
+				@include linear-gradient(color-stops($dark-red-end, $dark-red-start));
+				color:white;
+			}
+			.red:hover{color:white;}
+ 			form {
+    		    @include nice-form;
+			}
+		}
+
+		hr.top-sep {
+		    width: 850px;
+            border: none;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #edf7ff;
+            font-size: 1px;
+            line-height: 0;
+		}
+}
+
+
+.slim-sidebar {
+	@include column(5, true);
+	margin-top: 10px;
+	.lock-cloud {
+		background: {
+	        image: image-url("../../static/img/lock-cloud.png");
+	        repeat:  no-repeat;
+	    };
+	width: 106px;
+	height: 66px;
+	float: right;
+	margin-top: -50px;
+	}
+
+	.blue-box {
+		@include column(4, true);
+		background: $ultra-light-blue;
+		@include border-radius(3px, 3px);
+		margin-bottom: 15px;
+		margin-left: 20px;
+		padding-bottom: 15px;
+		h2 {
+			font-size: 21px !important;
+			text-align: center;
+			color: $dark-blue;
+			font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+			padding: 5px 0px 5px 0px;
+			margin-bottom: 0px;
+		}
+		.logo-secure
+		{
+			margin-left: 30px;
+			margin-bottom: 10px;
+		}
+		.left-keyword {
+			text-align: left;
+			color : $dark-blue;
+			font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+			font-size: 28px;
+			width: 130px;
+			padding: 15px 10px 5px 10px;
+		}
+		.left-keyword2 {
+			text-align: left;
+			color : $dark-red;
+			font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+			font-size: 32px;
+			width: 130px;
+			padding: 5px 10px 5px 10px;
+		}
+		.right-keyword {
+			text-align: right;
+			color: $dark-red;
+			font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+			font-size: 20px;
+			width: 130px;
+			padding: 5px 10px 10px 10px;
+		}
+
+		.right-keyword2 {
+			text-align: right;
+			color: $dark-blue;
+			font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+			font-size: 20px;
+			width: 130px;
+			padding: 10px 10px 15px 10px;
+		}
+		p {
+			padding: 10px 10px 5px 10px;
+			margin-bottom: 0px !important;
+			&.quote {
+ 				font-size: 14px;
+ 				span {
+ 					border-bottom: 1px solid gray;
+ 	 				padding: 2px;
+	 			}
+			}
+		}
+
+		#partners-list {
+			@include column(2,true);
+
+			.partner-img {
+				margin: 10px 0px 10px 30px;
+			}
+		}
+	}
+}
+
+.larger-sidebar {
+	@include column(5, true);
+	.cloud-bottom {
+			background: {
+		        image: image-url("../../static/img/cloud-password.png");
+		        repeat:  no-repeat;
+		    };
+		width: 106px;
+		height: 66px;
+		float: right;
+		margin-top: -30px;
+	}
+	.blue-box {
+		@include column(5, true);
+		@include border-radius(3px, 3px);
+ 		background: $ultra-light-blue;
+    	a {
+    	    @include a-style;
+        }
+
+        margin-top: 10px;
+		padding-top: 5px;
+
+		padding-bottom: 10px;
+		h2 {
+			font-size: 21px !important;
+			text-align: center;
+			color: $dark-blue;
+			font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+			padding: 5px 0px 5px 10px;
+			margin-bottom: 0px;
+		}
+
+		p {
+			padding: 0px 5px 0px 10px;
+			font-size: 14px;
+		}
+		#partners-list {
+			@include column(2,true);
+
+
+			.partner-img {
+				margin: 10px 0px 10px 30px;
+			}
+		}
+
+	}
+}
+
+form.reset-pass {
+    input#id_email,
+    input#id_new_password1,
+    input#id_new_password2 {
+	   @include medium-input;
+    }
+}
+/* signup tos */
+div#tos-check {
+	@include column(1);
+	@include push-margins(2);
+	padding: 0px 0px 0px 5px;
+}
+
+div.tos-wrap {
+	@include column(14);
+	@include push-margins(2);
+	padding: 3px 0px 0px 0px;
+	text-align: left;
+}
+
+span#code-status {
+    display: none;
+    span.discount{
+
+        font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+	    color: $dark-red;
+	    font-size: 23px;
+    }
+}
+
+div.payment-cont {
+    @include column(22, true);
+    display: none;
+
+    div.form {
+    	@include column(22, true);
+    }
+    div.fields {
+        @include column(12);
+		margin: 0;
+    }
+    div.right {
+        @include column(5, true);
+		border-left: 1px solid #EEEEEE;
+		padding-left: 20px;
+
+
+        div.price {
+            @include column(5, true);
+            margin: 0;
+            .currency {
+		        width: 5px;
+			    font-family: 'Arial';
+			    font-weight: bold;
+			    font-size: 20px;
+			    color: $grey;
+			    margin: -5px 10px 0px 00px;
+			    float: left;
+		    }
+		    .frequency {
+    			margin-top: 20px;
+			    float: left;
+			    font-size: 18px;
+			    color: $grey;
+		    }
+		    .value {
+		        @include title;
+		        min-width:60px;
+			    color: $dark-red;
+			    font-size: 55px;
+				margin-right: 5px;
+    			margin-top: -20px;
+			    float: left;
+		    }
+		    #real-value {
+		        display: none;
+		    }
+	    }
+        span.secu {
+            @include column(5, true);
+            margin-top: 22px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        div {
+            @include column(5, true);
+            margin-top: 25px;
+        }
+    }
+}
+
+
+.extra-card {
+	@include column(15,true);
+	@include push-margins(4);
+ 	.box-info {
+		@include column(5,true);
+			background: $light-grey;
+			border: 1px solid $grey-border;
+			@include border-radius(5px, 5px);
+			padding: 5px;
+			p.text-secure {
+				@include column(3,true);
+				font-weight: bold;
+				color: $grey;
+				font-size: 11px;
+				clear: none !important;
+				margin-top: 8px;
+			}
+
+			.lock {
+				@include column(2);
+				width: 60px;
+				margin: 0 5px 0 0;
+				padding: 0;
+			}
+		}
+
+
+ 		.logo-box {
+			@include column(5,true);
+            @include prepend(3);
+
+			height: 26px;
+			margin: 5px 0 0 0px;
+
+			.logo-left {
+				@include column(2);
+				height: 26px;
+				width: 63px;
+				margin: 0px;
+			}
+			.logo-right {
+				@include column(3,true);
+				height: 26px;
+				width: 89px;
+				margin: 0px;
+			}
+		}
+}
+
+
+
+div.packbutton-cont {
+    @include column(21, true);
+	@include push-margins(4);
+
+
+    a.packbutton {
+        @include column(5);
+        display:block;
+        height: 50px;
+        width: 205px;
+ 		border-bottom: none !important;
+    }
+
+	#free {
+
+		background: {
+            image: image-url("../../static/img/bt-economy.png") !important;
+            repeat:  no-repeat;
+            position:0 0px;
+        };
+		&:hover
+		{
+			background: {
+	            image: image-url("../../static/img/bt-economy.png") !important;
+	            repeat:  no-repeat;
+	            position:0 -50px;
+	        };
+		}
+		&.hover {
+			background: {
+	            image: image-url("../../static/img/bt-economy.png") !important;
+	            repeat:  no-repeat;
+	            position:0 -100px;
+	        };
+		}
+	}
+
+	#pay {
+		background: {
+            image: image-url("../../static/img/bt-first.png") !important;
+            repeat:  no-repeat;
+            position:0 0px;
+
+        };
+		&:hover
+		{
+			background: {
+	            image: image-url("../../static/img/bt-first.png") !important;
+	            repeat:  no-repeat;
+	            position:0 -50px;
+
+	        };
+		}
+		&.hover {
+			background: {
+	            image: image-url("../../static/img/bt-first.png") !important;
+	            repeat:  no-repeat;
+	            position:0 -100px;
+	        };
+		}
+	}
+}
+
+div.sub-packbutton-cont {
+    @include column(21, true);
+	@include push-margins(4);
+
+}
+
+div.price-ctn {
+    @include column(5, true);
+    margin: 0;
+    .currency {
+        width: 5px;
+	    font-family: 'Arial';
+	    font-weight: bold;
+	    font-size: 20px;
+	    color: $grey;
+	    margin: -5px 10px 0px 00px;
+	    float: left;
+    }
+    .frequency {
+		margin-top: 20px;
+	    float: left;
+	    font-size: 18px;
+	    color: $grey;
+    }
+    .value {
+        @include title;
+        width:60px;
+	    color: $dark-red;
+	    font-size: 55px;
+		margin-top: -20px;
+	    float: left;
+    }
+}
+
+
+.login_form {
+	label#id_remember {
+		padding-top: 1px !important;
+	}
+}
+
+#form-login {
+	input.text, input.email, input.password, textarea.uniform {
+		background-image: none !important;
+	}
+}

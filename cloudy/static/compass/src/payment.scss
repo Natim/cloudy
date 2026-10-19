@@ -1,0 +1,282 @@
+@import "backend";
+
+div.content {
+
+	a {
+		@include a-style;
+	}
+	p {
+		font-size: 14px;
+
+	}
+	span.fat {
+		font-size:35px;
+		color:$dark-blue;
+		font-weight:bold;
+	}
+	span.hl {
+		background-color: $dark-blue;
+		padding: 2px 5px 2px 5px;
+		color: white;
+		font-weight: bold;
+		font-size: 16px;
+
+	 	&.alert {
+			background-color: $dark-red;
+	 	}
+	}
+
+ 	table {
+ 		font-size: 14px;
+	 	tr.odd {
+ 			background-color: #f9f9f9;
+	 	}
+ 	    td {
+ 			border-bottom: 1px solid #ddd;
+ 			font-size: 12px;
+ 		}
+ 		td.pdf a {
+			text-decoration: none;
+	 		border-bottom: 0px;
+   		}
+	}
+}
+
+
+@mixin title
+{
+	font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+ 	display: block;
+}
+
+
+.pricing-offer-box 	{
+	    @include column(11);
+ 		margin: 10px 0px 20px  0px;
+
+ 		font-size: 14px;
+		background: {
+			image: image-url("../../static/img/pricing-offer-content.png");
+			repeat:  no-repeat;
+    	};
+
+
+		#first-title {
+			float: left;
+			width: 361px;
+			height: 45px;
+			background: {
+			image: image-url("../../static/img/first-title-bg.png");
+			repeat:  no-repeat;
+		};
+		.title-text {
+			margin: 10px 0px 0px 80px;
+			width: 222px;
+			height: 28px;
+			background: {
+				image: image-url("../../static/img/first-title.png");
+				repeat:  no-repeat;
+			};
+		}
+	}
+
+
+
+	.infos {
+		font-family: 'Arial';
+		font-size: 11px;
+		font-style: italic;
+		margin-left: 120px;
+	}
+
+	.price {
+		@include title;
+		color: $dark-red;
+		font-size: 60px;
+ 		margin-bottom: -10px;
+		height: 125px;
+
+		.currency {
+			font-family: 'Arial';
+			font-weight: bold;
+			font-size: 36px;
+			color: $grey;
+			margin: 5px -50px 0px 0px;
+			float: left;
+		}
+		.value {
+			margin-left: 30px;
+		}
+		.frequency {
+			font-size: 30px;
+			color: $grey;
+		}
+	}
+
+	.grey-box {
+		background: {
+			image: image-url("../../static/img/grey-box.png");
+			repeat:  no-repeat;
+		};
+		width: 283px;
+		height: 54px;
+		font-family: 'GentiumBasicRegular';
+		padding-top: 10px;
+		margin: 0px 0px 0px  0px;
+		text-align: center;
+	}
+
+
+
+	ul.points {
+		margin: 20px 0px 0px 0px;
+		padding-left:  5px;
+		color: #222;
+		background-color: white;
+		li {
+			list-style-type: none;
+			background: {
+				image: image-url("../../static/img/bullet-plus-red.png");
+				repeat:  no-repeat;
+				position: center left;
+	   	 	};
+			padding-left: 25px;
+		}
+	}
+}
+
+#recharge-fc-form {
+	@include column(12);
+
+	p.help-field {
+		@include column(7);
+	}
+
+	.expirydatefield {
+		div.selector {
+			width: 100px !important;
+			span
+			{
+				width: 50px !important;
+			}
+		}
+	}
+}
+
+.spacer {
+	clear:both;
+}
+.slim-sidebar {
+	@include column(5, true);
+	margin-top: 10px;
+	.lock-cloud {
+		background: {
+	        image: image-url("../../static/img/lock-cloud.png");
+	        repeat:  no-repeat;
+	    };
+	width: 106px;
+	height: 66px;
+	float: right;
+	margin-top: -50px;
+	}
+
+	.blue-box {
+		@include column(4, true);
+		background: $ultra-light-blue;
+		@include border-radius(3px, 3px);
+		margin-bottom: 15px;
+		margin-left: 20px;
+		padding-bottom: 15px;
+		h2 {
+			font-size: 21px !important;
+			text-align: center;
+			color: $dark-blue;
+			font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+			padding: 5px 0px 5px 0px;
+			margin-bottom: 0px;
+		}
+		.logo-secure
+		{
+			margin-left: 30px;
+			margin-bottom: 10px;
+		}
+		p {
+			padding: 10px 10px 5px 10px;
+			margin-bottom: 0px !important;
+			&.quote {
+ 				font-size: 14px;
+ 				span {
+ 					border-bottom: 1px solid gray;
+ 	 				padding: 2px;
+	 			}
+			}
+		}
+
+		#partners-list {
+			@include column(2,true);
+
+			.partner-img {
+				margin: 10px 0px 10px 30px;
+			}
+		}
+	}
+}
+
+div.payment-pres {
+    @include column(16);
+	padding-left: 20px;
+
+    div.price {
+        @include column(4);
+        margin-left: 5px;
+        .currency {
+	        width: 5px;
+		    font-family: 'Arial';
+		    font-weight: bold;
+		    font-size: 20px;
+		    color: $grey;
+		    margin: -5px 10px 0px 00px;
+		    float: left;
+	    }
+	    .frequency {
+			margin-top: 20px;
+		    float: left;
+		    font-size: 18px;
+		    color: $grey;
+	    }
+	    .value {
+	        @include title;
+	        min-width:60px;
+			margin-right: 5px;
+		    color: $dark-red;
+		    font-size: 55px;
+			margin-top: -20px;
+		    float: left;
+	    }
+	    #real-value {
+	        display: none;
+	    }
+    }
+    span.secu {
+        @include column(5, true);
+        margin-top: 10px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+    div {
+        @include column(5, true);
+
+        margin: 10px 0 0 20px;
+    }
+}
+
+
+span#code-status {
+    display: none;
+    span.discount{
+
+        font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+	    color: $dark-red;
+	    font-size: 23px;
+    }
+}

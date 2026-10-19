@@ -1,0 +1,27 @@
+{% load static %}
+
+<link href="{% static 'raw_css/logout-link.css' %}" media="screen, projection" rel="stylesheet" type="text/css" />
+
+<div id="logged">
+
+  <span class="user">
+    <a href="{% url 'profile' %}">
+      {% if user.get_profile.avatar %}
+      <img src="{{ user.get_profile.avatar.url }}" alt="avatar" />
+      {% else %}
+      <img src="{% static 'img/avatar_75x75.png' %}" alt="Profil" />
+      {% endif %}
+    </a>
+    <a href="{% url 'profile' %}">
+      {{ user.first_name|capfirst }}
+    </a>
+  </span>
+
+  <span class="links">
+    <a href="{% url 'account_admin' %}">Mon compte</a> |
+    <form method="post" action="{% url 'auth_logout' %}" class="logout-form">
+      {% csrf_token %}
+      <button type="submit" class="logout-link">Se déconnecter</button>
+    </form>
+  </span>
+</div>

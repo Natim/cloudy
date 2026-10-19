@@ -1,0 +1,31 @@
+{% extends "admin/base_site.html" %}
+
+ {% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/accounts/userprofile/">user profiles list</a>{% if title %} &rsaquo;  {% endif %}</div>{% endblock %}
+
+{% block content %}
+<h1>{{ user.get_full_name }} Logbooks </h1>
+<br />
+
+<h2>Active logbooks</h2>
+{% for logbook in user.get_profile.logbooks %}
+	<br/>
+	<b>Name:</b> {{ logbook.name }}<br/>
+	<b>Cat:</b> {{ logbook.cat }}<br/>
+	<b>Status:</b>
+		{% if not logbook.visbl and not logbook.deleted %} <span style='color: yellow;'>  HIDDEN </span>{% endif %}
+		{% if logbook.deleted %} <span style='color: red;'> DELETED </span>{% endif %}
+		{% if not logbook.deleted and logbook.visbl %} <span style='color: green;'>ACTIVE</span> {% endif %}
+		<br/>
+
+	<b>Link:</b>  <a href="{% url 'logbooks:logbook' logbook.id %}">{% url 'logbooks:logbook'  logbook.id %}</a> <br/>
+	{% with  logbook.logs_qs|length as count %}
+	<b>Number of logs</b> <span style="{% if count > 0 %}color: green; font-weight: bold;{% endif %} font-size: 15px;">{{ count }}</span>
+	<br/>
+	{% endwith %}
+	<b>Created</b> {{ logbook.cdate|date:'d m Y' }}<br/>
+	<b>Delete</b> !!! <a href="{% url 'admin_logbook_delete' logbook.id %}"   onclick="return confirm('Really delete ?');">x</a> !!! <-- Delete this logbook for REAL<br/>
+	<br/><br/>
+	<hr />
+{% endfor %}
+
+{% endblock %}

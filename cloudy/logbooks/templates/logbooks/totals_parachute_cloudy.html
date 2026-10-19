@@ -1,0 +1,95 @@
+{% extends "site_base_logbook.html" %}
+
+{% load static %}
+{% load core_tags %}
+{% load stats_tags %}
+{% load compress %}
+
+{% block body_id %}logbooks{% endblock %}
+{% block actions-id %}action-totals{%endblock %}
+
+{% block head %}
+{% compress css %}
+<link href="{% static 'compass/stylesheets/logbook.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'compass/stylesheets/logbook_popups.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+{% endcompress %}
+{% endblock %}
+
+{% block morejs %}
+<script type="text/javascript" src="{% static 'js/stats_selector.js' %}"></script>
+{% endblock %}
+
+{% block nav-logbook %}
+{% endblock %}
+
+{% block content %}
+<div class="promo-4col page">
+  <div class="total-cell">
+    <h1>Totaux {{logbook.name}}</h1>
+    <div class="period-date">
+      <span id="date_range_place"></span> <span id="date_place_whole"> (<span id="begin_date_place"></span> - <span
+          id="end_date_place"></span>)</span>
+    </div>
+  </div>
+  <form id="totals-range-form">
+    <div class="total-cell">
+
+      <label>Filtre période :</label>
+      {% include "partials/range_selector.html" %}
+    </div>
+
+    {% date_selector_popup %}
+  </form>
+</div>
+
+<div class="box-top-profile"></div>
+<div class="box-main-profile">
+  <div class="total-line">
+    <div class="total-blue">
+      <div class="total-box-top"></div>
+      <div class="total-box-main">
+        <div class="title-box">
+          Nombre de sauts
+        </div>
+        <div class="total-fly">
+          {% format_total totals total_jumps dontformat %}
+        </div>
+      </div>
+      <div class="total-box-bottom"></div>
+    </div>
+  </div>
+  <div class="total-line">
+    <div class="total-blue">
+      <div class="total-box-top"></div>
+      <div class="total-box-main">
+        <div class="title-box">
+          Temps de chute (secondes)
+        </div>
+        <div class="total-fly">
+          {% format_total totals total_falling raw %}
+        </div>
+      </div>
+      <div class="total-box-bottom"></div>
+    </div>
+
+    <div class="total-blue">
+      <div class="total-box-top"></div>
+      <div class="total-box-main">
+        <div class="title-box">
+          Altitude cummulée ({{ logbook.height_format_str}})
+        </div>
+        <div class="total-fly">
+          {% format_total totals total_altitude height %}
+        </div>
+      </div>
+      <div class="total-box-bottom"></div>
+    </div>
+
+  </div>
+</div>
+<div class="box-bottom-backend"></div>
+<script type="text/javascript">$(document).ready(function () { $.uniform.update("#filter"); });</script>
+
+{% endblock %}

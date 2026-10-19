@@ -1,0 +1,22 @@
+[
+    {
+        "pk": 1,
+        "model": "quotes.quote",
+        "fields": {
+            "quote": "I am crazy.",
+            "approved": false,
+            "source": "",
+            "author": "Randall Degges"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "quotes.quote",
+        "fields": {
+            "quote": "But I am crazier.",
+            "approved": false,
+            "source": "",
+            "author": "Unknown"
+        }
+    }
+]

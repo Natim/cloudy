@@ -1,0 +1,18 @@
+{% extends "mails/base_body.txt" %}
+{% block content_fr %}
+Bonjour {{ user.get_full_name }},
+
+Vous venez de repasser au pack Economy Class de Cloudy car vous n'avez pas mis à jour vos informations de paiement.
+
+Rassurez vous, vos données ne sont pas perdues !
+Alors ne perdez pas de temps et rendez vous vite sur votre compte Cloudy.
+{% endblock %}
+
+{% block content_en %}
+Hello {{ user.get_full_name }},
+
+You have just returned to the Economy Class of Cloudy because you have not updated your payment information.
+
+Rest assured, your data is not lost!
+So do not waste time and go quickly to your Cloudy account.
+{% endblock %}

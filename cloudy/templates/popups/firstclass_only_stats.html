@@ -1,0 +1,12 @@
+{% extends "popups/firstclass_only.html" %}
+{% load static %}
+
+{% block popup-id %}fc-only-popup-stats{% endblock %}
+
+{% block content %}
+<p style="text-align: left;">Découvrez de nombreux indicateurs simples et pratiques à visualiser avec le module
+  Statistiques de Cloudy, analysez vos vols et vos performances grâce à de nombreux graphiques et tableaux générés
+  automatiquement ! </p>
+<a href="{% static 'img/sample_stats.png' %}" target="_blank"><img style="margin-left: 20px;"
+    src="{% static 'img/sample_pop_up_stats.png' %}" alt="sample stast" /></a>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "accounts/base_registration.html" %}
+
+{% block title %}Activation du compte impossible{% endblock %}
+
+
+{% block content %}
+<h2>Activation du compte impossible</h2>
+<br />
+<div class="txt">
+  <p>La clé "{{ activation_key }}" est invalide et ne peut être utilisée pour activer ce compte.
+  </p>
+  N'hésitez pas à contacter le Support à l'adresse support@cloudy.fr
+
+</div>
+{% endblock %}

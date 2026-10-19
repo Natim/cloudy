@@ -1,0 +1,106 @@
+{% extends "site_base_public.html" %}
+
+{% load static %}
+
+{% load compress %}
+{# load rendertext #}
+{% load quotes_tags %}
+
+{% block body_id %}gcu{% endblock %}
+
+{% block head %}
+<link href="{% static 'compass/stylesheets/features.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<script type="text/javascript" src="{% static 'js/cloudy_home.js' %}"></script>
+{% endblock %}
+
+
+
+{% block main %}
+<!-- Main -->
+<div id="main">
+  <div id="features-top">
+    <div class="buttons">
+      <a id="signup-button" href="# TODO {# url 'register' #}"><span class="txt"></span></a>
+    </div>
+    <div class="buttons"></div>
+    <div id="paper-plane"></div>
+  </div>
+
+  <div id="features-third">
+    <div class="box-top"></div>
+    <div class="box-main">
+      <div class="content">
+        {% block content %}
+        <h2>MENTIONS LÉGALES</h2>
+        <br />
+        <p>
+          En vertu de l'article 6 de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique, il
+          est précisé aux utilisateurs du site www.cloudy.fr l'identité des différents intervenants dans le cadre de sa
+          réalisation et de son suivi :
+        </p>
+        <p>
+          Le site Cloudy est édité par la société SAS CLOUDY.
+        </p>
+        <p>
+          CLOUDY a pour objet, en France et dans tous pays, dans les secteurs d'activités :
+        </p>
+        <ul style="font-size: 14px;">
+          <li>de la distribution et vente de tous produits et services informatiques ;</li>
+        </ul>
+        <div style="padding-left: 50px;">
+          <p>
+            SAS CLOUDY<br>
+            22 rue du Temple de Blosne<br>
+            35136 Saint-Jacques-de-la-Lande - France<br>
+          </p>
+          <p>
+            SAS au capital social de 3 €<br>
+            Immatriculée au Registre des Commerces et des Sociétés de Rennes<br>
+            N° SIRET : 920 374 477 00015<br>
+            N° TVA : FR13 920 374 477<br>
+          </p>
+          <p>
+            Email : contact@cloudy.fr
+          </p>
+        </div>
+
+        <p>
+          L’hébergement est assuré par ALWAYSDATA, 91 rue du Fauborg Saint Honoré, 75008 Paris.
+        </p>
+        <p>
+          Créateur : SAS CLOUDY<br>
+          Responsable publication : SAS CLOUDY<br>
+          Le responsable de la publication est une personne morale
+          Webmaster : SAS CLOUDY
+        </p>
+        <p>
+          Même si toutes les précautions ont été prises, SAS CLOUDY ne pourra être tenu responsable du contenu des
+          liens externes. Si vous découvrez des contenus condamnables, nous vous prions de nous en informer.
+        </p>
+        <p>
+          Les textes, les graphismes, les logos et le nom Cloudy appartiennent à SAS CLOUDY.
+          Le code source de l’application est publié sous la licence GNU AGPL version 3 sur
+          <a href="https://github.com/Natim/cloudy" rel="noopener noreferrer">https://github.com/Natim/cloudy</a>.
+          Cette licence ne couvre pas le nom Cloudy, les logos, ni la charte graphique.
+        </p>
+
+        {% endblock %}
+      </div>
+
+      <div class="slim-sidebar">
+        <div class="blue-box">
+          <h2>Ils nous font <br />&nbsp; confiance : &nbsp;</h2>
+          <div id="partners-list">
+            {% include "partials/partners.html" %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+  <div class="box-bottom"></div>
+</div>
+
+{% endblock %}

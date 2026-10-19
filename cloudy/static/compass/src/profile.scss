@@ -1,0 +1,20 @@
+@import "backend";
+
+div.avatar {
+	position: relative;
+ 	top: -80px;
+ 	float: right;
+ 	margin-right: 62px;
+ 	height: 0px;
+	img {
+	  outline: 1px solid #ddd;
+	  border-top: 1px solid #fff;
+	  padding: 5px;
+	  background: #f0f0f0;
+	  float:left;
+	  margin:0 10px 0 2px;
+	  width: 75px;
+	  height: 75px;
+	  object-fit: cover;
+ 	 }
+}

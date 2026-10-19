@@ -1,0 +1,38 @@
+{% extends "site_base_public.html" %}
+
+{% load static %}
+
+{% load compress %}
+{# load rendertext #}
+{% load quotes_tags %}
+
+{% block body_id %}support{% endblock %}
+
+{% block head %}
+<link href="{% static 'compass/stylesheets/home.css' %}" media="screen, projection" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="{% static 'js/cloudy_home.js' %}"></script>
+{% endblock %}
+
+{% block main %}
+<!-- Main -->
+<div id="main">
+
+  <div id="support-box-details">
+    <div class="box-top-support"></div>
+    <div class="box-main-support">
+      <div id="support-content">
+        <h2><a href="{% url 'faq:list' %}">FAQ</a> - {{object.question}}</h2>
+
+        <p>{{object.answer}}</p>
+
+      </div>
+
+    </div>
+    <div class="box-bottom-support"></div>
+  </div>
+
+  <div id="content">
+
+  </div>
+
+  {% endblock %}

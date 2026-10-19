@@ -1,0 +1,160 @@
+<!-- % load core_tags %} -->
+{% load compress %}
+{% load static %}
+{% load core_tags %}
+<!-- % load google_analytics %} -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="https://www.facebook.com/2008/fbml" xml:lang="fr">
+
+<head>
+  <meta name="google-site-verification" content="Fe_ZW57heiMtVqR-Klj0DTIsvD7w7AWdGlBiTcjPnbo" />
+  <title>Cloudy - {% block title %}Le carnet de vol en ligne pour tous{% endblock %}</title>
+
+  <link href="{% static 'compass/stylesheets/print.css' %}" media="print" rel="stylesheet" type="text/css" />
+
+  <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+
+
+  <!--[if lt IE 8]>
+     <link href="/stylesheets/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
+     <script src="https://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js"></script>
+  <![endif]-->
+
+
+  <!--[if !IE 7]>
+      <style type="text/css">
+          #wrap {display:table;height:100%}
+          <script src="https://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script>
+      </style>
+  <![endif]-->
+
+
+  <script type="text/javascript" src="{% static 'js/jquery-1.4.2.min.js' %}"></script>
+
+  <script type="text/javascript" src="{% static 'js/cloudy.js' %}"></script>
+
+  <script type="text/javascript" src="{% static 'js/jquery.simpleSlide_min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/validation/jquery.validate.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/jquery.uniform.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/jquery.cycle.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/overlay.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/cloudy_signup.js' %}"></script>
+
+  <!-- % google_analytics %} -->
+
+  {% block head %}{% endblock %}
+</head>
+
+<body id="{% block body_id %}{% endblock %}" class="public">
+
+  <div id="wrap">
+    <!-- Top header -->
+    <div id="top-header">
+
+      <div id="wrap-top-head">
+        {% if not user.is_anonymous %}
+        {% include 'partials/header-logged.html' %}
+        {% else %}
+        <form id="form-login" action="{% url 'auth_login' %}" method="POST">
+          {% csrf_token %}
+          <label id="login">Se connecter </label>
+          <input type="text" name="email" id="email-input" class="default" value="email" />
+          <input type="password" name="password" id="pass-input" />
+          <button type="submit" class="submit">Roger</button>
+
+        </form>
+
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div id="header">
+      <div id="logo">
+        <a href="/"><img src="{% static 'img/logo.png' %}" /></a>
+      </div>
+      <ul id="header-nav">
+        <li id="lhome"><a href="/">Accueil</a></li>
+        <li id="lfeatures"><a href="{% url 'features' %}">Fonctionnalités</a></li>
+        <li id="lpricing"><a href="{% url 'pricing' %}">Tarifs</a></li>
+        <li id="lsupport"><a href="{% url 'support' %}">Support</a></li>
+      </ul>
+      <br />
+      {% if user.is_anonymous %}
+      <div id="clouds-top">
+        <p id="slogan">Le carnet de vol en ligne pour tous.<br />Un service simple, pratique et sécurisé.</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Main -->
+    {% block main %}{% endblock %}
+    <!-- End wrap -->
+
+
+
+    <!-- Footer -->
+    {% block footer %}
+    {% include "popups/gcu_register.html" %}
+    <div id="footer">
+      <div id="clouds-bottom"></div>
+      <div class="footer-links">
+        <ul>
+          <li><a href="{% url 'press:list' %}">Presse</a></li>
+          <li><a href="#TODO % url pricing %}">Tarifs</a></li>
+          <li><a href="#TODO % url features %}">Fonctionnalités</a></li>
+          <li><a href="{% url 'support' %}">Aide / Support</a></li>
+        </ul>
+        <ul class="col-center">
+          <li><a href="{% url 'gcu' %}">Mentions légales</a></li>
+          <li><a href="#" id="gcu_link" rel="#gcu-popup">C. G. Vente</a></li>
+          <li><a href="{% url 'contactus' %}">Contactez-nous</a></li>
+          <!--<li><a href="#">L'équipage</a></li>-->
+        </ul>
+        <p>Besoin d'aide ? Écrivez nous à <a href='mailto:support@cloudy.fr'>support@cloudy.fr</a></p>
+      </div>
+      <div class="footer-follows">
+        <div class="quick-links">
+        </div>
+        <a href="http://www.facebook.com/cloudy.fr" target="_blank">
+          <div class="bt-follow-facebook"></div>
+        </a>
+        <a href="http://twitter.com/cloudy_fr" target="_blank">
+          <div class="bt-follow-tw"></div>
+        </a>
+      </div>
+    </div> <!-- end footer -->
+  </div><!-- end wrap -->
+  {% endblock %}
+  {% block js %}{% endblock %}
+  {% include 'partials/analytics.html' %}
+
+  <!-- % if user.is_authenticated %}
+  <script type="text/javascript" src="//asset0.zendesk.com/external/zenbox/v2.1/zenbox.js"></script>
+  <style type="text/css" media="screen, projection">
+    @import url(//asset0.zendesk.com/external/zenbox/v2.1/zenbox.css);
+  </style>
+  <script type="text/javascript">
+    if (typeof (Zenbox) !== "undefined") {
+      Zenbox.init({
+        dropboxID: "20002206",
+        url: "https://cloudy.zendesk.com",
+        tabID: "feedback",
+        tabColor: "#063050",
+        tabPosition: "Left"
+      });
+    }
+  </script>
+
+  % else %}
+  % snapabug %}
+  % endif %}
+ -->
+
+  {% gauges %}
+
+</body>
+
+</html>

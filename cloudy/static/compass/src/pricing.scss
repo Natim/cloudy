@@ -1,0 +1,508 @@
+// This import applies a global reset to any page that imports this stylesheet.
+@import "blueprint/reset";
+
+// To configure blueprint, edit the partials/base.sass file.
+@import "partials/base";
+
+// Import all the default blueprint modules so that we can access their mixins.
+@import "blueprint";
+@import "blueprint/grid";
+@import "blueprint/scaffolding";
+@import "blueprint/debug";
+
+@import "compass/utilities/general/clearfix";
+@import "compass/css3/gradient";
+@import "compass/css3";
+@import "compass/utilities/lists/horizontal-list";
+
+
+
+// To generate css equivalent to the blueprint css but with your
+// configuration applied, uncomment:
+// @include blueprint
+
+// But Compass recommends that you scope your blueprint styles
+// So that you can better control what pages use blueprint
+// when stylesheets are concatenated together.
+@include blueprint-scaffolding("body.bp");
+
+@import "common";
+@import "header";
+@import "footer";
+
+@mixin title
+{
+	font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+	text-align: center;
+	display: block;
+}
+
+#main {
+    @include container;
+
+    h1 {
+       display: none;
+    }
+
+    #pricing-top {
+
+        height: 596px;
+		width: 855px;
+        padding: 60px 0px 0px 100px;
+        background: {
+            image: image-url("../../static/img/pricing-top-bg.png");
+            repeat:  no-repeat;
+            position: 0px  -9px;
+        };
+
+        #mob-logo {
+			position: absolute;
+			margin: 0 auto;
+			top:  128px;
+			margin-left: 707px;
+			margin-top: 0px;
+        }
+
+		.tag-promo {
+			background: {
+				image: image-url("../../static/img/tag-promo.png");
+				repeat:  no-repeat;
+	        };
+			float:right;
+			width: 149px;
+			height: 153px;
+			display: block;
+			position: relative;
+			margin: -18px -99px 0px 0px;
+		}
+
+		.pricing-offer-box 	{
+			height: 565px;
+			width: 361px;
+			display: block;
+			position: relative;
+			float: left;
+			margin-right: 20px;
+			font-size: 14px;
+			background: {
+				image: image-url("../../static/img/pricing-offer-content.png");
+				repeat:  no-repeat;
+        	};
+
+			#economy-title {
+				float: left;
+				width: 361px;
+				height: 45px;
+				margin-left: -1px;
+				background: {
+					image: image-url("../../static/img/economy-title-bg.png");
+					repeat:  no-repeat;
+				};
+
+				.title-text {
+					margin: 10px 0px 0px 65px;
+					width: 240px;
+					height: 28px;
+					background: {
+						image: image-url("../../static/img/economy-title.png");
+						repeat:  no-repeat;
+					};
+				}
+			}
+			#first-title {
+				float: left;
+				width: 361px;
+				height: 45px;
+				margin-left: -1px;
+				background: {
+				image: image-url("../../static/img/first-title-bg.png");
+				repeat:  no-repeat;
+			};
+			.title-text {
+				margin: 10px 0px 0px 80px;
+				width: 222px;
+				height: 28px;
+				background: {
+					image: image-url("../../static/img/first-title.png");
+					repeat:  no-repeat;
+				};
+			}
+		}
+
+		.price-free {
+			@include title;
+			height: 50px;
+			font-size: 45px;
+			color: $dark-blue;
+			margin-top: 65px;
+		}
+
+		.infos {
+			font-family: 'Arial';
+			font-size: 11px;
+			font-style: italic;
+			margin-left: 190px;
+		}
+
+		.price {
+			@include title;
+			color: $dark-red;
+			font-size: 60px;
+			margin-bottom: -10px;
+			height: 125px;
+
+			.currency {
+				font-family: 'Arial';
+				font-weight: bold;
+				font-size: 36px;
+				color: $grey;
+				margin: 5px -50px 0px 50px;
+				float: left;
+			}
+
+			.frequency {
+				font-size: 30px;
+				color: $grey;
+			}
+		}
+
+		.grey-box {
+			background: {
+				image: image-url("../../static/img/grey-box.png");
+				repeat:  no-repeat;
+			};
+			width: 283px;
+			height: 54px;
+			font-family: 'GentiumBasicRegular';
+			padding-top: 10px;
+			margin: 30px 0px 0px 40px;
+			text-align: center;
+		}
+
+		ul.blue {
+			margin: 20px 0px 0px 0px;
+			padding-left: 25px;
+
+			li {
+				list-style-type: none;
+				background: {
+					image: image-url("../../static/img/bullet-plus.png");
+					repeat:  no-repeat;
+					position: center left;
+		   	 	};
+				padding-left: 25px;
+			}
+		}
+
+		ul.red {
+			margin: 20px 0px 0px 0px;
+			padding-left: 25px;
+
+			li {
+				list-style-type: none;
+				background: {
+					image: image-url("../../static/img/bullet-plus-red.png");
+					repeat:  no-repeat;
+					position: center left;
+		   	 	};
+				padding-left: 25px;
+			}
+		}
+	}
+
+
+	#signup-button-blue {
+
+		@include column(7, true);
+		margin: 105px 0px 0px 45px !important;
+
+		@include button-property;
+
+		border: 1px solid $dark-blue-start;
+		@include linear-gradient(color-stops($dark-blue-end, $dark-blue-start));
+		background-color: $dark-blue-start;
+
+		&:hover {
+		    @include box-shadow(black, 1px, 2px, 2px);
+		    background-color: $dark-blue-end;
+		}
+		&:active {
+		    @include box-shadow(black, 0px, 0px, 0px);
+		}
+
+		span.txt {
+		    @include column(7);
+
+		    background: {
+		        image: image-url("../../static/img/text-signup-button-blue.png");
+		        repeat:  no-repeat;
+		        position: top left;
+		        z-index: 1000;
+		    };
+		}
+	}
+
+	#signup-button-red {
+
+		@include column(7,true);
+		margin: 20px 0px 0px 45px !important;
+		@include button-property;
+		border: 1px solid $dark-red-start;
+		@include linear-gradient(color-stops($dark-red-end, $dark-red-start));
+		background-color: $dark-red-start;
+
+		&:hover {
+		    @include box-shadow(black, 1px, 2px, 2px);
+		    background-color: $dark-red-end;
+		}
+		&:active {
+		    @include box-shadow(black, 0px, 0px, 0px);
+		}
+
+		span.txt {
+		    @include column(7);
+		    background: {
+		        image: image-url("../../static/img/text-signup-button-red.png");
+		        repeat:  no-repeat;
+		        position: top left;
+		        z-index: 1000;
+		    };
+		}
+	}
+
+	a#asf {
+		@include column(9,true);
+		display: block;
+		text-decoration: none;
+		width: 361px;
+		height: 55px;
+		margin-top: 20px;
+		background: {
+	        image: image-url("../../static/img/ban-asf.png");
+	        repeat:  no-repeat;
+	        position: top left;
+	        z-index: 1000;
+	    };
+	}
+}
+
+#pricing-second {
+	@include column(24, true);
+	height: 177px;
+	margin-top: 10px;
+	background: {
+		image: image-url("../../static/img/pricing-partner-bg.png");
+		repeat:  no-repeat;
+		position: top left;
+	};
+	h1 {
+		@include title;
+		font-size: 36px;
+		color: $dark-blue;
+		padding-top: 20px;
+	}
+
+	#partners-list {
+		@include column(17,true);
+  		.partner-img {
+
+			float: left;
+			margin: 0px 10px 0px 10px;
+		}
+	}
+
+	  .partners-group {
+        @include column(17);
+        @include prepend(5);
+
+     }
+
+}
+
+div.row1 {
+	@include column(15, true);
+	@include prepend(7);
+	@include push-margins(1);
+	margin-top: 20px;
+	height: 50px;
+	border-bottom: 1px solid #eee;
+
+	span.title-economy
+	{
+		@include column(7);
+		height: 40px;
+
+		background: {
+			image: image-url("../../static/img/economy-table-title.png");
+			repeat:  no-repeat;
+			position: top left;
+		};
+	}
+	span.title-first
+	{
+		@include column(6);
+	    height: 40px;
+
+		background: {
+			image: image-url("../../static/img/first-table-title.png");
+			repeat:  no-repeat;
+			position: top left;
+		};
+	}
+}
+
+div.row2 {
+	@include column(15, true);
+	@include prepend(7);
+	@include push-margins(1);
+	margin-top: 20px;
+	margin-bottom: 20px;
+
+	border-bottom: 1px solid #eee;
+	height: 50px;
+    font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+
+	span.economy-class {
+		@include column(4);
+		color: $dark-blue;
+		font-size: 24px;
+	    @include prepend(2);
+ 	}
+
+    span.first-class {
+    	@include column(7, true);
+    	@include prepend(0);
+
+		color: $dark-red;
+		font-size: 38px;
+		margin-top: -15px;
+		padding-bottom: 50px;
+		padding-right: 40px;
+		text-align: center;
+
+
+		span.value {
+			font-size: 38px;
+		}
+
+		span.currency {
+			font-family: 'Arial';
+			font-weight: bold;
+			font-size: 20px;
+			color: $grey;
+			margin: 5px -90px 0px 60px;
+			float: left;
+		}
+
+		span.frequency {
+			font-size: 18px;
+			color: $grey;
+		}
+		p.infos {
+			font-family: 'Arial';
+			font-size: 10px;
+			font-style: italic;
+			margin: -10px 0px 0px 130px;
+		}
+    }
+}
+
+div.table {
+	@include column(22, true);
+	@include prepend(1);
+
+	table.listing {
+		margin-top: 10px;
+		font-family: 'Arial';
+		font-size: 14px;
+
+		.economy-col
+		{
+			color: $dark-blue;
+			font-weight: bold;
+			text-align: center;
+		}
+
+		.first-col
+		{
+			color: $dark-red;
+			font-weight: bold;
+			text-align: center;
+ 		}
+		.tick {
+			background: {
+				image: image-url("../../static/img/tick.png");
+				repeat:  no-repeat;
+				position: 0px -2px;
+			};
+			height: 28px;
+			margin-left: 90px;
+ 		}
+
+		.tick-none {
+			background: {
+				image: image-url("../../static/img/tick-none.png");
+				repeat:  no-repeat;
+				position: 0px -2px;
+			};
+			height: 28px;
+			margin-left: 90px;
+
+ 		}
+
+		tr {
+			th {
+				height: 19px;
+				text-align: right;
+				border: none;
+				font-family: 'Arial';
+				font-size: 14px;
+				padding: 5px;
+				font-weight: normal;
+			}
+			td {
+				height: 19px;
+				border: none;
+				text-align: right;
+				font-family: 'Arial';
+				font-size: 14px;
+				padding: 5px;
+			}
+			.blue-cycle {
+				background: $blue-cycle;
+			}
+		}
+	}
+}
+
+div.row4 {
+	@include column(23, true);
+	@include push-margins(1);
+}
+
+#bottom
+{
+	@include column(21,true);
+	border-top: solid 1px $border-col;
+	padding-top: 20px;
+}
+.text-box {
+	@include column(10);
+ 	margin-right: 30px;
+	h2 {
+		@include column(10,true);
+		font-size: 21px;
+		font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+		color: $dark-blue;
+		margin-bottom: 10px;
+	}
+	p {
+		font-size: 13px;
+		font-family: 'Arial';
+		line-height: 18px;
+		clear: both;
+	}
+}
+
+
+}

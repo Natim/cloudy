@@ -1,0 +1,165 @@
+{% extends "site_base_logbook.html" %}
+
+{% load static %}
+{% load core_tags %}
+{% load logbook_tags %}
+{% load stats_tags %}
+{% load compress %}
+
+{% block body_id %}logbooks{% endblock %}
+{% block actions-id %}action-logbook{%endblock %}
+
+{% block head %}
+{% compress css %}
+<link href="{% static 'compass/stylesheets/logbook.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'compass/stylesheets/logbook_popups.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+{% endcompress %}
+{% endblock %}
+
+{% block content %}
+<div id="tooltip" class="tooltip-small"></div>
+<div class="date-slip"></div>
+{% include "partials/log-actions.html" %}
+
+<!-- first three cols -->
+<div class="logbook-no-slide-cont">
+
+  <table class="cleft glider">
+    <thead>
+      <tr class="first">
+        <th rowspan="2" width="50">Date</th>
+        <th colspan="2" rowspan="1">PLANEUR</th>
+        <th rowspan="2" width="30">FONCTION À BORD</th>
+        <th rowspan="2" width="30">NATURE DU VOL</th>
+        <th rowspan="2" width="30">MODE DE LANCt</th>
+        <th colspan="3">HEURES DE VOL</th>
+        <th rowspan="3" width="250">Observations et Visa de l'Autorité Habilitée ou de l'Instructeur</th>
+        <th rowspan="3" width="200">Commentaires</th>
+        <th rowspan="3" width="25"><span class="vertical">Media</span></th>
+      </tr>
+      <tr>
+        <th rowspan="1" width="70">TYPE</th>
+        <th rowspan="1" width="70">IMMATRIC.</th>
+        <td>Double commande</td>
+        <td width="40">Cdt de bord</td>
+        <td>Instructeur</td>
+      </tr>
+      <tr>
+        <td colspan="6">
+          Report ......
+        </td>
+        <td data-field="flytime_dbl" class="reports-info">
+          {% format_total totals total_double report %}
+        </td>
+        <td data-field="flytime_cdb" class="reports-info">
+          {% format_total totals total_captain report %}
+        </td>
+        <td data-field="flytime_ins" class="reports-info">
+          {% format_total totals total_instruct report %}
+        </td>
+      </tr>
+
+    </thead>
+    <tfoot>
+      <tr>
+        <td colspan="6" class="total-general">
+          TOTAL GENERAL DES HEURES DE VOL
+
+          <div class="total-hours" id="fullreports">
+
+          </div>
+          <span class=report>Totaux à reporter</span>
+        </td>
+
+        {# Report fields #}
+        <td sum-field="flytime_dbl" class="reports-foot"></td>
+        <td sum-field="flytime_cdb" class="reports-foot"></td>
+        <td sum-field="flytime_ins" class="reports-foot"></td>
+        <td class="reports-foot"></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tfoot>
+    <tbody>
+      {% with logbook.time_format as time_format %}
+      {% for i in iteration %}
+      {% with logs|nth:i as log %}
+      <tr class="{% if forloop.first %}first{% endif %} {% cycle 'blue' ''  %}" alt="{{log.id}}">
+        {% if log.date %}
+        <td data-field="date" class="e tdate c0" alt="{{ log.date|date:'Y-m-d'}}">{{ log.date|date:"j b" }}</td>
+        <td data-field="glider_type" class="e tmtext c1" alt="10" prevmax="10">
+          {{ log.glider_type|truncchar:10 }}
+          <pre>{{ log.glider_type }}</pre>
+        </td>
+        <td data-field="glider_imma" class="e tmtext c2" alt="10" prevmax="10">
+          {{ log.glider_imma|truncchar:10 }}
+          <pre>{{ log.glider_imma }}</pre>
+        </td>
+        <td data-field="fctbrd" class="e tselect c3" alt="6" ctitle="Fonction à bord">
+          <span>{{ log.fctbrd|capfirst }}</span>
+          <pre>{% for choice in LogModel.FUNCTION_ON_BOARD %}{{ choice.0 }},{% endfor %}</pre>
+        </td>
+        <td data-field="natvol" class="e tselect c4" alt="30" prevmax="20" ctitle="Nature du vol">
+          <span>{{ log.natvol|truncchar:20|capfirst }}</span>
+          <pre>{% for choice in LogModel.NATVOL %}{{ choice.0 }},{% endfor %}</pre>
+        </td>
+        <td data-field="lmode" class="e tselect c4" alt="30" prevmax="20" ctitle="Mode de lanct.">
+          <span>{{ log.lmode|truncchar:20|capfirst }}</span>
+          <pre>{% for choice in LogModel.LAUNCH_MODE %}{{ choice.0 }},{% endfor %}</pre>
+        </td>
+        <td data-field="flytime_dbl" class="e ttime_{{ time_format }} c5">{{ log.flytime_dbl|hmin:logbook }}</td>
+        <td data-field="flytime_cdb" class="e ttime_{{ time_format }} c6">{{ log.flytime_cdb|hmin:logbook }}</td>
+        <td data-field="flytime_ins" class="e ttime_{{ time_format }} c7">{{ log.flytime_ins|hmin:logbook }}</td>
+
+        <td data-field="obs" class="e ttextarea c8" alt="200" prevmax="30">{{ log.obs|truncchar:30 }}
+          <pre>{{ log.obs }}</pre>
+        </td>
+        <td data-field="cmmts" class="e ttextarea c9 extra" alt="200" prevmax="25">
+          {{ log.cmmts|truncchar:27 }}
+          <pre>{{ log.cmmts }}</pre>
+        </td>
+        <!-- weird can't make it work with css -->
+        <td data-field="files" class="e tmedia c23 extra {% if log.files.all|length > 0 %}multi{% endif %}">
+          {{ log.files.all|length }}
+          <pre>
+                                        <ul class="media">
+                                        {% if log.files %}
+                                            {% for file in log.files.all %}
+                                                <li>
+                                                    <a href="{{file.file.url}}" target="_blank">{{file.filename|sexy_me|truncchar:15}}</a>
+                                                     <span>{% widthratio file.filesize 1000 1 %} Kb</span>
+                                                </li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        </ul>
+                                    </pre>
+        </td>
+        {% else %}
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        {% endif %}
+      </tr>
+      {% endwith %}
+      {% endfor %}
+      {% endwith %}
+
+    </tbody>
+
+  </table>
+</div>
+<br class="clear" />
+<div class="spacer" style="margin-top: 20px; display: block;">&nbsp;</div>
+
+{% endblock %}

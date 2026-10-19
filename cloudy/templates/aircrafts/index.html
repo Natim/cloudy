@@ -1,0 +1,64 @@
+{% extends "aircrafts/base.html" %}
+
+{% load thumbnail %}
+{% load compress %}
+
+{% block lbaircraft_id %}aircrafts{% endblock %}
+
+{% block sub-content %}
+    <h2>Mes Aéronefs</h2>
+
+    {% if aircrafts %}
+
+     <table class="common">
+        <tr>
+            <th>Immatriculation</th>
+            <th>Type</th>
+
+            <th>Zone de vol</th>
+            <th>Photos</th>
+        </tr>
+          {% for aircraft in aircrafts %}
+
+            <tr class="{% cycle 'odd' ' ' %}">
+                <td><a href="{% url 'logbooks:aircrafts_form' logbook.id aircraft.pk %}">{{aircraft.imma}}</a></td>
+                <td> {{aircraft.type}}</td>
+                <td> {{aircraft.airport}}</td>
+                <td>
+                    {% for photo in aircraft.pictures.all %}
+                         <a href="{{MEDIA_URL}}{{ photo.file }}" class="nostyle"><img src="{% thumbnail photo.file 25x25 crop='smart' %}" alt="aeronef pic" /></a>
+                    {% empty %}
+                        <a href="{% url 'logbooks:aircrafts_form' logbook.id aircraft.pk %}">Ajoutez en !</a>
+                    {% endfor %}
+                </td>
+                 <td>
+                    <a href="{% url 'logbooks:aircrafts_delete' logbook.id aircraft.pk %}"
+            rel="Êtes-vous sûr de vouloir définitivement supprimer cet aéronef ?"
+            class='delete icon-delete'>&nbsp;</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+
+    {% else %}
+     <p>Vous n'avez enregistré aucun aéronef pour le moment.</p>
+
+    {% endif %}
+
+
+    <div class="link-buttons-wrap">
+        <a href="{% url 'logbooks:aircrafts_form' logbook.id %}" class='btn-mini red' id="add-aircraft-button">Ajouter un aéronef</a>
+    </div>
+
+
+
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function(){
+            $('a.delete').click(function() {
+                return confirm($(this).attr('rel'));
+            });
+
+        });
+    </script>
+
+{% endblock %}

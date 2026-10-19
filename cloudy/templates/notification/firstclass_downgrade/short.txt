@@ -1,0 +1,2 @@
+{% extends "mails/base_subject.txt" %}
+{% block content %}Vous venez de repasser au pack Economy Class de Cloudy - You have just returned to the Economy Class of Cloudy{% endblock %}

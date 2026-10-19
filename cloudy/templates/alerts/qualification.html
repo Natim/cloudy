@@ -1,0 +1,71 @@
+{% extends "alerts/base.html" %}
+
+{% block body_id %}galertes{% endblock %}
+{% block profile_id %}qual{% endblock %}
+
+{% block head_special_js %}
+<script type="text/javascript" src="{{STATIC_URL}}js/cloudy_alerts_qualifications.js"></script>
+{% endblock %}
+
+
+
+{% block edit_btn %}
+<a href="{% url 'alerts:qualification_detail' qualif.pk %}" class="btn red">Editer</a>
+{% endblock %}
+
+
+{% block form_display %}
+<div class="step">
+    {% if qualification %}
+        <h2>Editer une qualification</h2>
+    {% else %}
+        <h2>Ajouter une qualification</h2>
+    {% endif %}
+
+
+    <form action="." method='post' class='scrollto' enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="fieldWrapper">
+            <p>
+                <label for="select_subtype">Certification</label>
+
+                <span class="select_subtype">
+                    <select id="select_subtype"></select>
+                </span>
+                <span class="select_type">
+                    <select id="select_type"></select>
+                </span>
+                <span class="select_qualif">
+                    <select id="select_qualif"></select>
+                </span>
+            </p>
+        </div>
+
+        {% for field in form %}
+            {% if field.is_hidden %}
+                {{ field }}
+            {% else %}
+                {% include "partials/form-field-wrap.html" %}
+            {% endif %}
+        {% endfor %}
+
+        {% if qualification %}
+            <p class="submit">
+                <button type="submit" class="short" name="submit" value="Login">Editer</button>
+            </p>
+            <br/>
+            <p>
+                ou <a href="{% url 'alerts:qualification' %}">Ajouter une nouvelle qualification</a>
+            </p>
+        {% else %}
+            <p class="submit">
+                <button type="submit" class="short" name="submit" value="Login">Enregistrer</button>
+            </p>
+        {% endif %}
+
+    </form>
+
+</div>
+{% endblock %}

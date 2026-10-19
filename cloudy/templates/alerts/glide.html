@@ -1,0 +1,180 @@
+{% extends "site_base_profile.html" %}
+
+{% load core_tags %}
+{% load logbook_tags %}
+{% load alerts %}
+
+{% block body_id %}galertes{% endblock %}
+{% block profile_id %}gli{% endblock %}
+
+{% block head %}
+    <link href="{{STATIC_URL}}compass/stylesheets/alerts.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript" src="{{STATIC_URL}}js/cloudy_base_alerts.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/cloudy_alerts_glides.js"></script>
+{% endblock %}
+
+
+{% block left-menu %}
+    <li><a href="{% url 'alerts:qualification' %}" id="qual">Qualifications et licences</a></li>
+    <li><a href="{% url 'alerts:medical' %}" id="med">Médical</a></li>
+    <li><a href="{% url 'alerts:glide' %}" id="gli">Alertes glissantes</a></li>
+{% endblock %}
+
+
+
+{% block content %}
+    <div class="alert-list">
+        {% if qualification %}
+            <script type="text/javascript">
+                var EDIT = true;
+            </script>
+            <div id="qualif_id" name="{{qualification.pk}}"></div>
+        {% else %}
+            <script type="text/javascript">
+                var EDIT = false;
+            </script>
+        {% endif %}
+
+        {% for qualif in qualifications %}
+
+        <div class="cloudy-alert" id="{{qualif.pk}}">
+
+            <div class="cell c0">
+                <h2 id="{{qualif.license_type.name}}" name="{{qualif.license_type.category}}">{{qualif.license_type.name|capfirst}}</h2>
+                <div class="btnwrapper">
+                   <a href="{% url 'alerts:glide_detail' qualif.pk %}" class="btn red">Editer</a>
+               </div>
+               <div class="reminders">
+                    <span>
+                        Expérience : {{qualif.experience_int}} {{qualif.experience_unity}}
+                        <br/>
+                        Sur : {{qualif.duree_int}} {{qualif.duree_unity}}
+                    </span>
+                </div>
+            </div>
+
+            <div class="cell c3">
+                <strong class="date">{{ qualif.loogbook.name }}</strong>
+            </div>
+            <div class="clr"></div>
+            <a href="{% url 'alerts:delete_glide' qualif.pk %}" title="Supprimer"
+             rel="Êtes-vous sûr de vouloir définitivement supprimer cette alerte ?" class="delete">
+                <img src="{{STATIC_URL}}img/carnet/icon-close.png" />
+            </a>
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <div class="step">
+
+        {% if qualification %}
+            <h2>Editer une qualification</h2>
+            <form action="{% url 'alerts:glide_detail' qualification.pk %}" method='post' class='scrollto'>
+        {% else %}
+            <h2>Ajouter une qualification</h2>
+            <form action="{% url 'alerts:glide' %}" method='post' class='scrollto'>
+        {% endif %}
+
+            {% csrf_token %}
+
+            <div class="fieldWrapper">
+                <p>
+                    <label for="subtype">Certification</label>
+                    <span>
+                        {{ form.subtype }}
+                    </span>
+                    <span style="visibility: hidden; position: absolute;">
+                        {{ form.qtype }}
+                    </span>
+                    <span>
+                        <select id="id_qgtype_plane" name="qtype">
+                            {% for avion in avions %}
+                            <option value="{{avion.name}}">{{ avion.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <select id="id_qgtype_glider" name="qtype1">
+                            {% for planeur in planeurs %}
+                            <option value="{{planeur.name}}">{{ planeur.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <select id="id_qgtype_helico" name="qtype1">
+                            {% for helico in helicos %}
+                            <option value="{{helico.name}}">{{ helico.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <select id="id_qgtype_ulm" name="qtype1">
+                            {% for ulm in ulms %}
+                            <option value="{{ulm.name}}">{{ ulm.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <select id="id_qgtype_parachute" name="qtype1">
+                            {% for parachute in parachutes %}
+                            <option value="{{parachute.name}}">{{ parachute.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </span>
+                </p>
+            </div>
+
+            <div class="fieldWrapper">
+                <p>
+                    <label for="select_name">Nom du carnet</label>
+                    <span style="visibility: hidden; position: absolute;">
+                        {{ form.logbook_name }}
+                    </span>
+
+                    <span class="select_name">
+                        <select id="select_name" name="logbook_name">
+                            {% for logbook in logbooks %}
+                            <option value="{{logbook.name}}" name="{{logbook.cat}}">{{logbook.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </span>
+                </p>
+            </div>
+
+            <div class="fieldwrapper">
+                <p>
+                    <label for="exp_int">{{ form.experience_int.label }}</label>
+                    <span class="exp_int">
+                        {{ form.experience_int }}
+                    </span>
+                    <span class="exp_unity">
+                        {{ form.experience_unity }}
+                    </span>
+                </p>
+            </div>
+            <br/>
+            <div class="fieldwrapper">
+                <p>
+                    <label for="dur_int">{{ form.duree_int.label }}</label>
+                    <span class="dur_int">
+                        {{ form.duree_int }}
+                    </span>
+                    <span class="dur_unity">
+                        {{ form.duree_unity }}
+                    </span>
+                </p>
+                <p class="help-field">{{ form.duree_int.help_text }}<br/>
+                    Le calcul d'alerte glissante se fera alors 10% avant la durée indiquée en "Expérience / Utilisation".
+                </p>
+            </div>
+
+            <p class="submit">
+                <button type="submit" class="short" name="submit" value="Login">Enregistrer</button>
+            </p>
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    {% if qualification %}
+        $(document).ready(function(){
+            $.scrollTo( '.scrollto', 500);
+        });
+    {% endif %}
+</script>
+{% endblock %}

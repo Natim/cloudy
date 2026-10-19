@@ -1,0 +1,40 @@
+{% extends "accounts/base_registration.html" %}
+
+
+{% block title %}Registration complete{% endblock %}
+{% block body_class %}{{ block.super }} registration_complete{% endblock %}
+
+{% block head-title %}
+  Inscription réussie !
+{% endblock %}
+
+{% block content %}
+   <br />
+  <div class="txt">
+	<br />
+	Votre inscription est maintenant terminée et votre paiement a bien été accepté par notre banque.
+	<br />
+	<br />
+	Le montant de votre paiement et votre référence de transaction sont les suivants :
+<br />
+<p style="text-align: center;">
+{% if request.GET.amount %}
+	<div class="price-ctn">
+		<span class="currency">€</span>
+	    <span class="value">{{ request.GET.amount|floatformat }}</span>
+	</div>
+	{% endif %}
+	<br />
+	<b>{% if request.GET.tid %} {{ request.GET.tid }} {% endif %}</b>
+</p>
+<br />
+	Nous venons de vous envoyer un e-mail contenant votre facture et un rappel de votre identifiant (choisi lors de l'inscription).</p>
+
+   	Une fois connecté vous pourrez commencer à utiliser l'ensemble des fonctionnalités de Cloudy First Class !</p>
+  Si vous ne recevez pas cet e-mail de confirmation, nous vous invitons à vérifier votre dossier Courrier Indésirable (SPAM) ou à contacter le Support à l'adresse support@cloudy.fr</p></p>
+<br />
+  </div>
+  <p>
+    <a href="{% url 'home' %}" class="btn red">Je me connecte à compte Cloudy</a>
+  </p>
+{% endblock %}

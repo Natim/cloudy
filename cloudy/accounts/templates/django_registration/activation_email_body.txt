@@ -1,0 +1,19 @@
+Bonjour {{ user.first_name }},
+
+Merci d'avoir créé votre compte sur Cloudy.
+
+Afin d'activer votre compte, nous vous invitons à cliquer sur le lien suivant :
+{{ scheme }}://{{ site.domain }}{% url 'django_registration_activate' %}?activation_key={{ activation_key|urlencode }}
+
+Ce lien restera actif pendant {{ expiration_days }} jour{{ expiration_days|pluralize }}.
+
+---
+
+Hello {{ user.first_name }},
+
+Thank you for creating your account on Cloudy.
+
+To activate your account, please click the following link:
+{{ scheme }}://{{ site.domain }}{% url 'django_registration_activate' %}?activation_key={{ activation_key|urlencode }}
+
+This link will remain active for {{ expiration_days }} day{{ expiration_days|pluralize }}.

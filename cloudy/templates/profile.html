@@ -1,0 +1,49 @@
+{% extends "site_base_profile.html" %}
+{% load static %}
+
+{% block body_id %}profile{% endblock %}
+{% block profile_id %}profile{% endblock %}
+
+{% block head %}
+  <link href="{% static 'compass/stylesheets/profile.css' %}" media="screen, projection" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+
+{% block content %}
+    <form action="." method="post"  enctype="multipart/form-data" id="profile-form">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+            {% if field.is_hidden %}
+                {{ field }}
+            {% else %}
+                {% if field.name == 'photo' %}
+                    <div class="fieldWrapper">
+                        {{ field.errors }}
+                        <p>{{ field.label_tag }}
+                          {{ field }}
+                        </p>
+                        {% if field.help_text %}
+                        <p class="help-field">{{ field.help_text }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="avatar">
+                        {% if user.get_profile.avatar %}
+                            <img src="{{ user.get_profile.avatar.url }}" alt="avatar" />
+                        {% else %}
+                            <img src="{% static 'img/avatar_75x75.png' %}" alt="avatar" />
+                        {% endif %}
+                    </div>
+                {% else %}
+                    {% include "partials/form-field-wrap.html" %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        <br />
+        <p class="submit">
+            <button type="submit" name="submit" value="Login">Mettre à jour mon profil</button>
+        </p>
+    </form>
+
+{% endblock %}

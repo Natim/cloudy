@@ -1,0 +1,58 @@
+{% extends "site_base_logbook.html" %}
+
+{% load core_tags %}
+{% load stats_tags %}
+
+{% block body_id %}logbooks{% endblock %}
+{% block actions-id %}import{% endblock %}
+
+{% block head %}
+    <link href="{{STATIC_URL}}compass/stylesheets/logbook.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <link href="{{STATIC_URL}}compass/stylesheets/logbook_popups.css" media="screen, projection" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block nav-logbook %}
+    <div class="head">
+        <div class="name">
+           Import du carnet
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+
+<div class="col-on-left page">
+    <div class="box-top-profile"></div>
+    <div class="box-main-profile">
+         <div style="padding: 15px; font-size: 14px; width: 700px;">
+            Merci de nous avoir soumis votre demande d'import !<br/>  <br/>
+            Notre équipe va analyser et traiter votre fichier, nous reviendrons
+            vers vous rapidement si le format ne convient pas. Nous vous
+            rappelons que nous ne sommes pas en mesure de traiter le fichiers de
+            type HTML, DB, OTR etc...<br/>
+            <br/>
+
+            L'import de vos données peut prendre jusqu'à 2 semaines (temps moyen
+            : 4 jours), si vous souhaitez accélérer le processus merci de
+            télécharger le format d'import Cloudy et d'y adapter votre
+            carnet. Vous pouvez ensuite refaire une demande d'import (n'oubliez
+            pas de préciser "ANNULE ET REMPLACE" dans les commentaires.<br/>
+            <br/>
+
+            Pour connaître le statut de votre demande vous pouvez écrire à
+            Charles Lindbergh à l'adresse <i>support@cloudy.fr</i> ou même lui
+            demander sur Twitter
+            (<a href="http://twitter.com/#!/cloudy_fr">@cloudy_fr</a>) ou
+            sur <a href="http://www.facebook.com/cloudy.fr">Facebook</a><br/>
+            <br/>
+
+            Excellente fin de journée et bons vols à tous !
+            <br/>
+            <br/>
+
+            <b>Toute l'équipe Cloudy</b>
+        </div>
+    </div>
+    <div class="box-bottom-profile"></div>
+</div>
+{% endblock %}

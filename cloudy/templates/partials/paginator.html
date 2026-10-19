@@ -1,0 +1,29 @@
+{% comment %}
+Page navigation for a logbook, rendered by the {% paginator %} inclusion tag in
+cloudy.logbooks.templatetags.logbook_tags. Context: iteration, page, next,
+previous, pages_count, logbook.
+{% endcomment %}
+{% if iteration|length > 1 %}
+  <div class="nav">
+    <span class="pages">
+      {% if previous %}
+        <span><a href="{% url 'logbooks:logbook' logbook.id %}?p=1" title="Début du carnet">&#60;&#60;</a></span>
+        <span><a href="{% url 'logbooks:logbook' logbook.id %}?p={{ previous }}" title="Précédent">&#60;</a></span>
+      {% endif %}
+
+      {% for p in iteration %}
+        {% if p == page %}
+          <span class="selected">{{ p }}</span>
+        {% else %}
+          <span><a href="{% url 'logbooks:logbook' logbook.id %}?p={{ p }}">{{ p }}</a></span>
+        {% endif %}
+      {% endfor %}
+
+      {% if next %}
+        <span><a href="{% url 'logbooks:logbook' logbook.id %}?p={{ next }}" title="Suivant">&#62;</a></span>
+        <span><a href="{% url 'logbooks:logbook' logbook.id %}?p={{ pages_count }}"
+            title="Fin du carnet (p {{ pages_count }})">&#62;&#62;</a></span>
+      {% endif %}
+    </span>
+  </div>
+{% endif %}

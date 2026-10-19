@@ -1,0 +1,44 @@
+{% extends "site_base_public.html" %}
+
+{% load static %}
+
+{% load compress %}
+{# load rendertext #}
+{% load quotes_tags %}
+
+{% block body_id %}support{% endblock %}
+
+{% block head %}
+<link href="{% static 'compass/stylesheets/home.css' %}" media="screen, projection" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="{% static 'js/cloudy_home.js' %}"></script>
+{% endblock %}
+
+{% block main %}
+<!-- Main -->
+<div id="main">
+  <div id="support-box-details">
+    <div class="box-top-support"></div>
+    <div class="box-main-support">
+      <div id="support-content">
+        <h2>FAQ</h2>
+        <div class="faq-list">
+          {% for faq in object_list %}
+
+          <h3><a href="{{faq.get_absolute_url}}">{{faq.question}}</a></h3>
+          <p>{{faq.answer}}</p>
+
+          {% empty %}
+          Aucune entrée dans la FAQ pour le moment.
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+    <div class="box-bottom-support"></div>
+  </div>
+
+  <div id="content">
+
+  </div>
+
+  {% endblock %}

@@ -1,0 +1,176 @@
+{% extends "site_base_logbook.html" %}
+
+{% load static %}
+{% load core_tags %}
+{% load logbook_tags %}
+{% load stats_tags %}
+{% load compress %}
+
+{% block body_id %}logbooks{% endblock %}
+{% block actions-id %}action-logbook{%endblock %}
+
+{% block head %}
+{% compress css %}
+<link href="{% static 'compass/stylesheets/logbook.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'compass/stylesheets/logbook_popups.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+{% endcompress %}
+{% endblock %}
+{% block content %}
+
+<div id="tooltip" class="tooltip-small"></div>
+<div class="date-slip"></div>
+{% include "partials/log-actions.html" %}
+
+
+<div class="left-button" rel="1"> </div>
+<div class="right-button" rel="1"> </div>
+<div class="simpleSlide-window ffp" rel="1">
+  <div class="simpleSlide-tray" rel="1">
+    <!-- first three cols -->
+    <div class="simpleSlide-slide" rel="1" alt="1">
+
+      <table class="cleft ffp">
+        <thead>
+          <tr class="first">
+            <th rowspan="1" width="55">SAUT N°<span>Jump n°</span></th>
+            <th rowspan="1" width="55">DATE<span>Date</span></th>
+            <th rowspan="1" width="100">LIEU<span>Place</span></th>
+            <th rowspan="1" width="150">AÉRONEF<span>Aircraft</span></th>
+            <th rowspan="1" width="60">HAUTEUR<span>Altitude</span><span>({% if logbook.height_format_str == "pieds"%}ft{% else %}m{% endif %})</span></th>
+            <th rowspan="1" width="150">VOILURE<br />PRINCIPALE<span>Main Canopy</span></th>
+            <th rowspan="1" width="320">PROGRAMME DU SAUT<span>Performed exercice</span></th>
+          </tr>
+
+        </thead>
+        <tbody>
+          {% with logbook.height_format as height_format %}
+          {% for i in iteration %}
+          {% with logs|nth:i as log %}
+          <tr class="{% if forloop.first %}first{% endif %} {% cycle 'blue' ''  %}" alt="{{log.id}}">
+            {% if log.date %}
+            <td data-field="int" class="c0" alt="{{ log.date|date:'Y-m-d'}}">{{ log.position }}</td>
+            <td data-field="date" class="e tdate c1" alt="{{ log.date|date:'Y-m-d'}}">{{ log.date|date:"j b" }}</td>
+            <td data-field="place" class="e tmtext c2" alt="15" prevmax="15">
+              {{ log.place|truncchar:15 }}
+              <pre>{{ log.place }}</pre>
+            </td>
+            <td data-field="aircraft" class="e tmtext c3" alt="25" prevmax="15">
+              {{ log.aircraft|truncchar:25 }}
+              <pre>{{ log.aircraft }}</pre>
+            </td>
+            <td data-field="altitude" class="e height_{{ height_format }} c4">{{ log.altitude|height:logbook }}</td>
+
+            <td data-field="canopy" class="e tmtext c5" alt="20" prevmax="15">
+              {{ log.canopy|truncchar:20 }}
+              <pre>{{ log.canopy }}</pre>
+            </td>
+            <td data-field="perf_exercice" class="e ttextarea c6" alt="200" prevmax="30">{{ log.perf_exercice|truncchar:30 }}
+              <pre>{{ log.perf_exercice }}</pre>
+            </td>
+            {% else %}
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            {% endif %}
+          </tr>
+          {% endwith %}
+          {% endfor %}
+          {% endwith %}
+        </tbody>
+      </table>
+    </div>
+
+
+    {# This is the right side of the logbook #}
+
+    <div class="simpleSlide-slide" rel="1" alt="2">
+
+      <table class="cright ffp">
+        <thead>
+          <tr class="first">
+            <th colspan="2" width="600">OBSERVATIONS DU MONITEUR - <span class="inline">Instructor's observations</span>
+            </th>
+            <th rowspan="2" width="350">Commentaires<span>Comments</span><br /></th>
+            <th rowspan="2" width="25"><span class="vertical">Media</span></th>
+          </tr>
+          <tr>
+            <th rowspan="1" width="300">Exercice en chute - <span class="inline">Freefall training </span></th>
+            <th rowspan="1" width="300">Exercice sous voile - <span class="inline">Canopy piloting </span></th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          {% for i in iteration %}
+          {% with logs|nth:i as log %}
+          <tr class="{% if forloop.first %}first{% endif %} {% cycle 'blue' ''  %}" alt="{{log.id}}">
+            {% if log.date %}
+            <td style="display:none;" alt="{{ log.date|date:'j F'}}"></td>
+            <td data-field="freefall_training" class="e ttextarea c7 extra" alt="200" prevmax="30">
+              {{ log.freefall_training|truncchar:30 }}
+              <pre>{{ log.freefall_training }}</pre>
+            </td>
+            <td data-field="canopy_piloting" class="e ttextarea c8 extra" alt="200" prevmax="30">
+              {{ log.canopy_piloting|truncchar:30 }}
+              <pre>{{ log.canopy_piloting }}</pre>
+            </td>
+            <td data-field="cmmts" class="e ttextarea c9 extra" alt="200" prevmax="30">
+              {{ log.cmmts|truncchar:30 }}
+              <pre>{{ log.cmmts }}</pre>
+            </td>
+            <!-- weird can't make it work with css -->
+            <td data-field="files" class="e tmedia c23 extra {% if log.files.all|length > 0 %}multi{% endif %}">
+              {{ log.files.all|length }}
+              <pre>
+                                        <ul class="media">
+                                        {% if log.files %}
+                                            {% for file in log.files.all %}
+                                                <li>
+                                                    <a href="{{file.file.url}}" target="_blank">{{file.filename|sexy_me|truncchar:15}}</a>
+                                                     <span>{% widthratio file.filesize 1000 1 %} Kb</span>
+                                                </li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        </ul>
+                                    </pre>
+            </td>
+            {% else %}
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            {% endif %}
+          </tr>
+          {% endwith %}
+          {% endfor %}
+        </tbody>
+
+      </table>
+
+    </div>
+  </div>
+</div>
+
+<div class="foot-nav">
+  <div class="left-button" rel="1" id="slide-left-page">
+    <a href="#" class="btn dark prev">
+      <div class="prev-icon"></div>
+      Page précédente
+    </a>
+  </div>
+  <div class="right-button" id="slide-right-page" rel="1">
+    <a href="#" class="btn dark next">
+      <div class="next-icon"></div>
+      Page suivante
+    </a>
+  </div>
+</div>
+
+{% endblock %}

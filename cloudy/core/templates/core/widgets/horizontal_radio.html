@@ -1,0 +1,9 @@
+{% comment %}
+Radio buttons rendered inline, each followed by its label, replacing the old
+HorizRadioRenderer. Lives in an app-level templates directory because the default
+form renderer (django.forms.renderers.DjangoTemplates) searches app template dirs
+but not the project-wide TEMPLATES DIRS.
+{% endcomment %}
+{% spaceless %}
+{% for group, options, index in widget.optgroups %}{% for option in options %}<span class="radio-inline">{% include option.template_name with widget=option %}<label for="{{ option.attrs.id }}" class="label-radio">{{ option.label }}</label></span>{% endfor %}{% endfor %}
+{% endspaceless %}

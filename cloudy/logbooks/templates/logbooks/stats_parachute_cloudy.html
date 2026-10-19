@@ -1,0 +1,110 @@
+{% extends "logbooks/stats_base.html" %}
+
+{% load core_tags %}
+{% load stats_tags %}
+
+{% block body_id %}logbooks{% endblock %}
+{% block actions-id %}action-stats{%endblock %}
+
+
+{% block stats_content %}
+
+<div class="pie-charts-bg">
+
+  <div class="pie-chart">
+    <h2>Répartition sauts par voilure</h2>
+    <div id="pie_nbr_jumps" class="pie">
+      Chargement...
+    </div>
+    <script type="text/javascript" charset="utf-8">
+      cloudyStats.FieldGroupbyPieChart("pie_nbr_jumps", "total_jumps", "canopy", true);
+    </script>
+  </div>
+  <div class="pie-chart">
+    <h2>Répartition sauts par lieu</h2>
+    <div id="pie_nbr_places" class="pie">
+      Chargement...
+    </div>
+    <script type="text/javascript" charset="utf-8">
+      cloudyStats.FieldGroupbyPieChart("pie_nbr_places", "total_jumps", "place", true);
+    </script>
+  </div>
+
+
+
+</div>
+
+<div class="box-top-profile"></div>
+<div class="box-main-stats">
+  <div class="horizontal">
+    <div class="title-stats">
+      <h1>Nombre de sauts <span id="reminder-total-hdv"></span></h1>
+    </div>
+    <div class="sidebar-filter">
+      <div class="title-sidebar">
+        Filtres
+      </div>
+      <ul>
+        <li class="category">Lieu</li>
+        <select target-field="place">
+          <option>Chargement...</option>
+        </select>
+      </ul>
+      <ul>
+        <li class="category">Aéronef</li>
+        <select target-field="aircraft">
+          <option>Chargement...</option>
+        </select>
+      </ul>
+      <ul>
+        <li class="category">Voilure</li>
+        <select target-field="canopy">
+          <option>Chargement...</option>
+        </select>
+      </ul>
+      <ul>
+        <li class="category">Filtre facultatif</li>
+        <select target-field="optional_filter">
+          <option>Chargement...</option>
+        </select>
+      </ul>
+    </div>
+
+  </div>
+  <div id="placeholderbars" class="graph" style="width: 660px;height: 420px;">Chargement...
+  </div>
+
+  <script type="text/javascript" charset="utf-8">
+    function reload_flight_bars(filters) {
+      cloudyStats.FilteredIntBarGraph("placeholderbars", "total_jumps", filters);
+    };
+    $(document).ready(function () {
+      // Load the bars without any filters by default
+      reload_flight_bars(new Object);
+    });
+  </script>
+
+</div>
+<div class="box-bottom-backend"></div>
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function () {
+    cloudyStats.getFilterChoices(["place", "aircraft", "canopy", "optional_filter"]);
+
+
+    // Reload the graph when the user apply new filters
+    $("select[target-field]").change(function () {
+      // Gather the filters
+      var filters = new Object();
+      $("select[target-field]").each(function () {
+        var field = $(this).attr('target-field');
+        var val = $(this).val();
+        if (val != "__all__") {
+          filters[field] = val;
+        }
+      });
+      reload_flight_bars(filters);
+    });
+  });
+</script>
+<script type="text/javascript">$(document).ready(function () { $.uniform.update("#filter"); });</script>
+{% endblock %}

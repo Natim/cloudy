@@ -1,0 +1,315 @@
+{% extends "site_base_logbook.html" %}
+{% load static %}
+{% load cache %}
+
+{% load core_tags %}
+{% load logbook_tags %}
+{% load stats_tags %}
+{% load compress %}
+
+{% block body_id %}logbooks{% endblock %}
+{% block actions-id %}action-logbook{%endblock %}
+
+{% block head %}
+{% compress css %}
+<link href="{% static 'compass/stylesheets/logbook.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'compass/stylesheets/logbook_popups.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+{% endcompress %}
+
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<div id="tooltip" class="tooltip-small"></div>
+<div class="date-slip"></div>
+{% include 'partials/log-actions.html' %}
+
+<div class="left-button" rel="1"> </div>
+<div class="right-button" rel="1"> </div>
+<div class="simpleSlide-window" rel="1">
+  <p>*CDB : Commandant de bord **CPlt : Co-Pilote</p>
+  <div class="simpleSlide-tray" rel="1">
+    <!-- first three cols -->
+    <div class="simpleSlide-slide" rel="1" alt="1">
+
+      <table class="cleft dgac">
+        <thead>
+          <tr class="first">
+            <th rowspan="4" width="55">Date</th>
+            <th colspan="2" rowspan="2" width="163">Aéronef</th>
+            <th rowspan="4" width="55">Fonction à<br>bord</th>
+            <th rowspan="4" width="280">
+              <div class="title-report">Nature du vol</div>
+              <div class=report>Reports</div>
+            </th>
+            <th colspan="2" rowspan="2" width="129">Membre d'équipage</th>
+            <th colspan="4">Pilote Monomoteur</th>
+          </tr>
+          <tr>
+            <th colspan="2">Jour</th>
+            <th colspan="2">Nuit</th>
+          </tr>
+          <tr>
+            <th rowspan="2">Type</th>
+            <th rowspan="2">Immatri-<br>culation</th>
+            <td>Jour</td>
+            <td>Nuit</td>
+            <td>Double</td>
+            <td>CDB*</td>
+            <td>Double</td>
+            <td>CDB*</td>
+          </tr>
+          <tr>
+            <td data-field="mbr_equipage_jour" class="reports-info">
+              {% format_total totals total_mbr_equipage_jour report %}
+            </td>
+            <td data-field="mbr_equipage_nuit" class="reports-info">
+              {% format_total totals total_mbr_equipage_nuit report %}
+            </td>
+            <td data-field="mono_jdbl" class="reports-info">
+              {% format_total totals total_mono_day_double report %}
+            </td>
+            <td data-field="mono_jcdb" class="reports-info">
+              {% format_total totals total_mono_day_captain report %}
+            </td>
+            <td data-field="mono_ndbl" class="reports-info">
+              {% format_total totals total_mono_night_double report %}
+            </td>
+            <td data-field="mono_ncdb" class="reports-info">{% format_total totals total_mono_night_captain report %}
+            </td>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <td colspan="5" class="total-general">
+              Total général des heures comme pilote :
+              <span class=report>Totaux à reporter</span>
+              <div class="total-hours" id="fullreports">
+
+              </div>
+            </td>
+
+            {# Report fields #}
+            <td sum-field="mbr_equipage_jour" attr-field="ignore" class="reports-foot"></td>
+            <td sum-field="mbr_equipage_nuit" attr-field="ignore" class="reports-foot"></td>
+            <td sum-field="mono_jdbl" class="reports-foot"></td>
+            <td sum-field="mono_jcdb" class="reports-foot"></td>
+            <td sum-field="mono_ndbl" class="reports-foot"></td>
+            <td sum-field="mono_ncdb" class="reports-foot"></td>
+          </tr>
+        </tfoot>
+        <tbody>
+          {% with logbook.time_format as time_format %}
+          {% for i in iteration %}
+          {% with logs|nth:i as log %}
+          <tr class="{% if forloop.first %}first{% endif %} {% cycle 'blue' ''  %}" alt="{{log.id}}">
+            {% if log.date %}
+            <td data-field="date" class="e tdate c0" alt="{{ log.date|date:'Y-m-d'}}">{{ log.date|date:"j b" }}</td>
+            <td data-field="aeronef_type" class="e tmtext c1" alt="10" prevmax="8">{{ log.aeronef_type|truncatechars:8 }}
+              <pre>{{ log.aeronef_type }}</pre>
+            </td>
+            <td data-field="aeronef_imma" class="e tmtext c2" alt="10" prevmax="10">{{ log.aeronef_imma|truncatechars:10 }}
+              <pre>{{ log.aeronef_imma }}</pre>
+            </td>
+            <td data-field="fctbrd" class="e tmtext c3" alt="6" prevmax="6">{{ log.fctbrd|capfirst|truncatechars:6 }}
+              <pre>{{ log.fctbrd }}</pre>
+            </td>
+            <td data-field="natvol" class="e tltext c4" alt="50" prevmax="35">{{ log.natvol|capfirst|truncatechars:35 }}
+              <pre>{{ log.natvol|capfirst }}</pre>
+            </td>
+            <td data-field="mbr_equipage_jour" class="e ttime_{{ time_format }} c5">{{ log.mbr_equipage_jour|hmin:logbook }}</td>
+            <td data-field="mbr_equipage_nuit" class="e ttime_{{ time_format }} c6">{{ log.mbr_equipage_nuit|hmin:logbook }}</td>
+            <td data-field="mono_jdbl" class="e ttime_{{ time_format }} c7">{{ log.mono_jdbl|hmin:logbook }}</td>
+            <td data-field="mono_jcdb" class="e ttime_{{ time_format }} c8">{{ log.mono_jcdb|hmin:logbook }}</td>
+            <td data-field="mono_ndbl" class="e ttime_{{ time_format }} c9">{{ log.mono_ndbl|hmin:logbook }}</td>
+            <td data-field="mono_ncdb" class="e ttime_{{ time_format }} c10">{{ log.mono_ncdb|hmin:logbook }}</td>
+            {% else %}
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            {% endif %}
+          </tr>
+          {% endwith %}
+          {% endfor %}
+          {% endwith %}
+        </tbody>
+
+      </table>
+    </div>
+
+
+    {# This is the right side of the logbook #}
+
+    <div class="simpleSlide-slide" rel="1" alt="2">
+      <table class="cright dgac" id="right-dgac">
+        <thead>
+          <tr class="first">
+            <th colspan="6">Pilote Multimoteurs</th>
+            <th colspan="2" rowspan="2">Vols aux instruments</th>
+            <th rowspan="3">Simu-<br />lation</th>
+            <th rowspan="3"><span class="vertical">Arrivées I.F.R</span></th>
+            <th rowspan="4">Observations et Visa de l'Autorité Habilitée ou de l'Instructeur</th>
+            <th rowspan="4">Commentaires</th>
+            <th rowspan="4"><span class="vertical">Media</span></th>
+          </tr>
+          <tr>
+            <th colspan="3">Jour</th>
+            <th colspan="3">Nuit</th>
+          </tr>
+          <tr>
+            <td>Double</td>
+            <td>CDB*</td>
+            <td>CPlt**</td>
+            <td>Double</td>
+            <td>CDB*</td>
+            <td>CPlt**</td>
+            <td>Double</td>
+            <td>Pilote</td>
+          </tr>
+          <tr>
+            <td data-field="mul_jdbl" class="reports-info">
+              {% format_total totals total_multi_day_double report %}
+            </td>
+            <td data-field="mul_jcdb" class="reports-info">
+              {% format_total totals total_multi_day_captain report %}
+            </td>
+            <td data-field="mul_jcplt" class="reports-info">
+              {% format_total totals total_multi_day_copilot report %}
+            </td>
+            <td data-field="mul_ndbl" class="reports-info">
+              {% format_total totals total_multi_night_double report %}
+            </td>
+            <td data-field="mul_ncdb" class="reports-info">
+              {% format_total totals total_multi_night_captain report %}
+            </td>
+            <td data-field="mul_ncplt" class="reports-info">
+              {% format_total totals total_multi_night_copilot report %}
+            </td>
+            <td data-field="vai_dbl" class="reports-info">
+              {% format_total totals total_instruments_double report %}
+            </td>
+            <td data-field="vai_plt" class="reports-info">
+              {% format_total totals total_instruments_pilot report %}
+            </td>
+            <td data-field="simu" class="reports-info">
+              {% format_total totals total_simu report %}
+            </td>
+            <td data-field="ifr" type-field="int" class="reports-info">
+              {% format_total totals total_ifr dontformat %}
+            </td>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <td sum-field="mul_jdbl" class="reports-foot"></td>
+            <td sum-field="mul_jcdb" class="reports-foot"></td>
+            <td sum-field="mul_jcplt" class="reports-foot"></td>
+            <td sum-field="mul_ndbl" class="reports-foot"></td>
+            <td sum-field="mul_ncdb" class="reports-foot"></td>
+            <td sum-field="mul_ncplt" class="reports-foot"></td>
+            <td sum-field="vai_dbl" attr-field="ignore" class="reports-foot"></td>
+            <td sum-field="vai_plt" attr-field="ignore" class="reports-foot"></td>
+            <td sum-field="simu" attr-field="ignore" class="reports-foot"></td>
+            <td sum-field="ifr" class="reports-foot" type-field="int"></td>
+            <td class="highlight-col" (1)>Ces heures sont comprises dans les heures de vol PILOTE.</td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tfoot>
+        <tbody>
+
+          {% with logbook.time_format as time_format %}
+          {% for i in iteration %}
+          {% with logs|nth:i as log %}
+          <tr class="{% if forloop.first %}first{% endif %} {% cycle 'blue' ''  %}" alt="{{log.id}}">
+            {% if log.date %}
+            <td data-field="mul_jdbl" class="e ttime_{{ time_format }} c11" alt="{{ log.date|date:'j F'}}">{{ log.mul_jdbl|hmin:logbook }}</td>
+            <td data-field="mul_jcdb" class="e ttime_{{ time_format }} c12">{{ log.mul_jcdb|hmin:logbook }}</td>
+            <td data-field="mul_jcplt" class="e ttime_{{ time_format }} c13">{{ log.mul_jcplt|hmin:logbook }}</td>
+            <td data-field="mul_ndbl" class="e ttime_{{ time_format }} c14">{{ log.mul_ndbl|hmin:logbook }}</td>
+            <td data-field="mul_ncdb" class="e ttime_{{ time_format }} c15">{{ log.mul_ncdb|hmin:logbook }}</td>
+            <td data-field="mul_ncplt" class="e ttime_{{ time_format }} c16">{{ log.mul_ncplt|hmin:logbook }}</td>
+            <td data-field="vai_dbl" class="e ttime_{{ time_format }} c17">{{ log.vai_dbl|hmin:logbook }}</td>
+            <td data-field="vai_plt" class="e ttime_{{ time_format }} c18">{{ log.vai_plt|hmin:logbook }}</td>
+            <td data-field="simu" class="e ttime_{{ time_format }} c19">{{ log.simu|hmin:logbook }}</td>
+            <td data-field="ifr" type-field="int" class="e tint c20" ctitle="I.F.R (entier)">{% if log.ifr != 0 %}{{ log.ifr }}{% endif %}</td>
+            <td data-field="obs" class="e ttextarea c21" alt="200" prevmax="28">{{ log.obs|truncatechars:28 }}
+              <pre>{{ log.obs }}</pre>
+            </td>
+            <td data-field="cmmts" class="e ttextarea c22 extra" alt="200" prevmax="23">
+              {{ log.cmmts|truncatechars:23 }}
+              <pre>{{ log.cmmts }}</pre>
+            </td>
+            <!-- weird can't make it work with css -->
+            <td data-field="files" class="e tmedia c23 extra {% if log.files.all|length > 0 %}multi{% endif %}">
+              {{ log.files.all|length }}
+              <pre>
+                                        <ul class="media">
+                                        {% if log.files %}
+                                            {% for file in log.files.all %}
+                                                <li>
+                                                    <a href="{{file.file.url}}" target="_blank">{{file.filename|truncatechars:15}}</a>
+                                                     <span>{% widthratio file.filesize 1000 1 %} Kb</span>
+                                                </li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        </ul>
+                                    </pre>
+            </td>
+            {% else %}
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            {% endif %}
+          </tr>
+          {% endwith %}
+          {% endfor %}
+          {% endwith %}
+        </tbody>
+
+
+      </table>
+
+    </div>
+  </div>
+</div>
+
+<div class="foot-nav">
+  <div class="left-button" rel="1" id="slide-left-page">
+    <a href="#" class="btn dark prev">
+      <div class="prev-icon"></div>
+      Page précédente
+    </a>
+  </div>
+  <div class="right-button" id="slide-right-page" rel="1">
+    <a href="#" class="btn dark next">
+      <div class="next-icon"></div>
+      Page suivante
+    </a>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,296 @@
+{% with logbook.time_format_str as time_format_str %}
+
+<form action="{% url 'logbooks:add_log' logbook_id %}?p={{ request.GET.p}}" method="post" enctype='multipart/form-data'
+  id="add-log-form">
+  {% csrf_token %}
+  <div class="panes">
+    <!-- Tab 1 general, {{ form.foo.label_tag }} won't always work for some reasons so we use <label for="id_{{form.date.name}}"></label> -->
+    <div>
+      <div class="column">
+        {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+        {% endfor %}
+        <div class="box-form">
+          <h3>Flight informations</h3>
+          <div class="fieldwrapper">
+            <label for="id_{{form.date.name}}">{{ form.date.label|capfirst }}<span class='required'>*</span></label>
+            {{ form.date }}
+            {{ form.date.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.departure_place.name}}">{{ form.departure_place.label|capfirst }}<span
+                class='required'>*</span></label>
+            <div class="ui-widget">
+              {{ form.departure_place }}
+            </div>
+            {{ form.departure_place.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.departure_time.name}}">{{ form.departure_time.label|capfirst }}<span
+                class='required'>*</span></label>
+            {{ form.departure_time }}
+            <span class='helptext'>(HH:MM)</span>
+            {{ form.departure_time.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.arrival_place.name}}">{{ form.arrival_place.label|capfirst }}<span
+                class='required'>*</span></label>
+            <div class="ui-widget">
+              {{ form.arrival_place }}
+            </div>
+            {{ form.arrival_place.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.arrival_time.name}}">{{ form.arrival_time.label|capfirst }}<span
+                class='required'>*</span></label>
+            {{ form.arrival_time }}
+            <span class='helptext'>(HH:MM)</span>
+            {{ form.arrival_time.errors }}
+          </div>
+
+          <div class="spacer"></div>
+        </div>
+
+
+        <div class="box-form">
+          <h3>Aircraft</h3>
+
+          <div class="fieldwrapper">
+            <label for="id_{{form.aircraft_type.name}}">{{ form.aircraft_type.label|capfirst }}<span
+                class='required'>*</span></label>
+            <div class="ui-widget">
+              {{ form.aircraft_type }}
+            </div>
+            {{ form.aircraft_type.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.aircraft_imma.name}}">{{ form.aircraft_imma.label|capfirst }}<span
+                class='required'>*</span></label>
+            <div class="ui-widget">
+              {{ form.aircraft_imma }}
+            </div>
+            {{ form.aircraft_imma.errors }}
+          </div>
+          <div class="spacer"></div>
+        </div>
+
+
+
+        <div class="box-form">
+          <h3>Single pilot time</h3>
+          <div class="fieldwrapper">
+            <div class="fieldwrapper">
+              {{ form.single_pilot_se_me }}
+              {{ form.single_pilot_se_me.errors }}
+            </div>
+          </div>
+          <div class="spacer"></div>
+        </div>
+      </div>
+
+      <div class="column-right">
+        <div class="box-form">
+          <h3>Times</h3>
+
+          <div class="fieldwrapper">
+            <label for="id_{{form.single_pilot_time.name}}">{{ form.single_pilot_time.label|capfirst }}</label>
+            {{ form.single_pilot_time }}
+            <span class='helptext'>({{ time_format_str }})</span>
+            {{ form.single_pilot_time.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.multi_pilot_time.name}}">{{ form.multi_pilot_time.label|capfirst }}</label>
+            {{ form.multi_pilot_time }}
+            <span class='helptext'>({{ time_format_str }})</span>
+            {{ form.multi_pilot_time.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.total_time_flight.name}}">{{ form.total_time_flight.label|capfirst }}</label>
+            {{ form.total_time_flight }}
+            <span class='helptext'>({{ time_format_str }})</span>
+            {{ form.total_time_flight.errors }}
+          </div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="box-form">
+          <h3>Count Takeoffs/Landings</h3>
+          <div class="fieldwrapper">
+            <label for="id_{{form.take_off_day.name}}">{{ form.take_off_day.label|capfirst }}</label>
+            {{ form.take_off_day }}
+            {{ form.take_off_day.errors }}
+
+            <label for="id_{{form.take_off_night.name}}">{{ form.take_off_night.label|capfirst }}</label>
+            {{ form.take_off_night }}
+            {{ form.take_off_night.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.landing_day.name}}">{{ form.landing_day.label|capfirst }}</label>
+            {{ form.landing_day }}
+            {{ form.landing_day.errors }}
+
+            <label for="id_{{form.landing_night.name}}">{{ form.landing_night.label|capfirst }}</label>
+            {{ form.landing_night }}
+            {{ form.landing_night.errors }}
+          </div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="box-form">
+          <h3>Others</h3>
+          <div class="fieldwrapper">
+            <label for="id_{{form.name_pic.name}}">{{ form.name_pic.label|capfirst }}</label>
+            {{ form.name_pic }}
+            {{ form.name_pic.errors }}
+          </div>
+          <div class="spacer"></div>
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- pane 2  ----------------------------------------- -->
+    <div>
+      <div class="column">
+        <div class="box-form">
+          <h3>Operational condition</h3>
+          <div class="fieldwrapper">
+            <label for="id_{{form.op_time_night.name}}">{{ form.op_time_night.label|capfirst }}</label>
+            {{ form.op_time_night }}
+            <span class='helptext'>({{ time_format_str }})</span>
+            {{ form.op_time_night.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.op_time_ifr.name}}">{{ form.op_time_ifr.label|capfirst }}</label>
+            {{ form.op_time_ifr }}
+            <span class='helptext'>({{ time_format_str }})</span>
+            {{ form.op_time_ifr.errors }}
+          </div>
+          <div class="spacer"></div>
+
+        </div>
+
+        <div class="box-form">
+          <h3>Pilot function time</h3>
+          <div class="fieldwrapper">
+            <label for="id_{{form.pilot_time_in_cmd.name}}">{{ form.pilot_time_in_cmd.label|capfirst }}</label>
+            {{ form.pilot_time_in_cmd }}
+            <span class='helptext'>({{ time_format_str }})</span>
+            {{ form.pilot_time_in_cmd.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.pilot_timpe_cop.name}}">{{ form.pilot_timpe_cop.label|capfirst }}</label>
+            {{ form.pilot_timpe_cop }}
+            <span class='helptext'>({{ time_format_str }})</span>
+            {{ form.pilot_timpe_cop.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.pilot_time_dual.name}}">{{ form.pilot_time_dual.label|capfirst }}</label>
+            {{ form.pilot_time_dual }}
+            <span class='helptext'>({{ time_format_str }})</span>
+            {{ form.pilot_time_dual.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.pilot_time_inst.name}}">{{ form.pilot_time_inst.label|capfirst }}</label>
+            {{ form.pilot_time_inst }}
+            <span class='helptext'>({{ time_format_str }})</span>
+            {{ form.pilot_time_inst.errors }}
+          </div>
+          <div class="spacer"></div>
+        </div>
+
+      </div>
+
+      <div class="column-right">
+        <div class="box-form">
+          <h3>Synth. training devices</h3>
+          <div class="fieldwrapper">
+            <label for="id_{{form.synthetic_date.name}}">{{ form.synthetic_date.label|capfirst }}</label>
+            {{ form.synthetic_date }}
+            {{ form.synthetic_date.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.synthetic_type.name}}">{{ form.synthetic_type.label|capfirst }}</label>
+            <div class="ui-widget">
+              {{ form.synthetic_type }}
+            </div>
+            {{ form.synthetic_type.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.synthetic_time.name}}">{{ form.synthetic_time.label|capfirst }}</label>
+            {{ form.synthetic_time }}
+            <span class='helptext'>({{ time_format_str }})</span>
+            {{ form.synthetic_time.errors }}
+          </div>
+          <div class="spacer"></div>
+        </div>
+
+        <label class="label-message">Remarks and endorsements</label>
+        {{ form.obs }}
+        <span class="caracters-limit"> </span>
+        {{ form.obs.errors }}
+
+
+
+
+      </div>
+
+    </div>
+
+    <!-- pane 3  ----------------------------------------- -->
+
+
+    <div>
+      <div class="column">
+        <div class="box-form">
+          <h3>A bord avec vous...</h3>
+          <div class="fieldwrapper">
+            <label for="id_{{form.passengerA.name}}">{{ form.passengerA.label|capfirst }}</label>
+            {{ form.passengerA }}
+            {{ form.passengerA.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.passengerB.name}}">{{ form.passengerB.label|capfirst }}</label>
+            {{ form.passengerB }}
+            {{ form.passengerB.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.passengerC.name}}">{{ form.passengerC.label|capfirst }}</label>
+            {{ form.passengerC }}
+            {{ form.passengerC.errors }}
+          </div>
+
+
+          <div class="spacer"></div>
+        </div>
+      </div>
+
+      <div class="column-right">
+        <label class="label-message">Vos commentaires</label>
+        {{ form.coms }}
+        <span class="caracters-limit"> </span>
+        {{ form.coms.errors }}
+
+
+
+        <div class="box-form">
+          <h3>Vos souvenirs</h3>
+          <p> Photos, videos, documents (log de nav, dossier météo, ...)</p>
+          <div class="fieldwrapper">
+            {{ form.media }}
+          </div>
+
+          <div class="spacer"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <p class="submit">
+    <input type="submit" value="Enregistrer ce vol" class="btn red" />
+    &nbsp;&nbsp; <a href="#" class="reset-form">Recommencer</a>
+  </p>
+</form>
+{% endwith %}

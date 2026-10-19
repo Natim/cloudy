@@ -1,0 +1,88 @@
+@import "backend";
+
+ div.content {
+
+ 	div.alert-list{
+    	@include column(16, true);
+ 		margin-top: 5px;
+
+
+		div.cloudy-alert {
+    		@include column(16, true);
+    		padding: 10px 10px 0px 10px;
+    		margin-bottom: 20px;
+ 			border:1px solid $grey-border;
+			@include border-radius(3px 3px);
+			list-style-type:none;
+			font-size:13px;
+			height: 105px;
+
+			.cell{
+				padding:2px 20px;
+				min-height:80px;
+			}
+
+			h2 {
+				font-size: 18px;
+			}
+			.c0,.c1{
+				float:left;
+			}
+			.c2,.c3{
+				float:right;
+			}
+			 div.reminders {
+			    margin-top: 5px;
+			    @include column(7, true);
+ 			 }
+			 div.btnwrapper {
+			      @include column(3);
+
+			 }
+			.c3{
+				text-align:center;
+ 			}
+ 			div.alert-icons {
+ 				margin-top: 5px;
+ 			}
+			h3{
+				margin:0 0 30px 0;
+				padding:0;
+				font-family : Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;
+				font-weight:bold;
+				font-size:1.3em;
+				color:$dark-blue;
+			}
+			.delete{
+				position: relative;
+				top: -105px;
+				margin-left: 100%;
+ 			}
+			.btn{
+				margin-top: 5px;
+				padding:3px 8px;
+				color:white;
+			}
+			.file{
+				color:$dark-red;
+				font-weight:bold;
+			}
+			.ic-mail{
+				margin-right:20px;
+			}
+			.date{
+				display:block;
+				padding:5px 2px;
+				width:80px;
+				border:1px solid $dark-red-font;
+				@include border-radius(3px, 3px);
+				background:$input-red-error;
+				color:$dark-red-font;
+				font-size:18px;
+				font-weight:normal;
+			}
+		}
+	}
+
+
+}

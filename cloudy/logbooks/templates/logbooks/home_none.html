@@ -1,0 +1,35 @@
+{% extends "site_base_logbook.html" %}
+{% load static %}
+{% load core_tags %}
+{% load logbook_tags %}
+{% load stats_tags %}
+
+{% block body_id %}logbooks{% endblock %}
+
+{% block head %}
+
+<link href="{% static 'compass/stylesheets/logbook.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'compass/stylesheets/logbook_popups.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+
+{% endblock %}
+
+
+
+{% block content %}
+<div id="tooltip" class="tooltip-small"></div>
+<div class="date-slip"></div>
+<div class="edit-slip"></div>
+
+<p class="no-logbook">
+  <strong>Vous n'avez aucun carnet de vol pour le moment ! Une question ? Besoin d'aide ?</strong>
+  <br />
+  Consultez notre FAQ <a href="{% url 'support' %}" class="support-link">en cliquant ici</a> ou écrivez nous à l'adresse
+  <a href="mailto:support@cloudy.fr" class="support-link">support@cloudy.fr</a>
+  <br />
+  <br />
+  Vous pouvez ajouter un carnet en cliquant sur le bouton rouge "Ajouter un carnet" en haut à droite de la page.
+</p>
+
+{% endblock %}

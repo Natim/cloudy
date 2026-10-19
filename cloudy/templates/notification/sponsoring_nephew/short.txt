@@ -1,0 +1,2 @@
+{% extends "mails/base_subject.txt" %}
+{% block content %}Vous venez d'être parrainé ! - You have just sponsored!{% endblock %}

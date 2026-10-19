@@ -1,0 +1,143 @@
+@import "backend";
+
+div.content {
+	@include column(16,true);
+    @include prepend(1);
+
+
+	h3 {
+    	@include prepend(1);
+    	padding-top: 5px;
+		font-size:18px;
+		color:$dark-blue;
+		font-weight:bold;
+
+
+		&.step1 {
+			background: {
+			   image: image-url("../../static/img/number1.png");
+			   repeat:  no-repeat;
+			};
+			display: block;
+			height: 32px;
+			margin: 10px 0px 10px 0px;
+		}
+
+		&.step2 {
+			background: {
+			   image: image-url("../../static/img/number2.png");
+			   repeat:  no-repeat;
+			};
+			display: block;
+			height: 32px;
+			margin: 10px 0px 10px 0px;
+		}
+
+		&.step3 {
+			background: {
+			   image: image-url("../../static/img/number3.png");
+			   repeat:  no-repeat;
+			};
+			display: block;
+			height: 32px;
+			margin: 10px 0px 10px 0px;
+		}
+	}
+
+
+	ul{
+		margin:0;
+		padding:0;
+	}
+
+	li{
+		list-style-type:none;
+		margin:0;
+		padding:0;
+	}
+
+
+	.steps {
+		li{
+			border-top:1px solid $grey-border;
+			padding:25px 0 20px 0;
+
+			h3{
+				position:relative;
+				padding:12px 0 20px 40px;
+
+				img{
+					position:absolute;
+					top:0;
+					left:0;
+				}
+			}
+		}
+
+	}
+
+	div.intro{
+		p {
+			font-size: 14px;
+			line-height: 20px;
+		}
+		span.nb-miles {
+			@include border-radius(6px, 6px);
+			@include linear-gradient(color-stops(#365f80, $dark-blue3));
+			margin:5px 20px 0 0;
+			padding-left: 5px;
+			padding-right: 5px;
+			min-width: 60px;
+			text-align: center;
+ 			font-size:42px;
+ 			float:left;
+ 			position: relative;
+ 			top: -8px;
+
+ 		}
+		padding:20px 0;
+
+	}
+}
+
+div#char-count {
+	font-size: 12px;
+	margin-top: -10px;
+}
+
+
+
+.fb , .tw{
+	padding-left:24px;
+	position:relative;
+	img{
+		left:4px;
+		position:absolute;
+	}
+}
+div.share-links {
+	@include column(16,true);
+
+	.btn{
+		@include column(4);
+		margin-left: 20px;
+		padding: 4px;
+		padding-left:35px;
+	}
+ 	height: 35px;
+}
+
+div.step {
+	@include column(16,true);
+ 	margin-bottom: 20px;
+
+ 	p.text {
+ 		font-size: 14px;
+ 		margin-left: 20px;
+ 		span {
+ 			color: #444;
+ 			font-style: italic;
+ 		}
+ 	}
+
+}

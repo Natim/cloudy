@@ -1,0 +1,249 @@
+{% extends "site_base_public.html" %}
+
+{% load static %}
+{% load compress %}
+{# load rendertext #}
+{% load quotes_tags %}
+
+{% block body_id %}home{% endblock %}
+
+
+{% block head %}
+<link href="{% static 'compass/stylesheets/home.css' %}" media="screen, projection" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript" src="{% static 'js/cloudy_home.js' %}"></script>
+<script src="https://connect.facebook.net/fr_FR/all.js#xfbml=1"></script>
+<script type="text/javascript" src="https://apis.google.com/js/plusone.js">
+  { lang: 'fr' }
+</script>
+{% endblock %}
+
+{% block main %}
+<!-- Main -->
+<div id="main">
+  <div id="home-top">
+    <h1>Le carnet de vol en ligne pour tous</h1>
+    <div class="buttons">
+      <a id="signup-button" href="{% url 'register' %}">
+        <span class="txt"></span></a>
+    </div>
+    <div class="buttons">
+      <a id="take-a-tour" href="{% url 'features' %}">Partir en vol d'essai</a>
+    </div>
+
+    <div id="video-cont">
+      <a href="#" id="popup" rel="#video-popup">Cloudy video</a>
+      <!-- popup video -->
+      <div class="popup" id="video-popup">
+        <div class="head  ">
+          Vidéo Cloudy
+          <a href="#" class="close "><img src="{% static 'img/carnet/picto-close-blue.png' %}" /></a>
+
+        </div>
+        <div class="details ">
+          Découvrez Cloudy, le carnet de vol en ligne, en moins d'une minute !
+        </div>
+        <div class="body" id="vimeo-iframe">
+          <iframe title="YouTube video player" width="600" height="450"
+            src="https://www.youtube.com/embed/0Cw7cybWh48?rel=0&hd=1" frameborder="0" allowfullscreen></iframe>
+        </div>
+      </div>
+      <!-- end popup video -->
+
+    </div>
+
+    <div id="clouds-top"></div>
+    <div id="paper-plane"></div>
+    <div class="fb-position">
+      <g:plusone></g:plusone>
+    </div>
+    <div class="fb-position">
+      <fb:like href="http://www.facebook.com/cloudy.fr" layout="button_count" show_faces="false" width="125"
+        font="arial"></fb:like>
+    </div>
+  </div>
+
+  <div id="home-second">
+    {% show_all_quotes %}
+    <div class="home-icons-aeronef">
+
+      <ul id="home-icons">
+        <li id="avion"><a href="#TODO % url landing 'avion' %}"></a></li>
+        <li id="planeur"><a href="#TODO % url landing 'planeur' %}"></a></li>
+        <li id="helico"><a href="#TODO % url landing 'helicoptere' %}"></a></li>
+        <li id="ulm"><a href="#TODO % url landing 'ulm' %}"></a></li>
+        <li id="ballon"><a href="#TODO % url landing 'ballon' %}"></a></li>
+        <li id="parachute"><a href="#TODO % url landing 'parachute' %}"></a></li>
+        <li id="vol_libre"><a href="#TODO % url landing 'vol_libre' %}"></a></li>
+        <li id="drone"><a href="#TODO % url landing 'drone' %}"></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="home-third">
+    <div class="box-top"></div>
+    <div class="box-main">
+      <div id="prev-features">
+        <div class="left-button" rel="1"></div>
+        <div class="right-button" rel="1"></div>
+        <div class="simpleSlide-window" rel="1">
+          <div class="simpleSlide-tray" rel="1">
+            <!-- first three cols -->
+            <div class="simpleSlide-slide prev-feature" rel="1" alt="1">
+              <div class="home-col">
+                <div class="stats-title">
+
+                </div>
+
+                <div class="info-left">
+                  <a href="#TODO % url features %}#stats"><img src="{% static 'img/stats.png' %}"
+                      class="home-img" /></a>
+                  <p>
+                    Découvrez de nombreux indicateurs simples et pratiques à visualiser avec le module Statistiques de
+                    Cloudy, analysez vos vols et vos performances grâce à de nombreux graphiques et tableaux générés
+                    automatiquement !
+                    <br />
+                  </p>
+                </div>
+              </div>
+              <div class="home-col">
+                <div class="aeronefs-title">
+                </div>
+
+                <div class="info-left">
+                  <a href="#TODO % url features %}"><img src="{% static 'img/pourtous.jpg' %}" class="home-img" /></a>
+                  <p>
+                    Que vous soyez pilote d'avion, de planeur, d'ULM, d'hélicoptère, de ballon ou même parachutiste
+                    Cloudy est fait pour vous ! Découvrez un carnet Cloudy adapté à chaque discipline
+                    <br />
+
+                  </p>
+                </div>
+              </div>
+              <div class="home-col">
+                <div class="alerts-title">
+                </div>
+
+                <div class="info-right">
+                  <a href="#TODO % url features %}#alerts"><img src="{% static 'img/alertes.jpg' %}"
+                      class="home-img" /></a>
+                  <p>
+                    Ne prenez plus le risque de voir vos licences ou qualifications expirer, laissez Cloud@lertes vous
+                    prévenir ! Configurez votre profil et recevez un e-mail plusieurs semaines avant l'expiration,
+                    pratique, simple et sécurisé.
+                    <br />
+
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- second three cols -->
+            <div class="simpleSlide-slide prev-feature" rel="1" alt="1">
+              <div class="home-col">
+                <div class="import-title">
+                </div>
+
+                <div class="info-left">
+                  <a href="#TODO % url features %}#import"><img src="{% static 'img/import.jpg' %}"
+                      class="home-img" /></a>
+                  <p>
+                    Avant Cloudy, vous utilisiez un autre logiciel ou site internet pour garder une trace de vos heures
+                    de vol ? Aucun problème, transmettez nous votre fichier (Excel, CSV ou autre) et nous vous
+                    l'importons gratuitement en 48 heures !
+                    <br />
+
+                  </p>
+                </div>
+              </div>
+              <div class="home-col">
+                <div class="export-title">
+                </div>
+
+                <div class="info-left">
+                  <a href="#TODO % url features %}#export"><img src="{% static 'img/export.jpg' %}"
+                      class="home-img" /></a>
+                  <p>
+                    Avec la fonction Export de Cloudy vous pourrez désormais exporter votre carnet au format PDF
+                    (identique au format réglementaire DGAC ou FCL 1.080), XLS ou CSV (pour pouvoir l'utiliser sur
+                    Microsoft Office®) ou bien par e-mail.
+                    <br />
+
+                  </p>
+                </div>
+              </div>
+              <div class="home-col">
+                <div class="cost-title">
+                </div>
+
+                <div class="info-right">
+                  <a href="#TODO % url features %}#cost"><img src="{% static 'img/couts.jpg' %}" class="home-img" /></a>
+                  <p>
+                    Combien avez vous dépensé en heures de vol le mois dernier... Aucune idée ? Avec le module
+                    CloudyCost, vous renseignez les différents tarifs à l'heure de vos appareils favoris et le calcul se
+                    fait automatiquement !
+                    <br />
+
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- -->
+            <!-- third three cols -->
+            <div class="simpleSlide-slide prev-feature" rel="1" alt="1">
+
+              <div class="home-col">
+                <div class="memories-title">
+                </div>
+
+                <div class="info-left">
+                  <a href="#TODO % url features %}#media"><img src="{% static 'img/photos.jpg' %}"
+                      class="home-img" /></a>
+                  <p>
+                    N'oubliez plus ces moments mémorables en vol ou en navigation entre amis et déposez directement dans
+                    la ligne concernée de votre carnet de vol vos photos, souvenirs, vidéos, documents de navigation,
+                    cartes annotées ...
+                    <br />
+
+                  </p>
+                </div>
+              </div>
+              <div class="home-col">
+                <div class="share-title">
+                </div>
+
+                <div class="info-right">
+                  <a href="#TODO % url features %}#share"><img src="{% static 'img/share.jpg' %}"
+                      class="home-img" /></a>
+                  <p>
+                    Partagez, si vous le souhaitez et avec qui vous le souhaitez, vos vols, navigations, voyages avec
+                    vos amis, collègues, proches ou vos instructeurs par e-mail ou sur différents réseaux sociaux
+                    (Facebook, Twitter)
+                    <br />
+
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- -->
+
+          </div>
+        </div>
+
+        <div id="partners-list">
+          <h2>Ils nous font confiance :</h2>
+          <div class="cycle-partners">
+            {% include "partials/partners.html" %}
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="box-bottom"></div>
+
+  </div>
+
+  <div id="content">
+  </div>
+
+  {% endblock %}

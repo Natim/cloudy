@@ -1,0 +1,65 @@
+{% extends "site_base_public.html" %}
+
+{% load static %}
+
+{% load compress %}
+{# load rendertext #}
+{% load quotes_tags %}
+
+{% block body_id %}press{% endblock %}
+
+{% block head %}
+<link href="{% static 'compass/stylesheets/features.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<script type="text/javascript" src="{% static 'js/cloudy_home.js' %}"></script>
+{% endblock %}
+
+
+
+{% block main %}
+<!-- Main -->
+<div id="main">
+  <div id="features-top">
+    <div class="buttons">
+      <a id="signup-button" href="# TODO {# url 'register' #}"><span class="txt"></span></a>
+    </div>
+    <div class="buttons"></div>
+    <div id="paper-plane"></div>
+  </div>
+
+  <div id="features-third">
+    <div class="box-top"></div>
+    <div class="box-main">
+
+      <div class="content">
+        {% block content %}
+        <p>Ce que l'on dit de Cloudy dans la presse ...</p>
+        <br>
+
+        {% for article in object_list %}
+        <p>
+          {{article.date|date:"d\/m\/Y"}} : {{article.title}}
+          <a href="{{article.link}}" target="blank">Lire l'article</a>
+        </p>
+        {% empty %}
+        Aucun article de presse pour le moment.
+        {% endfor %}
+        {% endblock %}
+      </div>
+
+      <div class="slim-sidebar">
+        <div class="blue-box">
+          <h2>Ils nous font <br />&nbsp; confiance : &nbsp;</h2>
+          <div id="partners-list">
+            {% include "partials/partners.html" %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+  <div class="box-bottom"></div>
+</div>
+
+{% endblock %}

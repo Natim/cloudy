@@ -1,0 +1,85 @@
+{%load static%}
+
+<div class="popup" id="add-flight-popup">
+  <div class="head">
+    Choisissez vos carnets à ajouter à votre compte Cloudy
+    <a href="#" class="close"><img src="{% static 'img/carnet/picto-close-blue.png' %}" /></a>
+  </div>
+  <div class="details">
+    {% if not request.user.get_profile.has_payed_plan %}
+    Votre pack Cloudy Economy Class ne vous permet de choisir <span style="background-color: #ffdcdc;">qu'un seul
+      carnet.</span>
+    <a href="{#TODO # url 'payment:pcloudy' #}" class="standard-link">Cliquez ici</a> pour changer de pack.
+    {% else %}
+    Vous pourrez, à tout moment, une fois votre compte créé, rajouter ou supprimer des carnets de vol
+    {% endif %}
+  </div>
+  <div class="body ct">
+    <form action="{% url 'logbooks:addlogbook' %}" method="post" id="add-logbooks-form">
+      {% csrf_token %}
+      <ul class="select-fly-type">
+        <li>
+          <div class="picto avion"></div>
+          <p>Je souhaite un carnet de vol aux normes <strong>DGAC Avion</strong></p>
+          <input type="hidden" name="plane_dgac" value="0" />
+          <a class="custom-check-box"></a>
+        </li>
+        <li>
+          <div class="picto avion"></div>
+          <p>Je souhaite un carnet de vol aux normes <strong>FCL 1.080</strong></p>
+          <input type="hidden" name="plane_fcl1080" value="0" />
+          <a class="custom-check-box"></a>
+        </li>
+
+        <li>
+          <div class="picto planeur"></div>
+          <p>Je souhaite un carnet de vol aux normes <strong>DGAC Planeur</strong></p>
+          <input type="hidden" name="glider_dgac" value="0" />
+          <a class="custom-check-box"></a>
+        </li>
+        <li>
+          <div class="picto ulm"></div>
+          <p>Je souhaite un carnet de vol aux normes <strong>FFPLUM ULM</strong></p>
+          <input type="hidden" name="ulm_ffplum" value="0" />
+          <a class="custom-check-box"></a>
+        </li>
+        <li>
+          <div class="picto helico"></div>
+          <p>Je souhaite un carnet de vol aux normes <strong>DGAC Hélicoptère</strong></p>
+          <input type="hidden" name="helicopter_dgac" value="0" />
+          <a class="custom-check-box"></a>
+        </li>
+
+        <li class="disable">
+          <div class="picto ballon"></div>
+          <p>Je souhaite un carnet de vol aux normes <strong>DGAC Ballon</strong></p>
+          <input type="hidden" name="balloon_dgac" value="0" />
+          <a class="custom-check-box"></a>
+        </li>
+        <li>
+          <div class="picto para"></div>
+          <p>Je souhaite un carnet de vol aux normes <strong>Parachute</strong></p>
+          <input type="hidden" name="parachute_cloudy" value="0" />
+          <a class="custom-check-box"></a>
+        </li>
+        <li class="disable">
+          <div class="picto free_flight"></div>
+          <p>Je souhaite un carnet de vol aux normes <strong>Vol libre</strong></p>
+          <input type="hidden" name="free_flight_cloudy" value="0" />
+          <a class="custom-check-box"></a>
+        </li>
+        <li class="disable">
+          <div class="picto drone"></div>
+          <p>Je souhaite un carnet de vol aux normes <strong>Drone</strong></p>
+          <input type="hidden" name="drone_cloudy" value="0" />
+          <a class="custom-check-box"></a>
+        </li>
+      </ul>
+      <p class="submit">
+        <input type="submit" value="Créer mon/mes carnets" class="btn red" />
+      </p>
+
+    </form>
+
+  </div>
+</div>

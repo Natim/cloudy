@@ -1,0 +1,800 @@
+@import "backend";
+
+/* POPUP ADD FLIGHT ------------------------------------------- */
+
+.popup{
+    position:absolute;
+    top:50%;
+    left:-250px;
+    width:680px;
+    height:400px;
+    @include border-radius(4px, 4px);
+    background:white;
+    @include box-shadow(rgba(0,0,0,0.7), 0, 0, 9px);
+}
+
+#zendesk-popup {
+  height: 600px;
+  width: 393px;
+  margin:-175px 0 0 -200px;
+	.success {
+		width: 91% !important;
+		margin-left: 5px !important;
+	}
+
+        .btn{
+         height: 35px;
+         padding-top: 2px;
+            font-size:14px;
+            padding:6px 12px;
+             &:hover {
+                 margin-top: 1px;
+             }
+         }
+
+  form {
+    margin: 30px;
+
+    label {
+      display: block;
+    }
+
+    #id_subject, #id_description {
+      width: 100%;
+    }
+
+  }
+}
+
+#zendesk_button {
+  background-image: url(https://asset0.zendesk.com/external/zenbox/images/tab_feedback.png);
+  background-color: rgb(6, 48, 80);
+  border-top-color: rgb(6, 48, 80);
+  border-right-color: rgb(6, 48, 80);
+  border-bottom-color: rgb(6, 48, 80);
+  border-left-color: rgb(6, 48, 80);
+  display: block;
+  position:fixed;
+  top:23%;
+  width:33px;
+  z-index:10000;
+  overflow:hidden;
+  height:108px;
+  left: 0px;
+  text-indent: -500px;
+  background-position: -10px 0px;
+  border: 1px solid;
+  padding-right: 2px;
+  cursor: pointer;
+}
+
+#add-flight-popup{
+    margin:-275px 0 0 -350px;
+    width:680px;
+    height:710px;
+    top: 320px;
+
+    div.details a.standard-link {
+      text-decoration: none !important;
+      color: $dark-red !important;
+      border-bottom: none !important;
+      &:hover {
+          border-bottom: 1px solid $dark-red !important;
+          color: $dark-red !important;
+      }
+    }
+
+    .submit{
+        text-align:center;
+        padding:10px;
+        margin-bottom: 10px;
+        .btn{
+         height: 35px;
+         padding-top: 2px;
+            font-size:14px;
+            padding:6px 12px;
+             &:hover {
+                 margin-top: 1px;
+             }
+         }
+    }
+    .select-fly-type{
+        margin:0;
+        padding:0;
+
+        a.custom-check-box {
+            position:absolute;
+            top:15px;
+            right:15px;
+            padding:0 5px 0 0;
+            width:59px;
+            height:26px;
+            cursor:pointer;
+        }
+
+        li {
+            position:relative;
+            border:1px solid white;
+            list-style-type:none;
+            margin:6px 1px;
+            padding:5px;
+            p{
+                padding:10px 0 10px 70px;
+                margin:0;
+            }
+            .picto{
+                position:absolute;
+                top:0;
+                left:5px;
+                height:47px;
+                width:60px;
+                background-image:url(../../img/home-plane-select-name.png);
+                background-repeat:no-repeat;
+            }
+            .avion{background-position:-13px -13px;}
+            .planeur{background-position:-102px -13px;}
+            .helico{background-position:-190px -13px;}
+            .ulm{background-position:-280px -18px;}
+            .ballon{background-position:-367px -8px;}
+            .para{background-position:-458px -9px;}
+            .free_flight{background-position:-548px -14px;}
+            .drone{background-position:-634px -15px;}
+
+             a.custom-check-box {
+                background: {
+                    image: image-url("../../static/img/on-off-2.png") !important;
+                    repeat:  no-repeat;
+                    position:0 0px;
+                };
+            }
+
+        }
+        strong{
+            color:$dark-red;
+            text-decoration:underline;
+        }
+
+
+        li.on {
+            border:1px solid $grey-border;
+            @include border-radius(5px, 5px);
+
+            .picto{
+                background-image:url(../../img/home-plane-select-hover-name.png);
+            }
+            a.custom-check-box {
+                background: {
+                    image: image-url("../../static/img/on-off-2.png") !important;
+                    repeat:  no-repeat;
+                    position:0 -26px;
+                };
+            }
+        }
+
+
+        li.disable {
+            border: 1px solid white;
+            @include border-radius(5px, 5px);
+
+
+            a.custom-check-box {
+                background: {
+                    image: image-url("../../static/img/on-off-2.png") !important;
+                    repeat:  no-repeat;
+                    position:0 -52px;
+                };
+            }
+            &:hover {
+                border: 1px solid white;
+            }
+        }
+
+        li:hover {
+            border:1px solid $grey-border;
+            @include border-radius(5px, 5px);
+
+            .picto{
+                background-image:url(../../img/home-plane-select-hover-name.png);
+            }
+        }
+    }
+}
+
+/* POP UP ADD LOG ----------------------------*/
+
+
+#add-log-popup{
+    margin:-275px 0 0 -450px;
+    width:870px;
+    height: auto;
+    top: 320px;
+
+  input#id_date {
+      background: {
+         image: image-url("../../static/img/input-medium-date.png") !important;
+         repeat:  no-repeat;
+      };
+  }
+  .details {
+    height: 67px;
+    padding-bottom: 0px;
+  }
+  .ct {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .body {
+    border-top: 1px solid $grey-border;
+    position: relative;
+    z-index: 5;
+
+
+        ul.errorlist {
+            @include horizontal-list-container;
+            width: 100%;
+            color: #d11414;
+            padding:0px;
+            margin: 0px 0 5px 0;
+            clear: both;
+
+            li {
+               background: #fbe2e2;
+               padding: 4px 0 4px 10px;
+               @include border-radius(5px, 5px);
+            }
+        }
+
+
+    form {
+      margin-top: 10px;
+            a {
+                @include a-style;
+            }
+
+      .btn {
+        width: 180px;
+        height: 40px;
+        font-size: 16px;
+        font-weight: bold;
+      }
+
+      p.submit {
+        text-align: center;
+      }
+
+      .column {
+        float: left;
+        width: 400px;
+        margin-right: 25px;
+        margin-bottom: 10px;
+        min-height: 300px;
+      }
+      .column-right {
+        float: left;
+        width: 400px;
+        min-height: 300px;
+          margin-bottom: 10px;
+
+        p {
+          margin-left: 20px;
+          font-size: 14px;
+          padding-right: 20px;
+        }
+        .label-message {
+          font-weight: bold;
+          color: $brown;
+          margin-left: 10px;
+                    margin-bottom: 5px;
+                    display: block;
+        }
+
+        .files-list {
+          width: 210px;
+          padding-top: 5px;
+          ul {
+            list-style-type: none;
+            margin-left: -20px;
+            li {
+              width: 186px;
+              margin-bottom: 5px;
+              padding: 5px 10px 5px 10px;
+              font-size: 14px;
+              color: $brown;
+              background: {
+                   image: image-url("../../static/img/carnet/bar-file-bg.png") !important;
+                   repeat:  no-repeat;
+                };
+              .icon-delete {
+                display: block;
+                margin-top:5px;
+                height: 9px;
+                width: 9px;
+                float: right;
+                background: {
+                     image: image-url("../../static/img/carnet/icon-delete.png") !important;
+                     repeat:  no-repeat;
+                  };
+              }
+            }
+          }
+        }
+      }
+      .observations {
+        margin-left: 10px;
+        border: none;
+        background: {
+             image: image-url("../../static/img/observations-textarea2.png") !important;
+             repeat:  no-repeat;
+          };
+        font-size: 14px;
+        color: $brown;
+        width: 350px;
+        height: 65px;
+        padding: 5px;
+        overflow: hidden;
+                resize: none;
+      }
+      .caracters-limit {
+        color: $grey;
+        font-size: 12px;
+        float: right;
+        margin: 2px 30px 10px 0px;
+      }
+      .box-form {
+        border: 1px solid $grey-border;
+        width: 400px;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        margin-top: 5px;
+        float: left;
+        .spacer {
+          clear:both;
+        }
+      }
+
+      h3 {
+        width: 44%;
+        color: $dark-blue;
+        font-size: 14px;
+        font-weight: bold;
+        background: white;
+        padding: 0px 10px 0px 10px;
+        margin: -10px 0px 10px 12px;
+      }
+      .subwrapper {
+        padding-top: 10px;
+        float: left;
+      }
+      .subwrapper-right {
+        float: left;
+      }
+
+      .add-link {
+        float: right;
+        color: $dark-red;
+        text-decoration:none;
+        margin: 10px 20px 0px 0px;
+        font-size: 12px;
+        display: block;
+        background: url(../../img/carnet/icon-plus.png) no-repeat left center;
+        padding-left: 18px;
+        &:hover {
+          text-decoration:underline;
+        }
+      }
+
+      .popup-table {
+
+        width: 360px;
+        margin: 10px 0px 5px 20px;
+
+        thead {
+
+          .right {
+            background: {
+              color: white;
+              image: url(../../img/carnet/top-table-popup.png) !important;
+              repeat: no-repeat;
+              position: right top;
+            };
+          }
+          th {
+            padding-left: 15px;
+            background: {
+              color: white;
+              image: url(../../img/carnet/top-table-popup.png) !important;
+              repeat: no-repeat;
+              position: left top;
+            };
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+          }
+        }
+
+        td {
+          background: #d4e3e8;
+          color: $brown;
+          font-size: 14px;
+          padding-left: 15px;
+          padding-right: 5px;
+        }
+
+        .blue-cycle {
+          td {
+            background : $blue-cycle;
+          }
+        }
+      }
+
+      .fieldwrapper {
+        margin-left: 20px;
+        margin-bottom: 10px;
+        //height: 35px;
+
+        div.selector {
+          width: 200px !important;
+          span {
+            width: 165px !important;
+          }
+          select {
+            width: 205px !important;
+          }
+        }
+        .left-label {
+          width: 73px !important;
+        }
+        .big-label {
+          width: 140px !important;
+        }
+
+        .label-radio {
+          float: none;
+          width: 50px;
+        }
+        label {
+          font-weight: bold;
+          text-align:right;
+          color: $brown;
+          width: 100px;
+          display:inline;
+          float:left;
+          margin: 10px 10px 0px 0px;
+        }
+
+        .input-small {
+          @include mini-input;
+          float:left;
+          font-size: 14px;
+          margin-right: 10px;
+        }
+
+        .input-medium {
+          @include medium-input;
+          float:left;
+          font-size: 14px;
+        }
+        .icon-calendar {
+          display:block;
+          float: left;
+          background: {
+            image: url(../../img/carnet/icon-calendar.png);
+                repeat:  no-repeat;
+          };
+          width: 14px;
+          height: 14px;
+          margin: 12px 0px 0px 5px;
+        }
+        clear: both;
+      }
+    }
+  }
+
+  ul.tabs {
+    margin: 10px 0px 0px 0px !important;
+    @include horizontal-list-container;
+    .current {
+      background: white;
+      color: $dark-blue;
+      z-index: 20;
+    }
+    .right-tab {
+      border-left: none;
+    }
+
+    li {
+      @include horizontal-list-item( false, left);
+      a {
+        text-decoration: none;
+        display: block;
+        text-align: center;
+        width: 70px;
+        background: $header-input-blue;
+        padding: 8px;
+        font-weight: bold;
+        font-size: 14px;
+        color: $dark-red;
+        border: 1px solid $grey-border;
+        border-bottom: none;
+        position: relative;
+        z-index: 1;
+      }
+    }
+  }
+}
+span.helptext {
+    float: left;
+    font-style: italic;
+    color: $grey;
+    width: 30px;
+    padding: 10px 0 0  0px;
+}
+
+/* EXPORT IMPORT ---------------------------------------------- */
+
+#export-popup{
+    margin:-270px 0 0 -350px;
+    width:680px;
+    height:350px;
+    top: 320px;
+
+  .ct {
+    padding-top: 50px;
+    padding-left: 20px;
+    padding-right:  0px;
+  }
+    div.cont {
+        @include column(12, true);
+        @include push-margins(1);
+        a {
+            @include a-style;
+        }
+    }
+  div.extra {
+     @include column(10);
+     padding-left: 65px;
+  }
+  h3.csv {
+    @include column(10);
+    color: $dark-blue;
+    font-weight: bold;
+    font-size: 14px;
+    background: {
+      image: url(../../img/home-import-ico-trans.png);
+          repeat:  no-repeat;
+    };
+     padding-left: 65px;
+
+    padding-top: 20px;
+    height: 38px;
+  }
+
+  h3.pdf {
+        @include column(10);
+    color: $dark-blue;
+    font-weight: bold;
+    font-size: 14px;
+    background: {
+      image: url(../../img/home-import-pdf-trans.png);
+          repeat:  no-repeat;
+    };
+    padding-top: 20px;
+        padding-left: 65px;
+
+    height: 38px;
+    margin-right: 10px;
+  }
+
+    .btn{
+        @include column(3);
+
+    text-align: center;
+         height: 20px;
+         padding-top: 2px;
+            font-size:14px;
+            padding:6px 12px;
+     }
+  a.btn.red {
+
+      &:hover {
+          margin-top: 16px !important;
+
+      }
+  }
+
+    a.btn.disable {
+        margin-top: 16px;
+        color: white;
+        background-color: #aaa;
+        &:active {  }
+        &:hover {  }
+    }
+}
+
+/* IMPORT POP UP ****************************** */
+#import-popup{
+    width: 550px;
+    margin-left: -250px;
+    margin-top: -250px;
+
+    height:auto;
+  padding-bottom: 30px;
+
+  .import-label {
+    width: 100% !important;
+    text-align: left;
+    clear: both;
+  }
+
+    p.text {
+    padding-left: 65px;
+    a {
+      @include  a-style;
+    }
+    }
+    form {
+      @include nice-form;
+      @include column(12);
+        @include push-margins(1);
+      textarea.textarea-custom {
+        width: 250px;
+          height: 70px;
+      background: {
+            image: image-url("../../static/img/textarea-custom-med.png") !important;
+            repeat:  no-repeat;
+          };
+
+      }
+    }
+  h3.import {
+    @include column(11, last);
+
+    color: $dark-blue;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 22px;
+    background: {
+      image: url(../../img/home-import-ico-trans.png);
+          repeat:  no-repeat;
+    };
+    padding-left: 65px;
+    padding-top: 20px;
+    height: 40px;
+    margin-right: 10px;
+    margin-bottom: 20px
+  }
+  h3.report {
+    float: left;
+    color: $dark-blue;
+    font-weight: bold;
+    font-size: 16px;
+    background: {
+      image: url(../../img/home-import-report-trans.png);
+          repeat:  no-repeat;
+    };
+    padding-left: 65px;
+    padding-top: 20px;
+    height: 40px;
+    margin-right: 10px;
+    margin-bottom: 0px
+  }
+  div.report div  {
+          margin-left: 70px;
+  }
+     .btn{
+
+    text-align: center;
+    padding-top: 2px;
+    font-size:14px;
+    padding:6px 12px;
+     }
+  a.btn.red {
+
+      &:hover {
+          margin-top: 15px !important;
+
+      }
+  }
+
+
+  .moment {
+    float: left;
+    margin: 10px 10px 0px 0px;
+    font-weight: bold;
+    color:$dark-blue;
+    width: 55px;
+  }
+
+  .fieldwrapper {
+    margin-left: 20px;
+    margin-bottom: 10px;
+    height: 35px;
+
+    label {
+      font-weight: bold;
+      text-align:right;
+      color: $brown;
+      width: 130px;
+      display:block;
+      float:left;
+      margin: 10px 10px 0px 0px;
+    }
+
+    .left-label {
+      width: auto !important;
+      text-align: left;
+    }
+    .small-select {
+      width: 50px;
+      float: left;
+      margin-right: 25px;
+      div.selector {
+        width: 50px !important;
+        span {
+          width: 15px !important;
+        }
+        select {
+          width: 50px !important;
+        }
+      }
+    }
+
+    .input-small {
+      @include mini-input;
+      float:left;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+
+    .input-medium {
+      @include medium-input;
+      float:left;
+      font-size: 14px;
+    }
+    clear:both;
+  }
+}
+
+/* TOTAL POPUP ---------------------------------*/
+
+
+.total-cell-form {
+  left: 15% !important;
+    width:650px !important;
+    height:170px;
+    top: 320px;
+  padding: 0px !important;
+
+  .body {
+    padding-left: 15px;
+  }
+
+  label {
+    margin-top: 8px;
+  }
+
+  .btn{
+  margin-left: 230px;
+  float: left !important;
+  display: block !important;
+  text-align: center !important;
+     height: 30px !important;
+     padding-top: 2px !important;
+        font-size:14px !important;
+        padding:6px 12px !important;
+    margin-top: 20px !important;
+     }
+  a.btn.red {
+      &:hover {
+          margin-top: 15px !important;
+
+      }
+  }
+
+  .head {
+    width:590px !important;
+      margin-top: 0px !important;
+      margin-bottom: 20px !important;
+  }
+
+}

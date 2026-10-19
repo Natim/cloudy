@@ -1,0 +1,116 @@
+{% extends "site_base_logbook.html" %}
+
+{% load static %}
+{% load core_tags %}
+
+
+{% block body_id %}logbooks{% endblock %}
+{% block actions-id %}import{% endblock %}
+
+
+{% block head %}
+<link href="{% static 'compass/stylesheets/logbook.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'compass/stylesheets/logbook_popups.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+{% endblock %}
+
+{% block nav-logbook %}
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="box-top-profile"></div>
+<div class="box-main-import">
+  <div class="horizontal">
+    <div class="import">
+      <h1>Import du carnet</h1>
+      <div style="padding-left: 20px;">
+        <p>
+          Merci de mettre votre carnet
+          au <a href="{% static 'csv_samples/{{logbook.cat}}_import_sample.csv' %}">format
+            d'import Cloudy</a>.<br>En cas de soucis, contactez <a
+            href="mailto:support@cloudy.fr">support@cloudy.fr</a>.
+        </p>
+
+
+        <form action="{% url 'logbooks:auto_import' logbook.id %}" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          {{aform.as_p}}
+
+          <p class="submit">
+            <button type="submit" name="submit" value="Importer mon carnet">Importer votre carnet</button>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="box-bottom-backend"></div>
+
+<div class="box-top-profile"></div>
+<div class="box-main-import">
+  <div class="horizontal">
+    <div class="manual">
+      <h1>Mode d'emploi</h1>
+      <div style="padding-left: 20px;padding-right: 40px;">
+        1 - Téléchargez le format d'import Cloudy.<br>
+        2 - Remplissez ce fichier avec vos informations de vol et selon les colonnes bien définies.<br>
+        3 - Lors de l'enregistrement, vérifiez les points suivants :
+        <div style="padding-left: 30px;">
+          - Fichier au format CSV. (extension .csv)<br>
+          - Encodage de caractères : UTF-8<br>
+          - Option de séparateur : Point-virgule (;)<br>
+          - Séparateur de texte : Guillemet (")<br>
+        </div>
+        <br>
+        Libre Office/Open Office vous demande ces informations lors de l'ouverture d'un fichier csv.<br>
+        Pour Excel, version supérieure à 2011, il faut importer le fichier csv. Cliquez sur l’onglet Données, dans le
+        groupe Données externes, cliquez sur À partir du texte. Sélectionnez votre fichier csv et suivez les
+        instructions de l'assistant d'import.<br>Avec Google Drive, créez une feuille de calcul. Dans l'onglet Fichier,
+        sélectionnez importer. Suivez les instructions et n'oubliez pas de définir le bon séparateur de colonne (;)
+      </div>
+    </div>
+  </div>
+</div>
+<div class="box-bottom-backend"></div>
+
+<div class="box-top-profile"></div>
+<div class="box-main-import">
+  <div class="horizontal">
+    <div class="erreurs">
+      <h1>Erreurs fréquentes</h1>
+      <div style="padding-left: 20px;padding-right: 40px;">
+        Lorsqu'un message d'erreur est remonté, il vous indiquera toujours la ligne où se situe le problème.<br><br>
+        1 - Le champ 'NOM_COLONNE' ne doit pas être vide<br>
+        La colonne désignée contient une ligne vide, alors que la donnée est obligatoire. Vérifiez que toutes les lignes
+        de la colonne concernée soient bien remplies.<br><br>
+        2 - Le nombre de colonnes ne correspond pas : 'NOMBRE_TROUVE' au lieu de 'NOMBRE_ATTENDUE'<br>
+        Le nombre de colonnes de votre fichier ne correspond pas à ce que l'outil d'import attend. Il ne faut surtout
+        pas modifier le nombre de colonne du modèle. Vérifiez le nombre de colonnes de votre fichier. Si tout est bon,
+        vérifiez votre option de séparateur, décrit dans le mode d'emploi.<br><br>
+        3 - Le champ 'NOM_DU_CHAMP' ne valide pas le format :
+        <div style="padding-left: 30px;">
+          - HH:MM ou MM si vous avez sélectionné 'Temps en minutes' : Lorsque vous renseignez les durées, il y a deux
+          possibilités. Le format HH:MM, n'oubliez pas le séparateur ':' même pour les valeurs nulles. Soit le format MM
+          (ne pas oublier de cocher la case 'Temps en minutes' avant l'import) qui est un simple entier.<br>
+          Format HH:MM -> 00:00, 01:40, 01:00, 00:30<br>
+          Format MM -> 0, 100, 60, 30.<br><br>
+          - d'une date XX/XX/XXXX : Lorsque vous renseignez une date, celle-ci doit respecter le format JJ/MM/AAAA.
+          Vérifiez la ligne qui pose problème.<br><br>
+        </div>
+        4 - UTF8 codec can't decode bytes<br>
+        Cette erreur survient lorsque les données ne sont pas encodées au format UTF-8. Ouvrez votre fichier CSV et
+        sélectionnez UTF-8 comme encodage de caractères. <br> Corrigez les données posant des problèmes, à cause des
+        accents dans la plupart des cas. Elles sont facilement identifiables.<br>Ex : 'Pensez à vérifier compétences
+        lors du décollage vent de travers.' peut devenir 'Pensez Ã  vÃ©rifier compÃ©tences lors du dÃ©collage vent de
+        travers.'
+      </div>
+    </div>
+  </div>
+</div>
+<div class="box-bottom-backend"></div>
+{% endblock %}

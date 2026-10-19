@@ -1,0 +1,183 @@
+{% extends "site_base_public.html" %}
+
+{% load static %}
+{% load compress %}
+{# load rendertext #}
+{% load quotes_tags %}
+
+{% block body_id %}features{% endblock %}
+
+{% block head %}
+
+{% compress css %}
+<link href="{% static 'compass/stylesheets/features.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+{% endcompress %}
+
+<script type="text/javascript" src="{% static 'js/cloudy_home.js' %}"></script>
+{% endblock %}
+
+
+
+{% block main %}
+<!-- Main -->
+<div id="main">
+  <div id="features-top">
+    <div class="buttons">
+      <a id="signup-button" href="# TODO {# url 'register' #}"><span class="txt"></span></a>
+    </div>
+    <div class="buttons"></div>
+    <div id="paper-plane"></div>
+  </div>
+
+  <div id="features-second">
+    {% show_all_quotes %}
+  </div>
+
+  <div id="features-third">
+    <div class="box-top"></div>
+    <div class="box-main">
+
+      <div id="features-content">
+
+        <div class="features-line-content">
+          <div class="features-col-content">
+            <a href="#"><img src="{% static 'img/pourtous.jpg' %}" class="features-img" /></a>
+            <div class="icon-multiple"></div>
+          </div>
+          <div class="features-col-content">
+            <h2>Un carnet Cloudy pour tous !</h2>
+            <p>
+              Que vous soyez pilote d'avion, de planeur, d'ULM, d'hélicoptère, de ballon ou même parachutiste Cloudy est
+              fait pour vous ! Découvrez un carnet Cloudy adapté à chaque discipline...
+            </p>
+          </div>
+        </div>
+
+        <div class="features-line-content">
+          <div class="features-col-content">
+            <h2 id="alerts">Pratique : Cloud@lertes</h2>
+            <p>
+              Ne prenez plus le risque de voir vos licences ou qualifications expirer, laissez Cloud@lertes vous
+              prévenir ! Configurez votre profil et recevez un e-mail plusieurs semaines avant l'expiration, pratique,
+              simple et sécurisé.
+            </p>
+          </div>
+          <div class="features-col-content">
+            <a href="#"><img src="{% static 'img/alertes.jpg' %}" class="features-img" /></a>
+            <div class="icon-alert"></div>
+          </div>
+        </div>
+
+        <div class="features-line-content">
+          <div class="features-col-content">
+            <h2 id="stats">Découvrez vos statistiques</h2>
+            <p>
+              Découvrez de nombreux indicateurs simples et pratiques à visualiser avec le module Statistiques de Cloudy,
+              analysez vos vols et vos performances grâce à de nombreux graphiques et tableaux générés automatiquement !
+              Visualisez un exemple <a href="{% static 'img/sample_stats.png' %}" target="_blank">de statistiques</a>
+              DGAC avion.
+
+            </p>
+          </div>
+          <div class="features-col-content">
+            <a href="{% static 'img/sample_stats.png' %}" target="_blank"><img src="{% static 'img/stats.png' %}"
+                class="features-img" /></a>
+            <div class="icon-stats"></div>
+          </div>
+        </div>
+
+        <div class="features-line-content">
+          <div class="features-col-content">
+            <a href="{% static 'exemple_export_dgac.pdf' %}" target="_blank"><img src="{% static 'img/export.jpg' %}"
+                class="features-img" /></a>
+            <div class="icon-export"></div>
+          </div>
+          <div class="features-col-content">
+            <h2 id="export">Des exports multi-formats</h2>
+            <p>
+              Avec la fonction Export de Cloudy vous pourrez désormais exporter votre carnet au format PDF (identique au
+              format réglementaire DGAC ou FCL 1.080), XLS ou CSV (pour pouvoir l'utiliser sur Microsoft Office®) ou
+              bien par e-mail.
+              Téléchargez en exemple <a href="{% static 'pdf/exemple_export_dgac.pdf' %}" target="_blank">d'export
+                PDF</a> DGAC avion.
+
+            </p>
+          </div>
+        </div>
+
+        <div class="features-line-content">
+          <div class="features-col-content">
+            <h2 id="cost">Combien ça coûte ?</h2>
+            <p>
+              Combien avez vous dépensé en heures de vol le mois dernier... Aucune idée ? Avec le module CloudyCost,
+              vous renseignez les différents tarifs à l'heure de vos appareils favoris et le calcul se fait
+              automatiquement !
+            </p>
+          </div>
+          <div class="features-col-content">
+            <a href="#"><img src="{% static 'img/couts.jpg' %}" class="features-img" /></a>
+            <div class="icon-cost"></div>
+          </div>
+        </div>
+
+        <div class="features-line-content">
+          <div class="features-col-content">
+            <a href="#"><img src="{% static 'img/import.jpg' %}" class="features-img" /></a>
+            <div class="icon-import"></div>
+          </div>
+          <div class="features-col-content">
+            <h2 id="import">Importez ou Reportez</h2>
+            <p>
+              Avant Cloudy, vous utilisiez un autre logiciel ou site internet pour garder une trace de vos heures de vol
+              ? Aucun problème, reportez vos heures ou transmettez nous votre fichier (Excel, CSV ou autre) et nous vous
+              l'importons gratuitement en 48 heures !
+            </p>
+          </div>
+        </div>
+
+        <div class="features-line-content">
+          <div class="features-col-content">
+            <h2 id="share">Partagez simplement</h2>
+            <p>
+              Partagez, si vous le souhaitez et avec qui vous le souhaitez, vos vols, navigations, voyages avec vos
+              amis, collègues, proches ou vos instructeurs par e-mail ou sur différents réseaux sociaux (Facebook,
+              Twitter)
+            </p>
+          </div>
+          <div class="features-col-content">
+            <a href="#"><img src="{% static 'img/share.jpg' %}" class="features-img" /></a>
+            <div class="icon-share"></div>
+          </div>
+        </div>
+
+        <div class="features-line-content no-border">
+          <div class="features-col-content">
+            <a href="#"><img src="{% static 'img/photos.jpg' %}" class="features-img" /></a>
+            <div class="icon-memories"></div>
+          </div>
+          <div class="features-col-content">
+            <h2 id="media">Le carnet Souvenir</h2>
+            <p>
+              N'oubliez plus ces moments mémorables en vol ou en navigation entre amis et déposez directement dans la
+              ligne concernée de votre carnet de vol vos photos, souvenirs, vidéos, documents de navigation, cartes
+              annotées ...
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slim-sidebar">
+        <div class="blue-box">
+          <h2>Ils nous font <br />&nbsp; confiance : &nbsp; </h2>
+          <div id="partners-list">
+            {% include "partials/partners.html" %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="box-bottom"></div>
+</div>
+
+
+{% endblock %}

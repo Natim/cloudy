@@ -1,0 +1,39 @@
+[default]
+extend-ignore-re = [
+  "(?Rm)^.*#\\s*typos: ignore$",
+]
+
+[default.extend-identifiers]
+ wisper = "wisper"
+ fo = "fo"
+ vai_dbl = "vai_dbl"
+ vai_plt = "vai_plt"
+
+[default.extend-words]
+ ownr = "ownr"
+ imma = "imma"
+ cmmts = "cmmts"
+ nbrto = "nbrto"
+ nbrla = "nbrla"
+ aerodrom = "aerodrom"
+ loogbook = "loogbook"
+ juste = "juste"
+ fistclass = "fistclass"
+ payed = "payed"
+ parrainage = "parrainage"
+ aeronef = "aeronef"
+ planeur = "planeur"
+ ffplum = "ffplum"
+ parachute = "parachute"
+ logbook = "logbook"
+ logbooks = "logbooks"
+ bord = "bord"
+ Bord = "Bord"
+ BORD = "BORD"
+ BLOK = "BLOK"
+ vai = "vai"
+ classe = "classe"
+ fith = "fith"
+ confirme = "confirme"
+ noticies = "noticies"
+ feets = "feets"

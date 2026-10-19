@@ -1,0 +1,16 @@
+{% extends "mails/base_body.txt" %}
+{% block content_fr %}
+Bonjour {{ user.get_full_name }},
+
+Vous venez d'être parrainé par {{ sponsor.get_full_name }} et vous gagnez {{ m }} miles Cloudy !
+
+Rendez vous vite sur Cloudy afin de les convertir et gagner des mois d'abonnement First Class gratuits !
+{% endblock %}
+
+{% block content_en %}
+Hello {{ userget_full_name }},
+
+You have just sponsored by {{sponsor.get_full_name}} and you win {{m}} Cloudy miles!
+
+Go quickly to Cloudy to convert them and win First Class subscription months free!
+{% endblock %}

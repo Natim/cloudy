@@ -1,0 +1,188 @@
+{% load static %}
+{% with form.initial.log_id as is_form_edit %}
+<div class="popup {{logbook_cat}}" id="add-log-popup">
+  <div class="head">
+    <span id="add-log-title">
+      {% if is_form_edit %}
+      {% if logbook_cat == 'parachute_cloudy' %}
+      Edition d'un saut
+      {% else %}
+      Edition d'un vol
+      {% endif %}
+      {% else %}
+      {% if logbook_cat == 'parachute_cloudy' %}
+      Ajout d'un saut
+      {% else %}
+      Ajout d'un vol
+      {% endif %}
+      {% endif %}
+    </span>
+    <a href="#" class="close"><img src="{% static 'img/carnet/picto-close-blue.png' %}" /></a>
+  </div>
+
+  <div class="details">
+    Informations obligatoires et facultatives à la tenue d'un carnet de vol
+    <ul class="tabs">
+      {% if logbook_cat == 'plane_fcl1080' %}
+      <li>
+        <a href="#" class="current-tab">P. gauche</a>
+      <li>
+        <a href="#" class="right-tab">P. droite</a>
+      </li>
+      <li>
+        <a href="#" class="right-tab">Facultatif</a>
+      </li>
+      {% else %}
+      <li>
+        <a href="#" class="current-tab">Général </a>
+      <li>
+        <a href="#" class="right-tab">Facultatif</a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+
+  <div class="body ct">
+    {{ form.non_field_errors }}
+    {% if logbook_cat == 'plane_dgac' or logbook_cat == 'helicopter_dgac' %}
+    {% include 'popups/add_log_dgac_avion.html' %}
+    {% endif %}
+    {% if logbook_cat == 'glider_dgac' %}
+    {% include 'popups/add_log_dgac_planeur.html' %}
+    {% endif %}
+    {% if logbook_cat == 'ulm_ffplum' %}
+    {% include 'popups/add_log_ffplum_ulm.html' %}
+    {% endif %}
+    {% if logbook_cat == 'parachute_cloudy' %}
+    {% include 'popups/add_log_ffp.html' %}
+    {% endif %}
+    {% if logbook_cat == 'plane_fcl1080' %}
+    {% include 'popups/add_log_fcl1080.html' %}
+    {% endif %}
+  </div>
+</div>
+
+{% endwith %}
+<script type="text/javascript">
+
+
+  // reset form
+  $('a.reset-form').click(function () {
+    cloudy.reset_form("#add-log-form");
+    return false;
+  });
+
+  /* Count char for text area observation */
+  cloudy.update_count_chars_message($(this), $("span#obs-current-count"), 70);
+  $("textarea#id_obs").keyup(function () {
+    cloudy.update_count_chars_message($(this), $("span#obs-current-count"), 70);
+  });
+
+
+  $(document).ready(function () {
+    $("#id_date").click(function () {
+      if ($("#id_date").val() == "") {
+        date = new Date();
+        if (date.getDate().toString().length < 2)
+          day = "0" + date.getDate().toString();
+        else
+          day = date.getDate().toString();
+
+        month = date.getMonth() + 1;
+        if (month > 12)
+          month = month - 12;
+
+        if (month.toString().length < 2)
+          month = "0" + month.toString();
+        else
+          month = month.toString();
+
+        $("#id_date").val(day + "/" + month + "/" + date.getFullYear().toString());
+      }
+    });
+
+    $("#id_imma").autocomplete({
+      appendTo: "#add-log-form",
+      delay: 0,
+      source: "{% url 'logbooks:add_log_autocomplete' logbook.id %}",
+      select: function (event, ui) {
+        $("#id_ltype").val(ui.item.type);
+        if ($("#id_aerostart").val() == "")
+          $("#id_aerostart").val(ui.item.airport);
+        if ($("#id_aeroend").val() == "")
+          $("#id_aeroend").val(ui.item.airport);
+      }
+    });
+    $("#id_aircraft_imma").autocomplete({
+      appendTo: "#add-log-form",
+      delay: 0,
+      source: "{% url 'logbooks:add_log_autocomplete' logbook.id %}",
+      select: function (event, ui) {
+        $("#id_aircraft_type").val(ui.item.type);
+        if ($("#id_departure_place").val() == "")
+          $("#id_departure_place").val(ui.item.airport);
+        if ($("#id_arrival_place").val() == "")
+          $("#id_arrival_place").val(ui.item.airport);
+      }
+    });
+    $("#id_ulm_imma").autocomplete({
+      appendTo: "#add-log-form",
+      delay: 0,
+      source: "{% url 'logbooks:add_log_autocomplete' logbook.id %}",
+      select: function (event, ui) {
+        $("#id_ulm_type").val(ui.item.type);
+        if ($("#id_aerostart").val() == "")
+          $("#id_aerostart").val(ui.item.airport);
+        if ($("#id_aeroend").val() == "")
+          $("#id_aeroend").val(ui.item.airport);
+      }
+    });
+    $("#id_aerostart, #id_aeroend, #id_departure_place, #id_arrival_place").autocomplete({
+      appendTo: "#add-log-form",
+      delay: 0,
+      source: "{% url 'logbooks:airport_autocomplete' logbook.id %}"
+    });
+
+    $("#id_departure_time_0, #id_departure_time_1, #id_arrival_time_0, #id_arrival_time_1").blur(function () {
+      var departure_hour = $('#id_departure_time_0').val();
+      var departure_minute = $('#id_departure_time_1').val();
+      var arrival_hour = $('#id_arrival_time_0').val();
+      var arrival_minute = $('#id_arrival_time_1').val();
+
+      if (departure_hour == "" || departure_minute == "" || arrival_hour == "" || arrival_minute == "") {
+        return null;
+      }
+
+      departure_hour = parseInt(departure_hour);
+      departure_minute = parseInt(departure_minute);
+      arrival_hour = parseInt(arrival_hour);
+      arrival_minute = parseInt(arrival_minute);
+
+      delta_minute = arrival_minute - departure_minute;
+      if (delta_minute < 0) {
+        delta_minute = delta_minute + 60;
+        arrival_hour = arrival_hour - 1;
+      }
+
+      delta_hour = arrival_hour - departure_hour;
+
+      if (delta_hour.toString().length == 1)
+        delta_hour = "0" + delta_hour.toString();
+      else
+        delta_hour = delta_hour.toString();
+
+      if (delta_minute.toString().length == 1)
+        delta_minute = "0" + delta_minute.toString();
+      else
+        delta_minute = delta_minute.toString();
+
+      $('#id_total_time_flight_0').val(delta_hour);
+      $('#id_total_time_flight_1').val(delta_minute);
+
+      $.uniform.update();
+
+      return 0;
+    });
+  });
+
+</script>

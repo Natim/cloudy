@@ -1,0 +1,102 @@
+{% extends "accounts/base_registration.html" %}
+{% load static %}
+<!-- {#% load core_tags %#} -->
+
+{% block title %}Inscription{% endblock %}
+
+{% block head-title %}
+Je m'inscris
+{% endblock %}
+
+{% block body_id %}registration{% endblock %}
+
+{% block head %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+{% include "popups/gcu_register.html" %}
+<form action="." method="post" autocomplete="off" id="signup-form">
+  {% csrf_token %}
+  <fieldset>
+
+    <h2 class="step1">Mes informations personnelles</h2>
+
+    {# form.non_field_errors #}
+
+    {% for field in form.step1_fields %}
+    {% if field.is_hidden %}
+    {{ field }}
+    {% else %}
+    <div class="fieldWrapper">
+      <p>{{ field.label_tag }}
+        {{ field }}
+      </p>
+      {% if field.help_text %}
+      <p class="help-field">{{ field.help_text }}</p>
+      {% endif %}
+      {{ field.errors }}
+    </div>
+
+    {% endif %}
+    {% endfor %}
+  </fieldset>
+
+  <fieldset>
+    <h2 class="step2">Je crée mon compte Cloudy !</h2>
+
+
+    <div id="tos-check">
+      {{ form.tos }}
+    </div>
+    <div class="tos-wrap">En cochant cette case j'accepte les <a href="#" id="gcu_link" rel="#gcu-popup">conditions
+        générales</a> d'utilisation de Cloudy.<br />
+    </div>
+    {{ form.tos.errors }}
+
+  </fieldset>
+  <p class="submit">
+    <button type="submit">Prêt au décollage !</button>
+  <div id="red-plane" style="display: none; position: relative;"><img src="{% static 'img/red_paper-plane.png' %}" />
+  </div>
+  </p>
+</form>
+
+
+
+<div class="slim-sidebar">
+  <div class="blue-box">
+    <h2>Cloudy c'est:</h2>
+    <p class="quote">
+      Un service <span>innovant</span> et la garantie d'avoir <span>toujours</span> son carnet de vol en ligne à portée
+      de main.
+    <p class="left-keyword">
+      Simple
+    </p>
+    <p class="right-keyword">
+      Pratique
+    </p>
+    <p class="left-keyword2">
+      Sécurisé
+    </p>
+    <p class="right-keyword2">
+      100% en ligne
+    </p>
+    </p>
+  </div>
+</div>
+
+<div class="slim-sidebar">
+  <div class="blue-box">
+    <h2>Sécurité</h2>
+    <p class="quote">
+      Chez Cloudy, nous travaillons avec des partenaires de choix pour la sécurisation de vos paiement en ligne :
+    </p>
+    <img src="{% static 'img/logo-credit.png' %}" class="logo-secure" />
+    <img src="{% static 'img/logo-payline.png' %}" class="logo-secure" /><br />
+  </div>
+  <div class="lock-cloud"></div>
+</div>
+
+{% endblock %}

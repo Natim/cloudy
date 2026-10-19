@@ -1,0 +1,284 @@
+{% with logbook.time_format_str as time_format_str %}
+
+<form action="{% url 'logbooks:add_log' logbook_id %}?p={{ request.GET.p}}" method="post" enctype='multipart/form-data'
+  id="add-log-form">
+  {% csrf_token %}
+  <div class="panes">
+    <!-- Tab 1 general, {{ form.foo.label_tag }} won't always work for some reasons so we use <label for="id_{{form.date.name}}"></label> -->
+    <div>
+      <div class="column">
+        {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+        {% endfor %}
+        <div class="box-form">
+          <h3>Informations sur le vol</h3>
+          <div class="fieldwrapper">
+            <label for="id_{{form.date.name}}">{{ form.date.label|capfirst }}</label>
+            {{ form.date }}
+            {{ form.date.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.imma.name}}">{{ form.imma.label|capfirst }}</label>
+            <div class="ui-widget">
+              {{ form.imma }}
+            </div>
+            {{ form.imma.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.ltype.name}}">{{ form.ltype.label|capfirst }}</label>
+            {{ form.ltype }}
+            {{ form.ltype.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.fboard.name}}">{{ form.fboard.label|capfirst }}</label>
+            {{ form.fboard }}
+            {{ form.fboard.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.nvol.name}}">{{ form.nvol.label|capfirst }}</label>
+            {{ form.nvol }}
+            {{ form.nvol.errors }}
+          </div>
+
+          <div class="spacer"></div>
+        </div>
+
+
+        <div class="box-form">
+          <h3>Membre d'équipage</h3>
+
+          <div class="fieldwrapper">
+            <div class="subwrapper">
+              {{ form.mbreqdn }}
+              {{ form.mbreqdn.errors }}
+            </div>
+
+            <div class="subwrapper-right">
+              <label for="id_{{form.mbreqtime.name}}">{{ form.mbreqtime.label|capfirst }}</label>
+              {{ form.mbreqtime }}
+              {{ form.mbreqtime.errors }}
+            </div>
+          </div>
+          <div class="spacer"></div>
+        </div>
+
+
+
+        <div class="box-form">
+          <h3>Pilote monomoteur</h3>
+
+          <div class="fieldwrapper">
+            {{ form.pmonodn }}
+            {{ form.pmonodn.errors }}
+          </div>
+          <div class="fieldwrapper">
+            {{ form.pmonopos }}
+            {{ form.pmonopos.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.pmonotime.name}}">{{ form.pmonotime.label|capfirst }}</label>
+            {{ form.pmonotime }}
+            <span class='helptext'>({{ time_format_str }})</span>
+            {{ form.pmonotime.errors }}
+          </div>
+          <div class="spacer"></div>
+        </div>
+      </div>
+
+      <div class="column-right">
+        <div class="box-form">
+          <h3>Pilote multimoteurs</h3>
+
+          <div class="fieldwrapper">
+            {{ form.pmuldn }}
+            {{ form.pmuldn.errors }}
+          </div>
+          <div class="fieldwrapper">
+            {{ form.pmulpos }}
+            {{ form.pmulpos.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.pmultime.name}}">{{ form.pmultime.label|capfirst }}</label>
+            {{ form.pmultime }}
+            <span class='helptext'>({{ time_format_str }})</span>
+            {{ form.pmultime.errors }}
+          </div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="box-form">
+          <h3>Vols aux instruments</h3>
+
+          <div class="fieldwrapper">
+            {{ form.vaipos }}
+            {{ form.vaipos.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.vaitime.name}}">{{ form.vaitime.label|capfirst }}</label>
+            {{ form.vaitime }}
+            <span class='helptext'>({{ time_format_str }})</span>
+            {{ form.vaitime.errors }}
+          </div>
+          <div class="spacer"></div>
+        </div>
+
+        <div class="box-form">
+          <h3>Autres</h3>
+
+          <div class="fieldwrapper">
+            <label for="id_{{form.simu.name}}">{{ form.simu.label|capfirst }}</label>
+            {{ form.simu }}
+            <span class='helptext'>({{ time_format_str }})</span>
+            {{ form.simu.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.ifr.name}}">{{ form.ifr.label|capfirst }}</label>
+            {{ form.ifr }}
+            {{ form.ifr.errors }}
+          </div>
+          <div class="spacer"></div>
+        </div>
+
+        <label class="label-message">Observations et visa de l’autorité habilitée ou de l’instructeur</label>
+        {{ form.obs }}
+        <span class="caracters-limit"><span id="obs-current-count">0</span> caractères restants (visible sur l'export
+          pdf)</span>
+        {{ form.obs.errors }}
+      </div>
+    </div>
+
+    <!-- pane 2 -->
+    <div>
+      <div class="column">
+        <div class="box-form">
+          <h3>Filtre facultatif</h3>
+
+          <div class="fieldwrapper">
+
+            <div class="subwrapper-right">
+              <label for="id_{{form.optional_filter.name}}">{{ form.optional_filter.label|capfirst }}</label>
+              {{ form.optional_filter }}
+              {{ form.optional_filter.errors }}
+            </div>
+            <div class="spacer"></div>
+          </div>
+        </div>
+
+        <div class="box-form">
+          <h3>Déco / Atterrissages</h3>
+
+          <div class="fieldwrapper">
+
+            <div class="subwrapper-right">
+              <label for="id_{{form.landingcount.name}}">{{ form.landingcount.label|capfirst }}</label>
+              {{ form.landingcount }}
+              {{ form.landingcount.errors }}
+            </div>
+            <div class="spacer"></div>
+          </div>
+
+
+          <div class="fieldwrapper">
+
+            <div class="subwrapper-right">
+              <label for="id_{{form.takeoffcount.name}}">{{ form.takeoffcount.label|capfirst }}</label>
+              {{ form.takeoffcount }}
+              {{ form.takeoffcount.errors }}
+            </div>
+            <div class="spacer"></div>
+          </div>
+
+
+          <div class="spacer"></div>
+        </div>
+
+        <div class="box-form">
+          <h3>Zones de vol</h3>
+          <div class="fieldwrapper">
+            <label for="id_{{form.aerostart.name}}">{{ form.aerostart.label|capfirst }}</label>
+            {{ form.aerostart }}
+            {{ form.aerostart.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.aeroend.name}}">{{ form.aeroend.label|capfirst }}</label>
+            {{ form.aeroend }}
+            {{ form.aeroend.errors }}
+          </div>
+          <!-- a href="#" class="add-link">Ajouter un aérodrome intermédiaire</a-->
+
+          <div class="spacer"></div>
+        </div>
+
+
+      </div>
+
+      <div class="column-right">
+        <div class="box-form">
+          <h3>A bord avec vous...</h3>
+          <div class="fieldwrapper">
+            <label for="id_{{form.passengerA.name}}">{{ form.passengerA.label|capfirst }}</label>
+            {{ form.passengerA }}
+            {{ form.passengerA.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.passengerB.name}}">{{ form.passengerB.label|capfirst }}</label>
+            {{ form.passengerB }}
+            {{ form.passengerB.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.passengerC.name}}">{{ form.passengerC.label|capfirst }}</label>
+            {{ form.passengerC }}
+            {{ form.passengerC.errors }}
+          </div>
+
+
+          <div class="spacer"></div>
+        </div>
+
+        <label class="label-message">Vos commentaires</label>
+        {{ form.coms }}
+        <span class="caracters-limit"> </span>
+        {{ form.coms.errors }}
+
+
+
+        <div class="box-form">
+          <h3>Vos souvenirs</h3>
+          <p> Photos, videos, documents (log de nav, dossier météo, ...)</p>
+          <div class="fieldwrapper">
+            {{ form.media }}
+          </div>
+          <!--
+                    <div class="files-list">
+                        <ul>
+                            <li>
+                                Foobar.jpg
+                                <a href="#" class="icon-delete"></a>
+                            </li>
+                            <li>
+                                Foobar2.jpg
+                                <a href="#" class="icon-delete"></a>
+                            </li>
+                            <li>
+                                Foobar3.jpg
+                                <a href="#" class="icon-delete"></a>
+                            </li>
+                            <li>
+                                Foobar4.jpg
+                                <a href="#" class="icon-delete"></a>
+                            </li>
+                        </ul>
+                    </div>
+                    -->
+          <div class="spacer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="submit">
+    <input type="submit" value="Enregistrer ce vol" class="btn red" />
+    &nbsp;&nbsp; <a href="#" class="reset-form">Recommencer</a>
+  </p>
+</form>
+{% endwith %}

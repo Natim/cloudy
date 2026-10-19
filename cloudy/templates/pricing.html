@@ -1,0 +1,190 @@
+{% extends "site_base_public.html" %}
+{% load static %}
+{% load compress %}
+
+{% block body_id %}pricing{% endblock %}
+
+
+{% block head %}
+{% compress css %}
+<link href="{% static 'compass/stylesheets/pricing.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+{% endcompress %}
+<script type="text/javascript" src="{% static 'js/cloudy_pricing.js' %}"></script>
+
+{% endblock %}
+
+{% block main %}
+<!-- Main -->
+<div id="main">
+  <div id="pricing-top">
+    <div class="pricing-offer-box">
+      <div id="economy-title">
+        <div class="title-text">
+        </div>
+      </div>
+      <h1 class="price-free">GRATUIT</h1>
+      <div class="grey-box">
+        Le pack parfait pour découvrir Cloudy
+        <br />
+        ou pour tous les pilotes débutants
+      </div>
+      <ul class="blue">
+        <li>1 carnet de vol au choix</li>
+        <li>Importez votre carnet existant</li>
+        <li>Calculez vos totaux en un clic</li>
+        <li>10 Mo de stockage offerts</li>
+      </ul>
+      <a href="# TODO {# url 'register' #}" id="signup-button-blue"><span class="txt"></span></a>
+    </div>
+
+    <div class="pricing-offer-box">
+      <div id="first-title">
+        <div class="title-text">
+        </div>
+      </div>
+      <h1 class="price">
+        <span class="currency">€</span>
+        <span class="value">2.99</span>
+        <span class="frequency">
+          <span>/ mois</span>
+          <p class="infos">soit {{ first_class_price }} euros par an</p>
+        </span>
+      </h1>
+      <div class="grey-box">
+        Le pack le plus plébiscité !
+      </div>
+      <ul class="red">
+        <li>Nombre de carnets de vol illimités</li>
+        <li>Importez vos carnets existants</li>
+        <li>Calculez vos totaux en un clic</li>
+        <li>Recevez des rappels par email</li>
+        <li>Consultez des statistiques détaillées</li>
+        <li>Exportez vos carnets sous divers formats</li>
+        <li>Espace de stockage illimité</li>
+      </ul>
+      <a href="#TODO {# url 'register' #}?m=1" id="signup-button-red"><span class="txt"></span></a>
+    </div>
+  </div>
+
+
+  <div id="pricing-second">
+    <h1>Ils font déjà confiance à Cloudy, et vous?</h1>
+    <div id="partners-list">
+      <div class="cycle-partners">
+        {% include "partials/partners.html" %}
+      </div>
+    </div>
+  </div>
+
+
+  <div id="pricing-third">
+    <div class="box-top"></div>
+    <div class="box-main">
+
+      <div class="row1">
+        <span class="title-economy">&nbsp;</span>
+        <span class="title-first">&nbsp;</span>
+      </div>
+      <div class="row2">
+        <span class="economy-class">GRATUIT</span>
+        <span class="first-class">
+          <span class="currency">€</span>
+          <span class="value">2.99</span>
+          <span class="frequency">
+            <span>/ mois</span>
+            <p class="infos">soit {{ first_class_price }} euros par an</p>
+          </span>
+        </span>
+      </div>
+
+      <div class="table">
+        <table class="listing">
+
+          <tr>
+            <th width="270">Nombre de carnets de vol</th>
+            <th width="200" class="economy-col">Limité à un carnet au choix</th>
+            <th width="200" class="first-col">Carnets illimités</th>
+            <th width="100"></th>
+          </tr>
+          <tr>
+            <td class="blue-cycle">Import de carnet existant</td>
+            <td class="blue-cycle">
+              <div class="tick"></div>
+            </td>
+            <td class="blue-cycle">
+              <div class="tick"></div>
+            </td>
+            <td class="blue-cycle"></td>
+          </tr>
+          <tr>
+            <td>Calcul des totaux d'heures</td>
+            <td>
+              <div class="tick"></div>
+            </td>
+            <td>
+              <div class="tick"></div>
+            </td>
+            <td></td>
+
+          </tr>
+          <tr>
+            <td>Alertes d'expiration de licences</td>
+            <td>
+              <div class="tick-none"></div>
+            </td>
+            <td>
+              <div class="tick"></div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="blue-cycle">Statistiques détaillées</td>
+            <td class="blue-cycle">
+              <div class="tick-none"></div>
+            </td>
+            <td class="blue-cycle">
+              <div class="tick"></div>
+            </td>
+            <td class="blue-cycle"></td>
+          </tr>
+          <tr>
+            <td>Export multi-formats (PDF etc.)</td>
+            <td>
+              <div class="tick-none"></div>
+            </td>
+            <td>
+              <div class="tick"></div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="blue-cycle">Espace de stockage</td>
+            <td class="economy-col blue-cycle">Limité à 10 Mo</td>
+            <td class="first-col blue-cycle">Illimité</td>
+            <td class="blue-cycle"></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class='row4'>
+        <div id="bottom"></div>
+        <div class="text-box">
+          <h2>Vos données sont en sécurité</h2>
+          <p>Avec le carnet de vol en ligne Cloudy, plus de risque de perdre, d'abimer ni même de détériorer votre
+            carnet de vol. Notre architecture de stockage et l'utilisation de centres d'archivages hautement sécurisés
+            (certifiés ISO9001, ISO27001 et SAS70 Type II) vous garantissent un archivage pérenne et confidentiel.</p>
+        </div>
+
+        <div class="text-box">
+          <h2>Notre philosophie</h2>
+          <p>Chez Cloudy, nous pensons que les solutions internet pour les pilotes doivent être simples, abordables et
+            dynamiques. Cloudy a été créé "par des pilotes" et "pour des pilotes" afin d'offrir la meilleure expérience
+            dans la gestion de vos vols. Ainsi, quelque soit votre passion, nous sommes toujours à l'écoute.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="box-bottom"></div>
+</div>
+{% endblock %}

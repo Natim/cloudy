@@ -1,0 +1,193 @@
+{% extends "logbooks/stats_base.html" %}
+
+{% load core_tags %}
+{% load stats_tags %}
+
+{% block body_id %}logbooks{% endblock %}
+{% block actions-id %}action-stats{%endblock %}
+
+
+{% block stats_content %}
+<div class="box-top-profile"></div>
+<div class="box-main-stats">
+  <div class="horizontal">
+    <div class="graph">
+      <div id="placeholdermultiple" style="width:660px; height: 410px;">
+        Chargement...
+      </div>
+      <script type="text/javascript" charset="utf-8">
+        $(document).ready(function () {
+          cloudyStats.FlyTimeBarGraph("total_pilot_flight", "aeronef_type");
+        });
+      </script>
+    </div>
+
+    <div class="top-stats-container">
+      <table class="top-stats">
+        <thead>
+          <tr>
+            <th>Top 5 Aéronefs</th>
+          </tr>
+        </thead>
+        <tbody id="topaeronef">
+        </tbody>
+      </table>
+
+      <script type="text/javascript" charset="utf-8">
+        $(document).ready(function () {
+          cloudyStats.top5Aeronefs("total_pilot_flight", "aeronef_type");
+        });
+      </script>
+
+      <table class="top-stats">
+        <thead>
+          <tr>
+            <th>
+              Top 5 zones de vol
+            </th>
+          </tr>
+        </thead>
+        <tbody id="topairports">
+        </tbody>
+      </table>
+      <script type="text/javascript" charset="utf-8">
+        $(document).ready(function () {
+          cloudyStats.top5Airports();
+        });
+      </script>
+
+    </div>
+  </div>
+
+</div>
+<div class="box-bottom-backend"></div>
+
+<div class="pie-charts-bg">
+  <div class="pie-chart">
+    <h2>Répartition des heures</h2>
+    <div id="pie_hours_role" class="pie">
+      Chargement...
+    </div>
+    <script type="text/javascript" charset="utf-8">
+      var map = {
+        "total_multi": "Multi.",
+        "total_mono": "Mono.",
+        "total_mbr_equipage": "Equipage"
+      };
+      cloudyStats.TotalsPieChart("pie_hours_role", map, ["total_multi", "total_mono", "total_mbr_equipage"]);
+    </script>
+  </div>
+  <div class="pie-chart">
+    <h2>Répartition jour / nuit</h2>
+    <div id="pie_day_night" class="pie">
+      Chargement...
+    </div>
+    <script type="text/javascript" charset="utf-8">
+      var map = {
+        "total_day": "Jour",
+        "total_night": "Nuit"
+      };
+      cloudyStats.TotalsPieChart("pie_day_night", map, ["total_day", "total_night"]);
+    </script>
+  </div>
+  <div class="pie-chart">
+    <h2>Répartition des rôles</h2>
+    <div id="pie_roles" class="pie">
+      Chargement...
+    </div>
+
+    <script type="text/javascript" charset="utf-8">
+      var map = {
+        "total_captain": "Commandant",
+        "total_double": "Double",
+        "total_multi_copilot": "Copilote"
+      };
+      cloudyStats.TotalsPieChart("pie_roles", map, ["total_captain", "total_double", "total_multi_copilot"]);
+    </script>
+  </div>
+</div>
+
+<div class="box-top-profile"></div>
+<div class="box-main-stats">
+  <div class="horizontal">
+    <div class="title-stats">
+      <h1>Total heures de vol - <span id="reminder-total-hdv"></span></h1>
+    </div>
+    <div class="sidebar-filter">
+      <div class="title-sidebar">
+        Filtres
+      </div>
+      <ul>
+        <li class="category">Aéronefs type</li>
+        <select target-field="aeronef_type">
+          <option>Chargement...</option>
+        </select>
+      </ul>
+
+      <ul>
+        <li class="category">Immatriculation</li>
+        <select target-field="aeronef_imma">
+          <option>Chargement...</option>
+        </select>
+      </ul>
+
+      <ul>
+        <li class="category">Fonction à bord</li>
+        <select target-field="fctbrd">
+          <option>Chargement...</option>
+        </select>
+      </ul>
+
+      <ul>
+        <li class="category">Zones de vol</li>
+        <select target-field="airpdep">
+          <option>Chargement...</option>
+        </select>
+      </ul>
+      <ul>
+        <li class="category">Filtre facultatif</li>
+        <select target-field="optional_filter">
+          <option>Chargement...</option>
+        </select>
+      </ul>
+
+    </div>
+  </div>
+  <div id="placeholderbars" class="graph" style="width: 660px;height: 320px;">Chargement...
+  </div>
+
+  <script type="text/javascript" charset="utf-8">
+    function reload_flight_bars(filters) {
+      cloudyStats.FilteredFlyTimeBarGraph("placeholderbars", "total_pilot_flight", filters);
+    };
+    $(document).ready(function () {
+      // Load the bars without any filters by default
+      reload_flight_bars(new Object);
+    });
+  </script>
+
+</div>
+<div class="box-bottom-backend"></div>
+
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function () {
+    cloudyStats.getFilterChoices(["aeronef_type", "aeronef_imma", "fctbrd", "airpdep", "optional_filter"]);
+
+
+    // Reload the graph when the user apply new filters
+    $("select[target-field]").change(function () {
+      // Gather the filters
+      var filters = new Object();
+      $("select[target-field]").each(function () {
+        var field = $(this).attr('target-field');
+        var val = $(this).val();
+        if (val != "__all__") {
+          filters[field] = val;
+        }
+      });
+      reload_flight_bars(filters);
+    });
+  });
+</script>
+<script type="text/javascript">$(document).ready(function () { $.uniform.update("#filter"); });</script>
+{% endblock %}

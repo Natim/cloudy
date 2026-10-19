@@ -1,0 +1,359 @@
+@import "backend";
+
+#logo{
+	padding:0 0 4px 10px;
+}
+
+
+#share-flight-popup{
+		color:$dark-grey;
+		textarea{
+			height:80px;
+			width:550px;
+			font-family:inherit;
+			font-size:inherit;
+			color:$dark-grey;
+		}
+
+		.share-time-label{
+			text-align:left;
+			width:120px;
+		}
+
+		.submit{
+			padding:20px 0 0 210px;
+			.btn{
+				padding:5px 8px;
+				font-size:1.2em;
+			}
+		}
+}
+
+
+
+
+
+#add_flight{
+	padding:20px;
+	background:white;
+	@include border-radius(3px, 3px);
+	border:1px solid $grey-border;
+
+	.error{
+		border-width:1px;
+		padding:12px 15px 12px 35px;
+		background:$input-red-error url(../../img/carnet/picto-error.png) no-repeat 15px 50%;
+		color:$dark-grey;
+	}
+
+	.notif{
+		margin-bottom:10px;
+	}
+
+	form{
+		p{
+			margin:0;
+			padding:3px 0;
+			label{
+				display:inline-block;
+				width:200px;
+				padding:0 5px;
+				text-align:right;
+			}
+			input,select{
+				width:160px;
+			}
+			textarea{
+				background:$light-grey;
+				border:1px solid $grey-border;
+			}
+			.text-with{
+				position:relative;
+				.letter-count{
+					display:block;
+					position:absolute;
+					bottom:12px;
+					right:12px;
+					font-size:11px;
+					color:$grey;
+				}
+			}
+			.date{
+				font-weight:bold;
+				padding:0 0 0 20px;
+				input{
+					width:20px;
+				}
+			}
+
+		}
+		.cols{
+			input{
+				width:30px;
+			}
+		}
+		.radio{
+			padding:0 0 5px 205px;
+			label{
+				display:inline;
+				margin:0 10px 0 0;
+			}
+		}
+
+		fieldset{
+			width:600px;
+			legend{
+				padding:0 10px;
+				background:#fff;
+				color:$dark-blue;
+			}
+			p{
+				label{
+					width:185px;
+				}
+			}
+		}
+		fieldset.open, fieldset.close{
+			legend{
+				padding-left:20px;
+				cursor:pointer;
+			}
+		}
+		fieldset.open{
+
+		}
+		fieldset.close{
+			border-left:0 none;
+			border-right:0 none;
+			border-bottom:0 none;
+		}
+
+		.submit{
+			border-top:1px solid $grey-border;
+			padding:20px;
+			text-align:center;
+
+			.btn{
+				font-size:16px;
+				padding:8px 12px;
+			}
+		}
+
+		.uploaded-files{
+			padding:20px 0 20px 213px;
+		}
+
+	}
+
+
+	.more{
+		border-top:1px solid $grey-border;
+		padding:20px 0 25px 0;
+
+		h3{
+			font-size:1.2em;
+			font-weight:bold;
+			background:#fff;
+			color:$dark-blue;
+		}
+
+		textarea{
+			color:$dark-grey;
+			font-family:inherit;
+			font-size:12px;
+		}
+	}
+}
+
+
+#carnet{
+	position:relative;
+
+	.nav{
+		@include border-radius(3px, 3px);
+		float:right;
+		padding:4px;
+		margin:0 0 10px 0;
+		background:#d5e6ed;
+
+		a{
+			text-decoration:none;
+			color:$dark-grey;
+		}
+
+
+		.next, .prev{
+			@include border-radius(3px, 3px);
+			border:1px solid $grey;
+			background:$light-grey;
+			padding:0 3px;
+		}
+		.next:hover, .prev:hover{
+			border-color:white;
+			@include box-shadow(#999, 0px, 0px, 2px);
+		}
+
+		.pages{
+			padding:0 5px;
+			a{
+				color:$dark-red;
+				font-weight:bold;
+			}
+			a:hover, a:focus{
+				text-decoration:underline;
+			}
+		}
+	}
+
+	h2, .year{
+		color:$dark-blue;
+		font-weight:bold;
+		font-size:14px;
+	}
+
+	h2{
+		text-align:center;
+	}
+
+	.year{
+		float:left;
+		text-transform:uppercase;
+	}
+
+
+	.aside{
+		position:absolute;
+		top:150px;
+		right:100%;
+		padding:0 5px;
+		border:1px solid $grey-border;
+		border-right:0 none;
+		background:#edf5f8;
+		font-weight:bold;
+		text-align:center;
+		line-height:1.2em;
+	}
+
+	table{
+		position:relative;
+		margin:0 0 50px 0;
+		border-collapse:collapse;
+		background:#e5e3e4;
+		@include linear-gradient(color-stops(#e5e3e4, #d1d1d1 10%, #d1d1d1));
+	}
+	table.left{
+		border-right:3px dashed $grey;
+	}
+	table.right{
+		border-left:3px dashed $grey;
+	}
+
+	thead{
+
+		.vertical{
+			display:block;
+			@include apply-transform(rotate(-90deg));
+			margin:0 -20px;
+		}
+
+		td,th{
+			padding:4px,
+		}
+		td{
+			text-align:center;
+			font-size:11px;
+		}
+		th{
+			font-weight:bold;
+			text-transform:uppercase;
+			text-align:center;
+			background:none;
+			line-height:1.2em;
+		}
+		.first{
+			tr,td,th{
+				border-top:none;
+			}
+		}
+		.doublebar{
+			position:absolute;
+			top:0;
+			margin:0 0 0 -3px;
+			height:100%;
+			width:1px;
+			background:$grey-border;
+		}
+	}
+
+	td,th{
+		color:#555;
+		border:1px solid $grey-border;
+	}
+
+	tfoot{
+		.total-general{
+			background:$grey;
+			@include linear-gradient(color-stops(#e5e3e4, #d1d1d1 ));
+		}
+
+		td{
+			background:#fff;
+		}
+
+		tr.hiddenline{
+			height:1px;
+			margin:0;
+			padding:0;
+			font-size:1px;
+			border:0;
+			th,td{
+				height:1px;
+				margin:0;
+				padding:0;
+				font-size:1px;
+				border:0;
+			}
+			.highlight-col{
+				position:relative;
+				div{
+					border-top:4px solid #636363;
+					position:absolute;
+					padding:10px 0 0 0;
+					height:50px;
+					width:100%;
+					background:url(../../img/carnet/bottom-arrow.png) no-repeat 50% 0;;
+					span{
+						width:300%;
+						left:-100%;
+						text-align:center;
+						display:block;
+						position:absolute;
+						font-size:12px;
+						font-style:normal;
+					}
+				}
+			}
+		}
+	}
+
+
+	tbody{
+
+		th,td{
+			background:white;
+		}
+
+		tr.blue {
+			td,th{
+				background:#edf5f8;
+			}
+		}
+		tr.first {
+			td,th{
+				border-top-width:2px;
+			}
+		}
+	}
+
+
+}

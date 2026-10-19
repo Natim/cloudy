@@ -1,0 +1,145 @@
+{% extends "site_base_logbook.html" %}
+
+{% load static %}
+{% load core_tags %}
+{% load logbook_tags %}
+{% load stats_tags %}
+{% load compress %}
+
+{% block body_id %}logbooks{% endblock %}
+{% block actions-id %}action-logbook{%endblock %}
+
+{% block head %}
+{% compress css %}
+<link href="{% static 'compass/stylesheets/logbook.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'compass/stylesheets/logbook_popups.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+{% endcompress %}
+{% endblock %}
+
+{% block content %}
+<div id="tooltip" class="tooltip-small"></div>
+<div class="date-slip"></div>
+{% include "partials/log-actions.html" %}
+
+
+
+<!-- first three cols -->
+<div class="logbook-no-slide-cont">
+
+  <table class="cleft ulm">
+    <thead>
+      <tr class="first">
+        <th rowspan="2" width="50">Date<span>Date</span></th>
+        <th rowspan="2" width="120">Type<span>Type</span></th>
+        <th rowspan="2" width="120">Immatriculation<span>Immatriculation</span></th>
+        <th colspan="2">HEURES DE VOL<span>Flight time</span></th>
+        <th rowspan="3" width="250">Observations <br />Nature du vol<span>Observations<br />Flight type</span></th>
+        <th rowspan="3" width="200">Commentaires<span>Comments</span></th>
+        <th rowspan="3" width="25"><span class="vertical">Media</span></th>
+      </tr>
+      <tr>
+        <th rowspan="1" width="70">Double<span>Double</span></th>
+        <th rowspan="1" width="70">Cdt de bord<span>Captain</span></th>
+
+      </tr>
+      <tr>
+        <td colspan="3">
+          Report ......
+        </td>
+        <td data-field="flytime_dbl" class="reports-info">
+          {% format_total totals total_double report %}
+        </td>
+        <td data-field="flytime_cdb" class="reports-info">
+          {% format_total totals total_captain report %}
+        </td>
+
+      </tr>
+
+    </thead>
+    <tfoot>
+      <tr>
+        <td colspan="3" class="total-general">
+          TOTAL GENERAL DES HEURES DE VOL
+
+          <div class="total-hours" id="fullreports">
+
+          </div>
+          <span class="report ulm">Totaux à reporter</span>
+        </td>
+
+        {# Report fields #}
+        <td sum-field="flytime_dbl" class="reports-foot"></td>
+        <td sum-field="flytime_cdb" class="reports-foot"></td>
+        <td class="reports-foot"></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tfoot>
+    <tbody>
+      {% with logbook.time_format as time_format %}
+
+      {% for i in iteration %}
+      {% with logs|nth:i as log %}
+      <tr class="{% if forloop.first %}first{% endif %} {% cycle 'blue' ''  %}" alt="{{log.id}}">
+        {% if log.date %}
+        <td data-field="date" class="e tdate c0" alt="{{ log.date|date:'Y-m-d'}}">{{ log.date|date:"j b" }}</td>
+        <td data-field="ulm_type" class="e tmtext c1" alt="10" prevmax="10">
+          {{ log.ulm_type|truncchar:10 }}
+          <pre>{{ log.ulm_type }}</pre>
+        </td>
+        <td data-field="ulm_imma" class="e tmtext c2" alt="10" prevmax="10">
+          {{ log.ulm_imma|truncchar:10 }}
+          <pre>{{ log.ulm_imma }}</pre>
+        </td>
+
+        <td data-field="flytime_dbl" class="e ttime_{{ time_format }} c3">{{ log.flytime_dbl|hmin:logbook }}</td>
+        <td data-field="flytime_cdb" class="e ttime_{{ time_format }} c4">{{ log.flytime_cdb|hmin:logbook }}</td>
+
+        <td data-field="obs" class="e ttextarea c8" alt="200" prevmax="30">{{ log.obs|truncchar:30 }}
+          <pre>{{ log.obs }}</pre>
+        </td>
+        <td data-field="cmmts" class="e ttextarea c5 extra" alt="200" prevmax="25">
+          {{ log.cmmts|truncchar:27 }}
+          <pre>{{ log.cmmts }}</pre>
+        </td>
+        <!-- weird can't make it work with css -->
+        <td data-field="files" class="e tmedia c23 extra {% if log.files.all|length > 0 %}multi{% endif %}">
+          {{ log.files.all|length }}
+          <pre>
+                                        <ul class="media">
+                                        {% if log.files %}
+                                            {% for file in log.files.all %}
+                                                <li>
+                                                    <a href="{{file.file.url}}" target="_blank">{{file.filename|sexy_me|truncchar:15}}</a>
+                                                     <span>{% widthratio file.filesize 1000 1 %} Kb</span>
+                                                </li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        </ul>
+                                    </pre>
+        </td>
+        {% else %}
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+
+        {% endif %}
+      </tr>
+      {% endwith %}
+      {% endfor %}
+      {% endwith %}
+    </tbody>
+
+  </table>
+</div>
+<br class="clear" />
+<div class="spacer" style="margin-top: 20px; display: block;">&nbsp;</div>
+
+{% endblock %}

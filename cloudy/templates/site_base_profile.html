@@ -1,0 +1,213 @@
+{% load static %}
+{% load core_tags %}
+{% load i18n %}
+{% load compress %}
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml" xml:lang="fr">
+
+<head>
+  <meta name="google-site-verification" content="Fe_ZW57heiMtVqR-Klj0DTIsvD7w7AWdGlBiTcjPnbo" />
+  <title>Cloudy - {% block title %}Cloudy{% endblock %}</title>
+  {% compress css %}
+  <link href="{% static 'compass/stylesheets/print.css' %}" media="print" rel="stylesheet" type="text/css" />
+  <link href="{% static 'raw_css/date.css' %}" media="screen, projection" rel="stylesheet" type="text/css" />
+  <link href="{% static 'raw_css/uniform.default.css' %}" media="screen, projection" rel="stylesheet" type="text/css" />
+  {% endcompress %}
+
+  <link href="{% static 'compass/stylesheets/logbook_popups.css' %}" media="screen, projection" rel="stylesheet"
+    type="text/css" />
+
+  <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
+
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+
+
+  <!--[if lt IE 8]>
+     <link href="/stylesheets/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
+     <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js"></script>
+  <![endif]-->
+
+
+  <!--[if !IE 7]>
+      <style type="text/css">
+          #wrap {display:table;height:100%}
+          <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script>
+      </style>
+  <![endif]-->
+
+  <script type="text/javascript">
+    isIE6 = navigator.userAgent.toLowerCase().indexOf('msie 6') != -1;
+    if (isIE6 == true) {
+      window.location.replace("/ie6/");
+    }
+  </script>
+
+  <script type="text/javascript" src="{% static 'js/jquery-1.4.2.min.js' %}"></script>
+  {% compress js %}
+  <script type="text/javascript" src="{% static 'js/cloudy.js' %}"></script>
+  {% endcompress %}
+
+  {% compress js %}
+  <script type="text/javascript" src="{% static 'js/jquery.simpleSlide_min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/validation/jquery.validate.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/jquery.uniform.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/jquery.scrollTo-1.4.2-min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/overlay.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/cloudy_signup.js' %}"></script>
+  {% endcompress %}
+
+  {% google_analytics %}
+
+  {% block head %}{% endblock %}
+</head>
+
+<body id="{% block body_id %}{% endblock %}">
+  <div id="wrap">
+    <!-- Top header -->
+    {% if messages %}
+    <div id="top-notif">
+      {% for message in messages %}
+      <div{% if message.tags %} class="notif {{ message.tags }}" {% endif %}>{{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div id="top-header">
+    <div id="logo">
+      <a href="/"><img src="{% static 'img/logo.png' %}" /></a>
+    </div>
+    <div id="wrap-top-head">
+      {% include 'partials/header-logged.html' %}
+    </div>
+  </div>
+
+  <div id="top-bar">
+    {% with user.get_profile.has_payed_plan as has_payed_plan %}
+    <div class="add">
+      <a href="{% url 'logbooks:home' %}" class="btn right" id="back_to_carnet">
+        <img src="{% static 'img/arrow_return.png' %}" class="icon-return" /> Retour aux carnets
+      </a>
+
+      <a href="{% url 'profile' %}" class="btn" id="vensemble">Mon profil</a>
+      {% if not has_payed_plan %}
+      <a href="#" class="btn unavailable" id="galertes" rel="#fc-only-popup">Mes alertes</a>
+      {% else %}
+      <a href="{% url 'alerts:qualification' %}" class="btn" id="galertes">Mes alertes</a>
+      {% endif %}
+      <a href="{% url 'payment:pcloudy' %}" class="btn" id="ofact">Mon pack Cloudy</a>
+    </div>
+    {% endwith %}
+  </div>
+
+  <!-- {# show_unseen_noticies_for_user request.user #} -->
+  {% firstclass_only_popup %}
+
+  <div class="promo-4col page">
+    <div class="cell first">
+      {% if user.get_profile.has_payed_plan %}
+      <span class="title">Pack <strong>&#8220;First Class&#8221;</strong></span>
+      <span>{% get_config_var 'FIRST_CLASS_PRICE' %}€ / an</span>
+      <!--<span class="balance"><strong>Date de fin du First Class :</strong> 21/02/1987</span>-->
+      {% else %}
+      <span class="title">Pack <strong>&#8220;Economy Class&#8221;</strong></span>
+      <span>0€ / mois</span>
+      <a href="{% url 'payment:pcloudy' %}" class="btn red">Changer de pack</a>
+      {% endif %}
+    </div>
+    <div class="cell">
+      {% with user.get_profile.active_logbooks|length as countlb %}
+      <span class="title"><strong>{{ countlb }}</strong>
+        {% if not user.get_profile.has_payed_plan %} / 1{% endif %}</span>
+      <span>Carnet{{ countlb|pluralize }} de vol</span>
+      {% endwith %}
+      <div class="bar">
+        {% if countlb != "1" and countlb != "0" and not user.get_profile.has_payed_plan %}
+        <div style="width: 100%;"></div>
+        {% else %}
+        <div
+          style="width:{% if not user.get_profile.has_payed_plan %}{% widthratio countlb 1 100 %}%{% else %}100%{% endif %}">
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="cell">
+      <span class="title"><strong>{{ user.get_profile.get_space_balance_mb }} MB</strong>
+        {% if not user.get_profile.has_payed_plan %}/ {% get_config_var 'DISKSPACE_FREE_MAXMB' %}MB{% endif %}</span>
+      <span>Espace disque {% if user.get_profile.has_payed_plan %}illimité{% endif %}</span>
+      <div class="bar">
+        {% if user.get_profile.get_space_balance_mb > 10 and not user.get_profile.has_payed_plan %}
+        <div style="width: 100%;"></div>
+        {% else %}
+        <div
+          style="width:{% if not user.get_profile.has_payed_plan %}{% widthratio  user.get_profile.get_space_balance_mb 10 100 %}%{% else %}100%{% endif %}">
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-on-left page">
+    <div class="box-top-profile"></div>
+    <div class="box-main-profile">
+      <div class="col">
+        <ul class="nav-left" id="{% block profile_id %}{% endblock %}">
+          {% block left-menu %}
+          <li><a href="{% url 'profile' %}" id="profile">Profil</a></li>
+          <li><a href="{% url 'account_admin' %}" id="adminacc">Administration du compte</a></li>
+          {% endblock %}
+        </ul>
+      </div>
+
+
+      <div class="content" id="{% block content_id %}{% endblock %}">
+        {% block content %}
+        {% endblock %}
+      </div>
+    </div>
+    <div class="box-bottom-profile"></div>
+  </div>
+
+  <!-- Footer -->
+  {% block footer %}
+  {% include "popups/gcu_register.html" %}
+  <div id="footer">
+    <div id="clouds-bottom"></div>
+    <div class="footer-links">
+      <ul>
+        <li><a href="{% url 'press:list' %}">Presse</a></li>
+        <li><a href="{% url 'pricing' %}">Tarifs</a></li>
+        <li><a href="{% url 'features' %}">Fonctionnalités</a></li>
+        <li><a href="{% url 'support' %}">Aide / Support</a></li>
+      </ul>
+      <ul class="col-center">
+        <li><a href="{% url 'gcu' %}">Mentions légales</a></li>
+        <li><a href="#" id="gcu_link" rel="#gcu-popup">C. G. Vente</a></li>
+        <li><a href="{% url 'contactus' %}">Contactez-nous</a></li>
+        <!--<li><a href="#">L'équipage</a></li>-->
+      </ul>
+      <p>Besoin d'aide ? Écrivez nous à <a href='mailto:support@cloudy.fr'>support@cloudy.fr</a></p>
+    </div>
+    <div class="footer-follows">
+      <div class="quick-links">
+      </div>
+      <a href="http://www.facebook.com/cloudy.fr" target="_blank">
+        <div class="bt-follow-facebook"></div>
+      </a>
+      <a href="http://twitter.com/cloudy_fr" target="_blank">
+        <div class="bt-follow-tw"></div>
+      </a>
+    </div>
+  </div> <!-- end footer -->
+  {% endblock %}
+  {% block js %}{% endblock %}
+
+
+  {% include 'partials/analytics.html' %}
+  {% gauges %}
+
+</body>
+
+</html>

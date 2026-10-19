@@ -1,0 +1,851 @@
+// This import applies a global reset to any page that imports this stylesheet.
+@import "blueprint/reset";
+
+// To configure blueprint, edit the partials/base.sass file.
+@import "partials/base";
+
+// Import all the default blueprint modules so that we can access their mixins.
+@import "blueprint";
+@import "blueprint/grid";
+@import "blueprint/scaffolding";
+@import "blueprint/debug";
+
+@import "compass/utilities/general/clearfix";
+@import "compass/css3/gradient";
+@import "compass/css3";
+@import "compass/utilities/lists/horizontal-list";
+
+
+// To generate css equivalent to the blueprint css but with your
+// configuration applied, uncomment:
+// @include blueprint
+
+// But Compass recommends that you scope your blueprint styles
+// So that you can better control what pages use blueprint
+// when stylesheets are concatenated together.
+@include blueprint-scaffolding("body.bp");
+
+@import "common";
+@import "header";
+@import "footer";
+
+@mixin help-input {
+	@include column(8);
+    padding: 0 5px 0 5px;
+    color: #333;
+    height: 36px;
+    border: none !important;
+    font-size: 16px;
+    background: {
+		color: transparent;
+        image: image-url("../../static/img/help_input.png") !important;
+        repeat:  no-repeat;
+    };
+    width: 296px;
+
+}
+
+.fb-position {
+	position:relative;
+	z-index: 2000;
+	float: right;
+	margin-top: 30px;
+	.fb_edge_widget_with_comment span.fb_edge_comment_widget iframe.fb_ltr {
+	display: none !important;}
+}
+
+
+#main {
+    @include container;
+	z-index: 105;
+
+    h1 {
+       display: none;
+    }
+
+	#mob-logo {
+      position: absolute;
+	  margin: 0 auto;
+      top:  128px;
+      margin-left: 807px;
+	  margin-top:  0px;
+    }
+
+    #video-cont {
+        a#popup {
+            color: white;
+            text-indent: -9999px;
+            position: absolute;
+            width: 280px;
+            height: 191px;
+            display:block;
+            margin-top:  45px;
+            left: 50%;
+            margin-left: -425px;
+
+            background: {
+                image: image-url("../../static/img/video_hover.png");
+                repeat:  no-repeat;
+                position: top left;
+            };
+			&:hover {
+				background: {
+	                image: image-url("../../static/img/video_preview.png");
+	                repeat:  no-repeat;
+	                position: top left;
+	            };
+			}
+        }
+    }
+
+	#clouds-top {
+            position: absolute;
+            width: 549px;
+            height: 137px;
+            margin-top: 165px;
+            left: 50%;
+            margin-left: -520px;
+            z-index: 99;
+            background: {
+                image: image-url("../../static/img/top-home-clouds.png");
+                repeat:  no-repeat;
+                position: top left;
+            };
+    }
+
+	#support-top {
+
+		height: 265px;
+
+        background: {
+            image: image-url("../../static/img/support-top-bg.png");
+            repeat:  no-repeat;
+            position: 0px  -9px;
+        };
+
+		form {
+			@include column(18, true);
+			@include push-margins(12);
+            margin-top: 125px;
+
+			.help-input {
+				@include help-input;
+			}
+			.search-button {
+				@include column(1,true);
+				border:none;
+				display:block;
+				height: 37px;
+				width: 38px;
+				margin-top: 9px;
+				cursor: pointer;
+				background: {
+					image: image-url("../../static/img/bt-search.png");
+					repeat:  no-repeat;
+					color: transparent;
+					};
+			}
+		}
+
+	}
+    #home-top {
+        height: 265px;
+        background: {
+            image: image-url("../../static/img/home-top-bg.png");
+            repeat:  no-repeat;
+            position: 0px  -9px;
+        };
+
+
+        #paper-plane {
+            position: absolute;
+            width: 141px;
+            height: 62px;
+            margin-top: 110px;
+            margin-left: 260px;
+            left: 50%;
+            background: {
+                image: image-url("../../static/img/dotted_plane.png");
+                repeat:  no-repeat;
+                position: top left;
+            };
+        }
+
+		#dotted-helico {
+            position: absolute;
+            width: 141px;
+            height: 71px;
+            left: 43%;
+			margin-top: -48px;
+            background: {
+                image: image-url("../../static/img/dotted-helico.png");
+                repeat:  no-repeat;
+                position: top left;
+            };
+        }
+
+        .buttons {
+
+            @include column(18, true);
+
+            #signup-button {
+
+                @include column(7, true);
+                @include push-margins(12);
+
+
+                margin-top: 125px;
+                margin-bottom: 10px;
+                font-size: 13px;
+
+                height: 45px;
+                color: white;
+
+                @include text-shadow(black, 1px, 1px, 0);
+                @include box-shadow(black, 1px, 1px, 2px);
+                border: 1px solid $dark-red-start;
+                @include border-radius(3px, 3px);
+                @include linear-gradient(color-stops($dark-red-end, $dark-red-start));
+                background-color: $dark-red-start;
+
+                &:hover {
+                    color: $light-grey;
+                    @include box-shadow(black, 1px, 2px, 2px);
+                    @include linear-gradient(color-stops($dark-red-end, $dark-red-end));
+                    background-color: $dark-red-end;
+
+                     -webkit-animation-name: resize;
+                    -webkit-animation-duration: 0.5s;
+                    -webkit-animation-iteration-count: 5;
+                    -webkit-animation-direction: alternate;
+                    -webkit-animation-timing-function: ease-in-out;
+
+
+                }
+                &:active {
+                    color: $light-grey;
+                    @include box-shadow(black, 0px, 0px, 0px);
+                    margin-top: 126px;
+                    margin-bottom: 9px;
+                }
+
+                span.txt {
+                    @include column(7);
+                    margin: 10px 0 0 8px;
+                    height: 22px;
+
+                    background: {
+                        image: image-url("../../static/img/text-signup-button.png");
+                        repeat:  no-repeat;
+                        position: top left;
+                        z-index: 1000;
+                    };
+                }
+            }
+
+            #take-a-tour {
+                @include push-margins(12);
+                @include column(4,true);
+				background: {
+                    image: image-url("../../static/img/red_paper-plane.png");
+                    repeat:  no-repeat;
+                    position: top right;
+                    z-index: 1000;
+                };
+                text-decoration: none;
+                color: $dark-red-font;
+                font-size: 15px;
+                font-weight: 300;
+                padding: 0 45px 5px 0;
+                &:hover {
+					color: white;
+					background: {
+	                    image: image-url("../../static/img/white_paper-plane.png");
+	                    repeat:  no-repeat;
+	                    position: top right;
+	                    z-index: 1000;
+	                };
+                }
+
+            }
+        }
+    }
+
+
+
+    #home-second {
+        @include column(24, true);
+        height: 172px;
+        background: {
+            image: image-url("../../static/img/home-block-two-bg.png");
+            repeat:  no-repeat;
+            position: top left;
+       };
+       .cycle-quotes {
+            @include column(9, true);
+
+            margin: 0px;
+            padding:0px;
+            background: {
+                image: image-url("../../static/img/quote_l.png");
+                repeat:  no-repeat;
+                position: 15px 20px;
+            };
+
+            p {
+
+                margin:0px;
+                padding:0px;
+                @include column(6);
+                background: {
+                    image: image-url("../../static/img/quote_r.png");
+                    repeat:  no-repeat;
+                    position: 255px 50px;
+
+                };
+                padding: 5px 0 5px 0;
+                margin-top: 30px;
+ 								padding-bottom: 40px;
+                @include prepend(2);
+
+                font-family:  'GentiumBasicRegular';
+                letter-spacing: 0;
+                filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=hIEfix.png,sizingMethod=crop);
+                zoom:1;
+                line-height: 25px;
+                font-weight: normal;
+                color: $dark-blue3;
+                font-size: 19px;
+
+            }
+            span {
+                @include column(5, true);
+                @include prepend(2);
+                font-size: 11px;
+                color: $grey-quote;
+								margin-top: -30px
+            }
+        }
+
+        .home-icons-aeronef {
+            margin-top: 40px;
+            //margin-left: 30px;
+            @include column(14, true);
+
+            ul#home-icons {
+                width: 583px;
+                height: 97px;
+                background: url("/static/img/home-plane-select.png") no-repeat;
+                margin: 0px auto; padding: 0;
+                position: relative;
+
+                li {
+                    margin: 0;
+                    padding: 0;
+                    list-style: none;
+                    position: absolute;
+                    top: 0;
+                    height: 97px;
+                    display: block;
+
+                }
+                a {
+                    height: 97px;
+                    display: block;
+                }
+
+                #avion {left: 0; width: 70px;}
+                #planeur {left: 73px; width: 70px;}
+                #helico {left: 146px; width: 70px;}
+                #ulm {left: 220px; width: 70px;}
+                #ballon {left: 293px; width: 70px;}
+                #parachute {left: 367px; width: 70px;}
+                #vol_libre {left: 440px; width: 70px;}
+                #drone {left: 513px; width: 70px;}
+
+
+
+            #avion a:hover {
+                background: transparent  url("/static/img/home-plane-select-hover.png")
+                0px 0 no-repeat;
+            }
+            #planeur:hover {
+                background: transparent  url("/static/img/home-plane-select-hover.png")
+                -73px 0 no-repeat;
+            }
+            #helico:hover {
+                background: transparent  url("/static/img/home-plane-select-hover.png")
+                -146px 0 no-repeat;
+            }
+            #ulm:hover {
+                background: transparent  url("/static/img/home-plane-select-hover.png")
+                -220px 0 no-repeat;
+            }
+            #ballon:hover {
+                background: transparent  url("/static/img/home-plane-select-hover.png")
+                -293px 0 no-repeat;
+            }
+            #parachute:hover {
+                background: transparent  url("/static/img/home-plane-select-hover.png")
+                -367px 0 no-repeat;
+            }
+            #vol_libre:hover {
+                background: transparent  url("/static/img/home-plane-select-hover.png")
+                -440px 0 no-repeat;
+            }
+            #drone:hover {
+                background: transparent  url("/static/img/home-plane-select-hover.png")
+                -513px 0 no-repeat;
+            }
+
+         }
+
+       }
+    }
+	#box-support {
+		@include column(24, true);
+        height: 307px;
+		margin-bottom: 15px;
+        background: {
+            image: image-url("../../static/img/box-support.png");
+            repeat:  no-repeat;
+            position: top left;
+       };
+		#support-content {
+			@include column(23,true);
+			@include push-margins(2);
+
+			a {
+				text-decoration: none;
+			}
+			.box-title {
+				@include column(11);
+				padding-top: 20px;
+				margin-bottom: 10px;
+				.baseline {
+					font-size: 14px;
+					margin-top: -25px;
+					float:left;
+				}
+			}
+
+			h2 {
+				@include column(10);
+				font-size: 36px;
+				color: $dark-blue;
+				font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+
+				&:hover {
+					text-decoration: none;
+				}
+			}
+			.faq {
+				background: {
+				image: image-url("/static/img/icon-faq.png");
+                repeat:  no-repeat;
+                position: center left;
+				};
+				height: 80px;
+				padding-left: 85px;
+			}
+			.question {
+				background: {
+				image: image-url("/static/img/icon-question.png");
+                repeat:  no-repeat;
+                position: center left;
+				};
+				height: 80px;
+				padding-left: 85px;
+			}
+			.tuto {
+				background: {
+				image: image-url("/static/img/icon-tuto.png");
+                repeat:  no-repeat;
+                position: center left;
+				};
+				height: 80px;
+				padding-left: 85px;
+			}
+
+			.juridical {
+				background: {
+				image: image-url("/static/img/icon-juridical.png");
+                repeat:  no-repeat;
+                position: center left;
+				};
+				height: 80px;
+				padding-left: 85px;
+			}
+		}
+	}
+
+	#support-box-details {
+		@include column(24, true);
+		margin-bottom: 20px;
+		#support-content {
+			padding: 0px 20px 0px 20px;
+		}
+		h2 {
+			font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+			color: $dark-blue;
+			font-size: 36px;
+			float:left;
+			a {
+				text-decoration: underline;
+				color: $dark-red;
+				&:hover {
+					text-decoration: none;
+				}
+			}
+		}
+		p {
+			clear:both;
+			padding-bottom: 10px;
+		}
+		#search {
+			float:right;
+			margin-top: 10px;
+			p {
+				text-align: right;
+				.search-button {
+					@include border-radius(4px, 4px);
+					@include box-shadow(#ddd, 0px, 0px, 2px);
+					display:inline-block;
+					text-decoration:none;
+					cursor:pointer;
+					border:1px solid $dark-red;
+					background-color:$dark-red-start;
+					@include linear-gradient(color-stops($dark-red-end, $dark-red-start));
+					color:white;
+					height: 25px;
+					font-size: 14px;
+					&:hover {
+						@include box-shadow(#999, 0px, 0px, 3px);
+						color:white;
+					}
+				}
+			}
+		}
+		.faq-list {
+			h3 {
+				font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+				font-size: 22px;
+				margin-bottom: 10px;
+				color: $dark-blue;
+				a {
+					text-decoration: none;
+					color: $dark-blue;
+					&:hover {
+						text-decoration: underline;
+					}
+				}
+			}
+			p {
+				margin-bottom: 30px;
+			}
+			clear:both;
+		}
+	}
+
+    #home-third {
+        @include column(24, true);
+				margin-bottom: 20px;
+        span.spacer {
+            @include column(1, true);
+        }
+
+        .home-col {
+
+            @include column(7);
+
+            margin: 0 10px 0 18px;
+            padding: 0;
+
+            .info-left {
+
+                width: 275px;
+                border-right: solid 1px $border-col;
+
+                margin: 0 0 10px 0;
+                padding: 0;
+
+
+                p {
+                    width: 230px;
+                    padding: 5px 0px 5px 10px;
+                    color: $brown;
+                    font-size: 12.5px;
+                    line-height: 18px;
+                }
+            }
+			.info-right {
+
+                width: 275px;
+                margin: 0 0 10px 0;
+                padding: 0;
+                p {
+                    width: 230px;
+                    padding: 5px 0px 5px 10px;
+                    color: $brown;
+                    font-size: 12.5px;
+                    line-height: 18px;
+                }
+            }
+            .home-img{
+                width: 250px;
+                margin: 0px 0px 10px 0px;
+            }
+
+			a {
+				font-weight: bold;
+				color: $link;
+				&:hover {
+					color: $link-hover;
+					text-decoration: none;
+				}
+			}
+
+
+            h2 {
+                text-indent: -9999px;
+                font-size: 10px;
+                display: None;
+            }
+            div.stats-title {
+
+                padding-left: 65px;
+                padding-top: 20px;
+                height: 40px;
+
+                background: {
+                    image: image-url("/static/img/home-stats-ico-title.png");
+                    repeat:  no-repeat;
+                    position: 10px 12px;
+                };
+            }
+
+            div.aeronefs-title {
+
+                padding-left: 65px;
+                padding-top: 20px;
+                height: 40px;
+                background: {
+                    image: image-url("/static/img/home-aeronefs-ico-title.png");
+                    repeat:  no-repeat;
+                    position:  10px 0;
+                };
+            }
+
+            div.alerts-title {
+
+                padding-left: 60px;
+                padding-top: 20px;
+                height: 40px;
+                background: {
+                    image: image-url("/static/img/home-alerts-ico-title.png");
+                    repeat:  no-repeat;
+                    position: 10px 10px;
+                };
+            }
+
+			div.phone-title {
+
+                padding-left: 60px;
+                padding-top: 20px;
+                height: 40px;
+                background: {
+                    image: image-url("/static/img/home-phone-ico-title.png");
+                    repeat:  no-repeat;
+                    position: 10px 0px;
+                };
+            }
+
+			div.export-title {
+
+                padding-left: 78px;
+                padding-top: 20px;
+                height: 40px;
+                background: {
+                    image: image-url("/static/img/home-export-ico-title.png");
+                    repeat:  no-repeat;
+                    position:  10px 0;
+                };
+            }
+
+			div.cost-title {
+
+                padding-left: 60px;
+                padding-top: 20px;
+                height: 40px;
+
+                background: {
+                    image: image-url("/static/img/home-cost-ico-title.png");
+                    repeat:  no-repeat;
+                    position: 10px 12px;
+                };
+            }
+
+			div.import-title {
+
+                padding-left: 65px;
+                padding-top: 20px;
+                height: 40px;
+                background: {
+                    image: image-url("/static/img/home-import-ico-title.png");
+                    repeat:  no-repeat;
+                    position:  10px 0;
+                };
+            }
+			div.memories-title {
+
+                padding-left: 87px;
+                padding-top: 20px;
+                height: 40px;
+                background: {
+                    image: image-url("/static/img/home-memories-ico-title.png");
+                    repeat:  no-repeat;
+                    position:  10px 0;
+                };
+            }
+			div.share-title {
+
+                padding-left: 87px;
+                padding-top: 20px;
+                height: 40px;
+                background: {
+                    image: image-url("/static/img/home-share-ico-title.png");
+                    repeat:  no-repeat;
+                    position:  10px 0;
+                };
+            }
+        }
+
+
+        /* Left Right features buttons */
+        div.left-button {
+            position: absolute;
+            margin-top: 150px;
+            margin-left: 10px;
+            z-index: 500;
+
+            width: 29px;
+            height: 24px;
+            background: {
+                image: image-url("../../static/img/al.png");
+                repeat:  no-repeat;
+                position:  5px 0px;
+            };
+        }
+
+        div.right-button {
+            position: absolute;
+            z-index: 500;
+            margin-top: 150px;
+            margin-left: 920px;
+            width: 24px;
+            height: 24px;
+            background: {
+                image: image-url("../../static/img/ar.png");
+                repeat:  no-repeat;
+                position:  0 0;
+            };
+        }
+
+        .prev-feature  {
+            width: 905px;
+
+            padding-top: 10px;
+            padding-left: 35px;
+            height: 320px;
+        }
+
+    }
+}
+#partners-list {
+	@include column(23,true);
+	margin-left: 20px;
+	margin-top: 50px;
+	margin-bottom: 30px;
+	border-top: 1px solid $border-col;
+	padding-top: 10px;
+	h2 {
+		@include column(6);
+		@include prepend(1);
+		font-size: 21px;
+		font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+		color: $dark-blue;
+		margin-top: 20px;
+	}
+	.partner-img {
+		float: left;
+		margin: 0px 10px 0px 10px;
+	}
+
+    .partners-group {
+        @include column(17);
+        @include prepend(8);
+
+     }
+
+}
+
+
+form  {
+  @include blueprint-form;
+}
+
+
+@-webkit-keyframes resize {
+    0% {
+        padding: 0;
+    }
+    50% {
+
+        @include box-shadow(black, 2px, 3px, 3px);
+    }
+    70% {
+
+        @include box-shadow(black, 2px, 4px, 4px);
+    }
+    100% {
+        @include box-shadow(black, 3px, 5px, 5px);
+    }
+}
+
+
+
+/* HOME POPUP  ***********/
+
+/* IPHONE POPUP */
+div#iphone-popup.popup  {
+    margin:-275px 0 0 -270px;
+    width:450px;
+    height:auto;
+    top: 120px;
+    padding-bottom: 30px;
+
+}
+/* VIDEO POPUP ***********/
+
+#video-popup {
+    margin: -275px 0 0 -270px;
+    width:600px;
+    height:539px;
+    top: 320px;
+}
+
+
+
+div#video-popup.popup div.body.ct  {
+
+    padding-top: 0px;
+    padding-bottom: 0px;
+     margin: 0px;
+
+}
+
+.popup .body   {
+
+    padding: 0px;
+
+}

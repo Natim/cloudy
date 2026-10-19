@@ -1,0 +1,162 @@
+{% extends "payment/base_pack.html" %}
+{% load core_tags %}
+
+{% block profile_id %}pcloudy{% endblock %}
+
+{% block head %}
+    <link href="{{STATIC_URL}}compass/stylesheets/payment.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+
+{% block content %}
+    {% if request.GET.pack %}
+    <div class="error">
+        {% if request.GET.pack == 'alerts_qual' %}
+            Vous ne pouvez pas accéder au module Cloud@lertes car vous ne disposez pas d'un pack First Class.
+        {% endif %}
+
+        {% if request.GET.pack == 'stats' %}
+            Vous ne pouvez pas accéder au module Statistiques car vous ne disposez pas d'un pack First Class.
+        {% endif %}
+
+        {% if request.GET.pack == 'addlogbook' %}
+            Vous ne pouvez pas ajouter de carnet car vous ne disposez pas d'un pack First Class.
+        {% endif %}
+
+        {% if request.GET.pack == 'export_logbook' %}
+            Vous ne pouvez pas exporter de carnet car vous ne disposez pas d'un pack First Class.
+        {% endif %}
+
+        {% if request.GET.pack == 'aircrafts' %}
+            Vous ne pouvez pas enregistrer un nouvel aéronef car vous ne disposez pas d'un pack First Class.
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if user.get_profile.has_payed_plan %}
+        <h2>Pack <strong>&#8220;First Class&#8221;</strong></h2>
+<!--        <p>
+            <span class="balance">
+                Date d'échéance :
+                <span class="hl alert">  21/02/1987</span>.
+            </span>
+        </p>-->
+    {% else %}
+        <h2>Pack <strong>&#8220;Economy Class&#8221;</strong></h2>
+    {% endif %}
+
+    <div class="step">
+        {% if user.get_profile.has_payed_plan %}
+            <h2>Rechargez votre pack Cloudy First Class</h2>
+            <p>Pour recharger votre pack First Class et bénéficier pendant 12 mois supplémentaires de tous les avantages de Cloudy, remplissez le formulaire de paiement ci-dessous.</p>
+
+        {% else %}
+            <p>Le pack First Class, ce sont de nombreux avantages:</p>
+             <div class="pricing-offer-box">
+
+                    <div class="grey-box">
+                        Le pack le plus plébiscité !
+                    </div>
+                    <ul class="points">
+                        <li>Nombre de carnets de vol illimités</li>
+                        <li>Importez vos carnets existants</li>
+                        <li>Calculez vos totaux en un clic</li>
+                        <li>Recevez des rappels pour les expirations</li>
+                        <li>Consultez des statistiques détaillées</li>
+                        <li>Exportez vos carnets sous divers formats</li>
+                        <li>Espace de stockage illimité !</li>
+                    </ul>
+              </div>
+
+							<div class="slim-sidebar">
+					        <div class="blue-box">
+					            <h2>Sécurité</h2>
+					             <p class="quote">
+					             Chez Cloudy, nous travaillons avec des partenaires de choix pour la sécurisation de vos paiements en ligne :
+					            </p>
+								<img src="{{STATIC_URL}}img/logo-credit.png" class="logo-secure" />
+								<img src="{{STATIC_URL}}img/logo-payline.png" class="logo-secure" /><br />
+					        </div>
+						   <div class="lock-cloud"></div>
+					    </div>
+              <div class="spacer"></div>
+              <hr class="sep" />
+
+              <h2>Bénéficiez de 12 mois d'abonnement Cloudy First Class :</h2>
+
+        {% endif %}
+
+         <div class="payment-pres">
+                <div class="price">
+                    <span class="currency">€</span>
+                    <span class="value"> {% get_config_var 'FIRST_CLASS_PRICE' %}</span>
+                    <span class="frequency">/ an</span>
+                    <span id="real-value"> {% get_config_var 'FIRST_CLASS_PRICE' %}</span>
+                </div>
+
+                <span class="secu">Chez Cloudy vos transactions sont assurées en toute sécurité.
+                    <img src="{{STATIC_URL}}img/private.png" />
+                </span>
+
+                <div>
+                    <img src="{{STATIC_URL}}img/card-cb.gif" />
+                    <img src="{{STATIC_URL}}img/card-mastercard.gif" />
+                    <img src="{{STATIC_URL}}img/card-visa.gif" />
+                </div>
+            </div>
+
+        <p class="submit">
+            <button type="button" id="checkout">Je recharge mon compte !</button>
+            <div id="red-plane" style="display: none; position: relative;"><img src="{{STATIC_URL}}img/red_paper-plane.png" /></div>
+        </p>
+    </div>
+
+<script type="text/javascript">
+    function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+          var cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    var createCheckoutSession = function() {
+      return fetch("{% url 'payment:create_checkout_session' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify({})
+      }).then(function(result) {
+        return result.json();
+      });
+    };
+
+    var stripe = Stripe("pk_test_51IobD1H0DOComKZwnPeb3SGqPmxs0pppyMpwxsSaTz65AI86NeFcleUJiLoHuQGy5FmavTa18VWAj2FjdgCsr573004fOVxCN7");
+
+    $(document).ready(function(){
+      document
+        .getElementById("checkout")
+        .addEventListener("click", function(evt) {
+          // You'll have to define PRICE_ID as a price ID before this code block
+          createCheckoutSession().then(function(data) {
+            // Call Stripe.js method to redirect to the new Checkout page
+            stripe
+              .redirectToCheckout({
+                sessionId: data.sessionId
+              })
+              .then(handleResult);
+          });
+        });
+    });
+</script>
+{% endblock %}

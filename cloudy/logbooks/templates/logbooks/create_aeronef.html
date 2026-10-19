@@ -1,0 +1,167 @@
+{% extends "site_base_logbook.html" %}
+{% load static %}
+{% load core_tags %}
+{% load stats_tags %}
+
+{% block body_id %}logbooks{% endblock %}
+
+{% block head %}
+
+<link href="{% static 'compass/stylesheets/logbook.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'compass/stylesheets/logbook_popups.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+
+{% endblock %}
+
+
+{% block content %}
+<div class="box-top-profile"></div>
+<div class="box-main-param">
+
+  <div class="alert-list">
+
+    <div class="alert">
+      <div class="image-box">
+        <img src="{% static 'img/add-aeronef.jpg' %}" class="image-aeronef">
+      </div>
+      <div class="aeronef-infos">
+        <h2>F-GDIA</h2>
+        <div class="name-aeronef">
+          Cessna 152
+        </div>
+      </div>
+      <a href="#" class="btn red">Editer</a>
+      <div class="clr"></div>
+      <a href="#" title="Supprimer" class="delete"><img src="{% static 'img/carnet/icon-close.png' %}" /></a>
+    </div>
+
+    <div class="alert">
+      <div class="image-box">
+        <img src="{% static 'img/add-aeronef.jpg' %}" class="image-aeronef">
+      </div>
+      <div class="aeronef-infos">
+        <h2>F-PTYA</h2>
+        <div class="name-aeronef">
+          DA42-ER
+        </div>
+      </div>
+      <a href="#" class="btn red">Editer</a>
+      <div class="clr"></div>
+      <a href="#" title="Supprimer" class="delete"><img src="{% static 'img/carnet/icon-close.png' %}" /></a>
+    </div>
+
+    <div class="alert">
+      <div class="image-box">
+        <img src="{% static 'img/add-aeronef.jpg' %}" class="image-aeronef">
+      </div>
+      <div class="aeronef-infos">
+        <h2>F-BESY</h2>
+        <div class="name-aeronef">
+          PA28
+        </div>
+      </div>
+      <a href="#" class="btn red">Editer</a>
+      <div class="clr"></div>
+      <a href="#" title="Supprimer" class="delete"><img src="{% static 'img/carnet/icon-close.png' %}" /></a>
+    </div>
+
+
+  </div>
+
+</div>
+<div class="box-bottom-backend"></div>
+
+<div class="box-top-profile"></div>
+<div class="box-main-param">
+  <form class="add-aeronef-form">
+    <div class="fieldwrapper">
+      <p>
+        <label>Immatriculation</label>
+        <input type="text" class="input-medium">
+      </p>
+    </div>
+
+    <div class="fieldwrapper">
+      <p>
+        <label>Type d'appareil</label>
+        <input type="text" class="input-medium">
+      </p>
+    </div>
+
+    <div class="fieldwrapper">
+      <p>
+        <label>Tarif de l'heure de vol</label>
+        <input type="text" class="input-small">
+      <div class="small-select">
+        <select>
+          <option>€</option>
+          <option>$</option>
+          <option>£</option>
+        </select>
+      </div>
+      </p>
+    </div>
+
+    <div class="fieldwrapper">
+      <p>
+        <label>Tarif de l'heure de vol avec instructeur</label>
+        <input type="text" class="input-small">
+      <div class="small-select">
+        <select>
+          <option>€</option>
+          <option>$</option>
+          <option>£</option>
+        </select>
+      </div>
+      </p>
+    </div>
+
+    <div class="fieldwrapper">
+      <p>
+        <label>Tarif de l'heure de vol comme copilote</label>
+        <input type="text" class="input-small">
+      <div class="small-select">
+        <select>
+          <option>€</option>
+          <option>$</option>
+          <option>£</option>
+        </select>
+      </div>
+      </p>
+    </div>
+
+    <div class="fieldwrapper">
+      <label>Tarif à utiliser par défaut</label>
+      <div class="check-list">
+        <div class="checkline">
+          <input type="checkbox" name="pricehour" id="pricehour">
+          <label for="pricehour">Tarif à l'heure de vol</label>
+        </div>
+        <div class="checkline">
+          <input type="checkbox" name="priceinstructor" id="priceinstructor">
+          <label for="priceinstructor">Tarif avec instructeur</label>
+        </div>
+        <div class="checkline">
+          <input type="checkbox" name="pricecopilot" id="pricecopilot">
+          <label for="pricecopilot">Tarif en tant que copilote</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="fieldwrapper">
+      <p>
+        <label>Photo de l'aéronef</label>
+        <input type="file">
+      </p>
+    </div>
+
+    <p class="submit">
+      <button type="submit" name="submit">Ajouter l'aéronef</button>
+    </p>
+  </form>
+
+</div>
+<div class="box-bottom-backend"></div>
+
+{% endblock %}

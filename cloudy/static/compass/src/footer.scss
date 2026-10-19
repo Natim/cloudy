@@ -1,0 +1,196 @@
+#clouds-bottom {
+  position: absolute;
+  width: 395px;
+  height: 141px;
+  left: 50%;
+  margin-left: -555px;
+  margin-top: -57px;
+  background: {
+      image: image-url("../../static/img/footer_home_clouds.png");
+      repeat:  no-repeat;
+      position: top left;
+  };
+}
+
+#clouds-bottom-logged {
+  position: absolute;
+  width: 395px;
+  height: 141px;
+  left: 50%;
+  margin-left: -555px;
+  margin-top: -54px;
+  background: {
+      image: image-url("../../static/img/footer_home_clouds-logged.png");
+      repeat:  no-repeat;
+      position: top left;
+  };
+
+.help {
+	font-family:'ArchivoBlack', Impact, "Arial Black", sans-serif;
+	color: $dark-red;
+	font-size: 16px;
+	text-decoration: none;
+	float: right;
+	margin: 45px 60px 0px 0px;
+	&:hover {
+		text-decoration: underline;
+	}
+	}
+}
+
+#footer {
+
+    @include container;
+    margin: 0px;
+	margin-top: 30px;
+
+	.footer-register {
+		@include column(8);
+		margin: 0px 0px 5px 20px;
+		font-size: 13px;
+		position:relative;
+		z-index: 300;
+		height: 200px;
+		overflow-y: scroll;
+
+		#signup-button {
+
+			  @include column(5, true);
+			  margin-top: 10px;
+			  font-size: 12px;
+
+			  height: 29px;
+			  color: white;
+
+			  @include text-shadow(black, 1px, 1px, 0);
+			  @include box-shadow(black, 1px, 1px, 2px);
+			  border: 1px solid $dark-red-start;
+			  @include border-radius(3px, 3px);
+			  @include linear-gradient(color-stops($dark-red-end, $dark-red-start));
+			  background-color: $dark-red-start;
+
+			  &:hover {
+			      color: $light-grey;
+			      @include box-shadow(black, 1px, 2px, 2px);
+			      @include linear-gradient(color-stops($dark-red-end, $dark-red-end));
+			      background-color: $dark-red-end;
+
+			       -webkit-animation-name: resize;
+			      -webkit-animation-duration: 0.5s;
+			      -webkit-animation-iteration-count: 5;
+			      -webkit-animation-direction: alternate;
+			      -webkit-animation-timing-function: ease-in-out;
+
+			  }
+			  &:active {
+			      color: $light-grey;
+			      @include box-shadow(black, 0px, 0px, 0px);
+			      margin-top: 11px;
+			      margin-bottom: -1px;
+			  }
+
+			  span.txt {
+			      @include column(5);
+			      margin: 8px 0 0 10px;
+			      height: 13px;
+
+			      background: {
+			          image: image-url("../../static/img/text-signup-button-mini.png");
+			          repeat:  no-repeat;
+			          position: top left;
+			          z-index: 1000;
+			      };
+			  }
+			}
+		}
+
+		.footer-links {
+			@include column(8);
+			@include prepend(1);
+			margin-top: 80px;
+		.col-center {
+			@include column(3);
+			border-left: solid 1px $border-link-col;
+			padding-left: 15px;
+		}
+
+		ul {
+		    font-size: 13px;
+			padding-left: 5px;
+			@include column(3);
+			li {
+				list-style-type: none;
+				a {
+					text-decoration: none;
+					color: $link;
+					&:hover {
+						color: $link-hover;
+					}
+				}
+			}
+		}
+		p {
+			@include column(8);
+		}
+	}
+
+		.footer-follows {
+			@include column(5,true);
+			@include prepend(1);
+			.quick-links {
+				width: 320px;
+				height: 19px;
+				padding-bottom: 22px;
+				background: {
+				image: image-url("../../static/img/quick_links.png");
+				repeat:  no-repeat;
+				position: top left;
+			};
+		}
+			.bt-follow-tw {
+				width: 134px;
+				height: 46px;
+				margin-bottom: 5px;
+				background: {
+				image: image-url("../../static/img/bt-follow-twitter.png");
+				repeat:  no-repeat;
+				position: top left;
+			};
+		}
+		.bt-follow-facebook
+		{
+			width: 134px;
+			height: 46px;
+			margin-bottom: 5px;
+			background: {
+			    image: image-url("../../static/img/bt-follow-fb.png");
+			    repeat:  no-repeat;
+			    position: top left;
+            };
+	    }
+
+			.bt-follow-blog
+			{
+				width: 134px;
+				height: 46px;
+				margin-top: 5px;
+				background: {
+				    image: image-url("../../static/img/bt-follow-blog.png");
+				    repeat:  no-repeat;
+				    position: top left;
+	            };
+		    }
+    }
+}
+
+/* CGVU Popup */
+div#gcu-popup.popup {
+  margin:-275px 0 0 0px;
+  width:700px;
+  height:590px;
+  top: 320px;
+
+  p {
+    font-size: 14px;
+  }
+}

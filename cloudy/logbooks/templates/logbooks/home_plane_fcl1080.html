@@ -1,0 +1,518 @@
+{% extends "site_base_logbook.html" %}
+{% load cache %}
+
+{% load static %}
+{% load core_tags %}
+{% load logbook_tags %}
+{% load stats_tags %}
+{% load compress %}
+
+{% block body_id %}logbooks{% endblock %}
+{% block actions-id %}action-logbook{%endblock %}
+
+{% block head %}
+{% compress css %}
+<link href="{% static 'compass/stylesheets/logbook.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'compass/stylesheets/logbook_popups.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+{% endcompress %}
+{% endblock %}
+
+
+
+{% block content %}
+<div id="tooltip" class="tooltip-small"></div>
+<div class="date-slip"></div>
+{% include "partials/log-actions.html" %}
+
+<div class="left-button" rel="1"> </div>
+<div class="right-button" rel="1"> </div>
+<div class="simpleSlide-window fcl1080" rel="1">
+  <div class="simpleSlide-tray" rel="1">
+    <!-- first three cols -->
+    <div class="simpleSlide-slide" rel="1" alt="1">
+
+      <table class="cleft fcl1080">
+        <thead>
+          <tr class="counter">
+            <th rowspan="1" colspan="1" width="55">1</th>
+            <th rowspan="1" colspan="2" width="55">2</th>
+            <th rowspan="1" colspan="2" width="55">3</th>
+            <th rowspan="1" colspan="2" width="55">4</th>
+            <th rowspan="1" colspan="6" width="55">5</th>
+            <th rowspan="1" colspan="2" width="55">6</th>
+            <th rowspan="1" colspan="1" width="55">7</th>
+            <th rowspan="1" colspan="4" width="55">8</th>
+
+
+          </tr>
+          <tr class="first">
+            <th rowspan="3" width="55">DATE <span>(dd/mm/yy)</span></th>
+            <th colspan="2" rowspan="2">DEPARTURE</th>
+            <th colspan="2" rowspan="2">ARRIVAL</th>
+            <th colspan="2" rowspan="2">AIRCRAFT</th>
+            <th colspan="4" rowspan="2">SINGLE PILOT TIME</th>
+            <th colspan="2" rowspan="3">MULTI-PILOT TIME</th>
+            <th colspan="2" rowspan="3">TOTAL TIME OF FLIGHT</th>
+            <th colspan="1" rowspan="3">NAME PIC</th>
+            <th colspan="2" rowspan="1">TAKEOFFS</th>
+            <th colspan="2" rowspan="1 ">LANDINGS</th>
+          </tr>
+          <tr class="second">
+            <th colspan="1" rowspan="2" class="tall">DAY</th>
+            <th colspan="1" rowspan="2" class="tall">NIGHT</th>
+            <th colspan="1" rowspan="2" class="tall">DAY</th>
+            <th colspan="1" rowspan="2" class="tall">NIGHT</th>
+          </tr>
+          <tr class="third">
+            <th>PLACE</th>
+            <th>TIME</th>
+            <th>PLACE</th>
+            <th>TIME</th>
+            <th>MAKE, MODEL,<br />VARIANT</th>
+            <th>REGISTRATION</th>
+            <th>SE</th>
+            <th>ME</th>
+            <th></th>
+            <th></th>
+          </tr>
+
+        </thead>
+        <tfoot>
+          <tr class="foot">
+            <td colspan="7" rowspan="3">
+              <div class="foot-text-leftpage">TOTAL THIS PAGE</div>
+              <div class="foot-text-leftpage">TOTAL FROM PREVIOUS PAGE</div>
+              <div class="foot-text-leftpage">TOTAL TIME</div>
+            </td>
+
+            <td></td>
+            <td></td>
+
+            <td sum-field="single_pilot_time_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field="single_pilot_time_min" class="reports-foot" type-field="int_min"
+              rel="single_pilot_time_hour"></td>
+            <td sum-field="multi_pilot_time_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field="multi_pilot_time_min" class="reports-foot" type-field="int_min" rel="multi_pilot_time_hour">
+            </td>
+            <td sum-field="total_time_flight_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field="total_time_flight_min" class="reports-foot" type-field="int_min"
+              rel="total_time_flight_hour"></td>
+            <td></td>
+            <td sum-field="take_off_day" class="reports-foot" type-field="int"></td>
+            <td sum-field="take_off_night" class="reports-foot" type-field="int"></td>
+            <td sum-field="landing_day" class="reports-foot" type-field="int"></td>
+            <td sum-field="landing_night" class="reports-foot" type-field="int"></td>
+          </tr>
+          <tr class="foot">
+            {% format_total_as totals total_single_pilot_time report as total %}
+            <td></td>
+            <td></td>
+            <td report-data-field="single_pilot_time" rel="single_pilot_time_hour" class="reports-info">
+              {{ total|hour_part }}
+            </td>
+            <td report-data-field="single_pilot_time" rel="single_pilot_time_min" class="reports-info">
+              {{ total|min_part }}
+            </td>
+            {% format_total_as totals total_multi_pilot_time report as total %}
+            <td report-data-field="multi_pilot_time" rel="multi_pilot_time_hour" class="reports-info">
+              {{ total|hour_part }}
+            </td>
+            <td report-data-field="multi_pilot_time" rel="multi_pilot_time_min" class="reports-info">
+              {{ total|min_part }}
+            </td>
+            {% format_total_as totals total_total_time_flight report as total %}
+            <td report-data-field="total_time_flight" rel="total_time_flight_hour" class="reports-info">
+              {{ total|hour_part }}
+            </td>
+            <td report-data-field="total_time_flight" rel="total_time_flight_min" class="reports-info">
+              {{ total|min_part }}
+            </td>
+            <td></td>
+            <td report-data-field="take_off_day" rel="take_off_day" class="reports-info">
+              {% format_total totals total_take_off_day dontformat %}
+            </td>
+            <td report-data-field="take_off_night" rel="take_off_night" class="reports-info">
+              {% format_total totals total_take_off_night dontformat %}
+            </td>
+            <td report-data-field="landing_day" rel="landing_day" class="reports-info">
+              {% format_total totals total_landing_day dontformat %}
+            </td>
+            <td report-data-field="landing_night" rel="landing_night" class="reports-info">
+              {% format_total totals total_landing_night dontformat %}
+            </td>
+          </tr>
+          <tr class="foot">
+            <td></td>
+            <td></td>
+            <td sum-field-with-report="single_pilot_time_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="single_pilot_time_min" class="reports-foot" type-field="int_min"
+              rel="single_pilot_time_hour"></td>
+            <td sum-field-with-report="multi_pilot_time_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="multi_pilot_time_min" class="reports-foot" type-field="int_min"
+              rel="multi_pilot_time_hour"></td>
+            <td sum-field-with-report="total_time_flight_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="total_time_flight_min" class="reports-foot" type-field="int_min"
+              rel="total_time_flight_hour"></td>
+            <td></td>
+            <td sum-field-with-report="take_off_day" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="take_off_night" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="landing_day" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="landing_night" class="reports-foot" type-field="int"></td>
+          </tr>
+        </tfoot>
+        <tbody>
+          {% with logbook.time_format as time_format %}
+
+          {% for i in iteration %}
+          {% with logs|nth:i as log %}
+          <tr class="{% if forloop.first %}first{% endif %} {% cycle '' '' 'grey' %}" alt="{{log.id}}">
+            {% if log.date %}
+            <td data-field="date" class="e tdate c0" alt="{{ log.date|date:'Y-m-d'}}">{{ log.date|date:"j b" }}</td>
+            <td data-field="departure_place" class="e tmtext c1" alt="10" prevmax="6">{{ log.departure_place|truncchar:6 }}
+              <pre>{{ log.departure_place }}</pre>
+            </td>
+            <td data-field="departure_time" class="e ttime c2">{{ log.departure_time|hmin_hhmm:logbook }}</td>
+            <td data-field="arrival_place" class="e tmtext c3" alt="10" prevmax="6">{{ log.arrival_place|truncchar:6 }}
+              <pre>{{ log.arrival_place }}</pre>
+            </td>
+            <td data-field="arrival_time" class="e ttime c4">{{ log.arrival_time|hmin_hhmm:logbook }}</td>
+            <td data-field="aircraft_type" class="e tmtext c5" alt="30" prevmax="15">{{ log.aircraft_type|truncchar:15 }}
+              <pre>{{ log.aircraft_type }}</pre>
+            </td>
+            <td data-field="aircraft_imma" class="e tmtext c6" alt="30" prevmax="15">{{ log.aircraft_imma|truncchar:15 }}
+              <pre>{{ log.aircraft_imma }}</pre>
+            </td>
+
+            <td data-field="single_pilot_se" class="center c7">{% if log.single_pilot_se %}X{% endif %}</td>
+            <td data-field="single_pilot_me" class="center c8">{% if log.single_pilot_me %}X{% endif %}</td>
+            <td id="r{{i}}_c9" data-field="single_pilot_time_hour" type-field="int" target="single_pilot_time"
+              class="e hour ttime_splited_{{ time_format }} c9" fulltime="{{ log.single_pilot_time|hmin:logbook }}">{{ log.single_pilot_time|hmin_hour:logbook }}</td>
+            <td id="r{{i}}_c10" data-field="single_pilot_time_min" type-field="int" target="single_pilot_time"
+              class="e min ttime_splited_{{ time_format }} c10" fulltime="{{ log.single_pilot_time|hmin:logbook }}">{{ log.single_pilot_time|hmin_min:logbook }}</td>
+
+            <td id="r{{i}}_c11" data-field="multi_pilot_time_hour" type-field="int" target="multi_pilot_time"
+              class="e hour ttime_splited_{{ time_format }} c11" fulltime="{{ log.multi_pilot_time|hmin:logbook }}">{{ log.multi_pilot_time|hmin_hour:logbook }}</td>
+            <td id="r{{i}}_c12" data-field="multi_pilot_time_min" type-field="int" target="multi_pilot_time"
+              class="e min ttime_splited_{{ time_format }} c12" fulltime="{{ log.multi_pilot_time|hmin:logbook }}">{{ log.multi_pilot_time|hmin_min:logbook }}</td>
+
+            <td id="r{{i}}_c13" data-field="total_time_flight_hour" type-field="int" target="total_time_flight"
+              class="e hour ttime_splited_{{ time_format }} c13" fulltime="{{ log.total_time_flight|hmin:logbook }}">{{ log.total_time_flight|hmin_hour:logbook }}</td>
+            <td id="r{{i}}_c14" data-field="total_time_flight_min" type-field="int" target="total_time_flight"
+              class="e min ttime_splited_{{ time_format }} c14" fulltime="{{ log.total_time_flight|hmin:logbook }}">{{ log.total_time_flight|hmin_min:logbook }}</td>
+
+
+            <td data-field="aircraft_imma" class="e tmtext c15" alt="30" prevmax="10">{{ log.name_pic|truncchar:10 }}
+              <pre>{{ log.name_pic }}</pre>
+            </td>
+            <td data-field="take_off_day" type-field="int" class="e tint c16">{% if log.take_off_day > 0 %}{{ log.take_off_day }}{% endif %}</td>
+            <td data-field="take_off_night" type-field="int" class="e tint c17">{% if log.take_off_night > 0 %}{{ log.take_off_night }}{% endif %}</td>
+            <td data-field="landing_day" type-field="int" class="e tint c18">{% if log.landing_day > 0 %}{{ log.landing_day }}{% endif %}</td>
+            <td data-field="landing_night" type-field="int" class="e tint c19">{% if log.landing_night > 0 %}{{ log.landing_night }}{% endif %}</td>
+
+
+            {% else %}
+            <td class="c0"></td>
+            <td class="c1"></td>
+            <td class="c2"></td>
+            <td class="c3"></td>
+            <td class="c4"></td>
+            <td class="c5"></td>
+            <td class="c6"></td>
+            <td class="c7"></td>
+            <td class="c8"></td>
+            <td class="c9"></td>
+            <td class="c10"></td>
+            <td class="c11"></td>
+            <td class="c12"></td>
+            <td class="c13"></td>
+            <td class="c14"></td>
+            <td class="c15"></td>
+            <td class="c16"></td>
+            <td class="c17"></td>
+            <td class="c18"></td>
+            <td class="c19"></td>
+            {% endif %}
+          </tr>
+          {% endwith %}
+          {% endfor %}
+          {% endwith %}
+        </tbody>
+
+      </table>
+    </div>
+
+
+    {# This is the right side of the logbook #}
+
+    <div class="simpleSlide-slide" rel="1" alt="2">
+      <table class="cright fcl1080" id="right-dgac">
+        <thead>
+          <tr class="counter">
+            <th rowspan="1" colspan="4" width="55">9</th>
+            <th rowspan="1" colspan="8" width="55">10</th>
+            <th rowspan="1" colspan="4" width="55">11</th>
+            <th rowspan="1" colspan="1" width="55">12</th>
+            <th rowspan="3" width="55">Comments</th>
+            <th rowspan="3" width="25"><span class="vertical">Media</span></th>
+
+          </tr>
+          <tr class="first">
+            <th colspan="4">OPERATIONAL CONDITION TIME</th>
+            <th colspan="8">PILOT FUNCTION TIME</th>
+            <th colspan="4">SYNTHETIC TRAINING DEVICES SESSION</th>
+            <th colspan="1" rowspan="2">REMARKS AND ENDORSEMENTS</th>
+          </tr>
+          <tr class="second">
+            <th colspan="2" class="tall">NIGHT</th>
+            <th colspan="2" class="tall">IFR</th>
+            <th colspan="2" class="tall">PILOT-IN COMMAND</th>
+            <th colspan="2" class="tall">CO-PILOT</th>
+            <th colspan="2" class="tall">DUAL</th>
+            <th colspan="2" class="tall">INSTRUCTOR</th>
+            <th colspan="1" class="tall">DATE<span>(dd/mm/yy)</span></th>
+            <th colspan="1" class="tall">TYPE</th>
+            <th colspan="2" class="tall">DURATION</th>
+          </tr>
+
+        </thead>
+        <tfoot>
+          <tr class="foot">
+            <td sum-field="op_time_night_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field="op_time_night_min" class="reports-foot" type-field="int_min" rel="op_time_night_hour"></td>
+            <td sum-field="op_time_ifr_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field="op_time_ifr_min" class="reports-foot" type-field="int_min" rel="op_time_ifr_hour"></td>
+            <td sum-field="pilot_time_in_cmd_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field="pilot_time_in_cmd_min" class="reports-foot" type-field="int_min"
+              rel="pilot_time_in_cmd_hour"></td>
+            <td sum-field="pilot_timpe_cop_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field="pilot_timpe_cop_min" class="reports-foot" type-field="int_min" rel="pilot_timpe_cop_hour">
+            </td>
+            <td sum-field="pilot_time_dual_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field="pilot_time_dual_min" class="reports-foot" type-field="int_min" rel="pilot_time_dual_hour">
+            </td>
+            <td sum-field="pilot_time_inst_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field="pilot_time_inst_min" class="reports-foot" type-field="int_min" rel="pilot_time_inst_hour">
+            </td>
+            <td></td>
+            <td></td>
+            <td sum-field="synthetic_time_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field="synthetic_time_min" class="reports-foot" type-field="int_min" rel="synthetic_time_hour"></td>
+            <td rowspan="3">
+              <div class="foot-text-certify">I certify that the entries in this log are true.</div>
+              <div class="foot-text-signature">PILOT'S SIGNATURE</div>
+            </td>
+            <td rowspan="3" colspan="2"></td>
+
+          </tr>
+          <tr class="foot">
+            {% format_total_as totals total_op_time_night report as total %}
+            <td report-data-field="op_time_night" rel="op_time_night_hour" class="reports-info">
+              {{ total|hour_part }}
+            </td>
+            <td report-data-field="op_time_night" rel="op_time_night_min" class="reports-info">
+              {{ total|min_part }}
+            </td>
+
+            {% format_total_as totals total_op_time_ifr report as total %}
+            <td report-data-field="op_time_ifr" rel="op_time_ifr_hour" class="reports-info">
+              {{ total|hour_part }}
+            </td>
+            <td report-data-field="op_time_ifr" rel="op_time_ifr_min" class="reports-info">
+              {{ total|min_part }}
+            </td>
+
+            {% format_total_as totals total_pilot_time_in_cmd report as total %}
+            <td report-data-field="pilot_time_in_cmd" rel="pilot_time_in_cmd_hour" class="reports-info">
+              {{ total|hour_part }}
+            </td>
+            <td report-data-field="pilot_time_in_cmd" rel="pilot_time_in_cmd_min" class="reports-info">
+              {{ total|min_part }}
+            </td>
+
+            {% format_total_as totals total_pilot_timpe_cop report as total %}
+            <td report-data-field="pilot_timpe_cop" rel="pilot_timpe_cop_hour" class="reports-info">
+              {{ total|hour_part }}
+            </td>
+            <td report-data-field="pilot_timpe_cop" rel="pilot_timpe_cop_min" class="reports-info">
+              {{ total|min_part }}
+            </td>
+
+            {% format_total_as totals total_pilot_time_dual report as total %}
+            <td report-data-field="pilot_time_dual" rel="pilot_time_dual_hour" class="reports-info">
+              {{ total|hour_part }}
+            </td>
+            <td report-data-field="pilot_time_dual" rel="pilot_time_dual_min" class="reports-info">
+              {{ total|min_part }}
+            </td>
+
+            {% format_total_as totals total_pilot_time_inst report as total %}
+            <td report-data-field="pilot_time_inst" rel="pilot_time_inst_hour" class="reports-info">
+              {{ total|hour_part }}
+            </td>
+            <td report-data-field="pilot_time_inst" rel="pilot_time_inst_min" class="reports-info">
+              {{ total|min_part }}
+            </td>
+            <td></td>
+            <td></td>
+
+            {% format_total_as totals total_synthetic_time report as total %}
+            <td report-data-field="synthetic_time" rel="synthetic_time_hour" class="reports-info">
+              {{ total|hour_part }}
+            </td>
+            <td report-data-field="synthetic_time" rel="synthetic_time_min" class="reports-info">
+              {{ total|min_part }}
+            </td>
+          </tr>
+          <tr class="foot">
+            <td sum-field-with-report="op_time_night_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="op_time_night_min" class="reports-foot" type-field="int_min"
+              rel="op_time_night_hour"></td>
+            <td sum-field-with-report="op_time_ifr_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="op_time_ifr_min" class="reports-foot" type-field="int_min"
+              rel="op_time_ifr_hour"></td>
+            <td sum-field-with-report="pilot_time_in_cmd_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="pilot_time_in_cmd_min" class="reports-foot" type-field="int_min"
+              rel="pilot_time_in_cmd_hour"></td>
+            <td sum-field-with-report="pilot_timpe_cop_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="pilot_timpe_cop_min" class="reports-foot" type-field="int_min"
+              rel="pilot_timpe_cop_hour"></td>
+            <td sum-field-with-report="pilot_time_dual_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="pilot_time_dual_min" class="reports-foot" type-field="int_min"
+              rel="pilot_time_dual_hour"></td>
+            <td sum-field-with-report="pilot_time_inst_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="pilot_time_inst_min" class="reports-foot" type-field="int_min"
+              rel="pilot_time_inst_hour"></td>
+            <td></td>
+            <td></td>
+            <td sum-field-with-report="synthetic_time_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="synthetic_time_min" class="reports-foot" type-field="int_min"
+              rel="synthetic_time_hour"></td>
+          </tr>
+        </tfoot>
+        <tbody>
+
+          {% with logbook.time_format as time_format %}
+
+          {% for i in iteration %}
+          {% with logs|nth:i as log %}
+          <tr class="{% if forloop.first %}first{% endif %} {% cycle '' '' 'grey' %}" alt="{{log.id}}">
+            {% if log.date %}
+
+
+            <td id="r{{i}}_c30" alt="{{ log.date|date:'j F'}}" data-field="op_time_night_hour" type-field="int"
+              target="op_time_night" class="e hour ttime_splited_{{ time_format }} c30"
+              fulltime="{{ log.op_time_night|hmin:logbook }}">{{ log.op_time_night|hmin_hour:logbook }}</td>
+            <td id="r{{i}}_c31" data-field="op_time_night_min" type-field="int" target="op_time_night"
+              class="e min ttime_splited_{{ time_format }} c31" fulltime="{{ log.op_time_night|hmin:logbook }}">{{ log.op_time_night|hmin_min:logbook }}</td>
+
+            <td id="r{{i}}_c32" data-field="op_time_ifr_hour" type-field="int" target="op_time_ifr"
+              class="e hour ttime_splited_{{ time_format }} c32" fulltime="{{ log.op_time_ifr|hmin:logbook }}">{{ log.op_time_ifr|hmin_hour:logbook }}</td>
+            <td id="r{{i}}_c33" data-field="op_time_ifr_min" type-field="int" target="op_time_ifr"
+              class="e min ttime_splited_{{ time_format }} c33" fulltime="{{ log.op_time_ifr|hmin:logbook }}">{{ log.op_time_ifr|hmin_min:logbook }}</td>
+
+            <td id="r{{i}}_c34" data-field="pilot_time_in_cmd_hour" type-field="int" target="pilot_time_in_cmd"
+              class="e hour ttime_splited_{{ time_format }} c34" fulltime="{{ log.pilot_time_in_cmd|hmin:logbook }}">{{ log.pilot_time_in_cmd|hmin_hour:logbook }}</td>
+            <td id="r{{i}}_c35" data-field="pilot_time_in_cmd_min" type-field="int" target="pilot_time_in_cmd"
+              class="e min ttime_splited_{{ time_format }} c35" fulltime="{{ log.pilot_time_in_cmd|hmin:logbook }}">{{ log.pilot_time_in_cmd|hmin_min:logbook }}</td>
+
+            <td id="r{{i}}_c36" data-field="pilot_timpe_cop_hour" type-field="int" target="pilot_timpe_cop"
+              class="e hour ttime_splited_{{ time_format }} c36" fulltime="{{ log.pilot_timpe_cop|hmin:logbook }}">{{ log.pilot_timpe_cop|hmin_hour:logbook }}</td>
+            <td id="r{{i}}_c37" data-field="pilot_timpe_cop_min" type-field="int" target="pilot_timpe_cop"
+              class="e min ttime_splited_{{ time_format }} c37" fulltime="{{ log.pilot_timpe_cop|hmin:logbook }}">{{ log.pilot_timpe_cop|hmin_min:logbook }}</td>
+
+            <td id="r{{i}}_c38" data-field="pilot_time_dual_hour" type-field="int" target="pilot_time_dual"
+              class="e hour ttime_splited_{{ time_format }} c38" fulltime="{{ log.pilot_time_dual|hmin:logbook }}">{{ log.pilot_time_dual|hmin_hour:logbook }}</td>
+            <td id="r{{i}}_c39" data-field="pilot_time_dual_min" type-field="int" target="pilot_time_dual"
+              class="e min ttime_splited_{{ time_format }} c39" fulltime="{{ log.pilot_time_dual|hmin:logbook }}">{{ log.pilot_time_dual|hmin_min:logbook }}</td>
+
+            <td id="r{{i}}_c40" data-field="pilot_time_inst_hour" type-field="int" target="pilot_time_inst"
+              class="e hour ttime_splited_{{ time_format }} c40" fulltime="{{ log.pilot_time_inst|hmin:logbook }}">{{ log.pilot_time_inst|hmin_hour:logbook }}</td>
+            <td id="r{{i}}_c41" data-field="pilot_time_inst_min" type-field="int" target="pilot_time_inst"
+              class="e min ttime_splited_{{ time_format }} c41" fulltime="{{ log.pilot_time_inst|hmin:logbook }}">{{ log.pilot_time_inst|hmin_min:logbook }}</td>
+
+
+            <td data-field="synthetic_date" class="c42" alt="{{ log.synthetic_date|date:'Y-m-d'}}">{{ log.synthetic_date|date:"j b" }}</td>
+            <td data-field="synthetic_type" class="e tmtext c43" alt="30" prevmax="15">{{ log.synthetic_type|truncchar:15 }}
+              <pre>{{ log.synthetic_type }}</pre>
+            </td>
+
+            <td id="r{{i}}_c44" data-field="synthetic_time_hour" type-field="int" target="synthetic_time"
+              class="e hour ttime_splited_{{ time_format }} c44" fulltime="{{ log.synthetic_time|hmin:logbook }}">{{ log.synthetic_time|hmin_hour:logbook }}</td>
+            <td id="r{{i}}_c45" data-field="synthetic_time_min" type-field="int" target="synthetic_time"
+              class="e min ttime_splited_{{ time_format }} c45" fulltime="{{ log.synthetic_time|hmin:logbook }}">{{ log.synthetic_time|hmin_min:logbook }}</td>
+
+
+            <td data-field="obs" class="e ttextarea c46" alt="200" prevmax="28">{{ log.obs|truncchar:28 }}
+              <pre>{{ log.obs }}</pre>
+            </td>
+            <td data-field="cmmts" class="e ttextarea c47 extra" alt="200" prevmax="23">
+              {{ log.cmmts|truncchar:23 }}
+              <pre>{{ log.cmmts }}</pre>
+            </td>
+            <td data-field="files" class="e tmedia c23 extra {% if log.files.all|length > 0 %}multi{% endif %}">
+              {{ log.files.all|length }}
+              <pre>
+                                        <ul class="media">
+                                        {% if log.files %}
+                                            {% for file in log.files.all %}
+                                                <li>
+                                                    <a href="{{file.file.url}}" target="_blank">{{file.filename|sexy_me|truncchar:15}}</a>
+                                                     <span>{% widthratio file.filesize 1000 1 %} Kb</span>
+                                                </li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        </ul>
+                                    </pre>
+            </td>
+            {% else %}
+            <td class="c30"></td>
+            <td class="c31"></td>
+            <td class="c32"></td>
+            <td class="c33"></td>
+            <td class="c34"></td>
+            <td class="c35"></td>
+            <td class="c36"></td>
+            <td class="c37"></td>
+            <td class="c38"></td>
+            <td class="c39"></td>
+            <td class="c40"></td>
+            <td class="c41"></td>
+            <td class="c42"></td>
+            <td class="c43"></td>
+            <td class="c44"></td>
+            <td class="c45"></td>
+            <td class="c46"></td>
+            <td class="c47"></td>
+            <td class="c48"></td>
+            {% endif %}
+          </tr>
+          {% endwith %}
+          {% endfor %}
+          {% endwith %}
+        </tbody>
+
+
+      </table>
+
+    </div>
+  </div>
+</div>
+
+<div class="foot-nav">
+  <div class="left-button" rel="1" id="slide-left-page">
+    <a href="#" class="btn dark prev">
+      <div class="prev-icon"></div>
+      Page précédente
+    </a>
+  </div>
+  <div class="right-button" id="slide-right-page" rel="1">
+    <a href="#" class="btn dark next">
+      <div class="next-icon"></div>
+      Page suivante
+    </a>
+  </div>
+</div>
+
+{% endblock %}

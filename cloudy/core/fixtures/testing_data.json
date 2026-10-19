@@ -1,0 +1,99 @@
+[
+  {
+    "pk": 1,
+    "model": "auth.user",
+    "fields": {
+      "username": "admin",
+      "first_name": "",
+      "last_name": "",
+      "is_active": true,
+      "is_superuser": true,
+      "is_staff": true,
+      "last_login": "2011-07-02 15:07:03",
+      "groups": [],
+      "user_permissions": [],
+      "password": "pbkdf2_sha256$1$cloudytest$6HijMMfG+LpoSl3F0LwM3yLzFYMxGiy0fzT/XAoAnkU=",
+      "email": "admin@example.com",
+      "date_joined": "2011-07-02 15:06:37"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "auth.user",
+    "fields": {
+      "username": "pilot",
+      "first_name": "Ada",
+      "last_name": "Pilot",
+      "is_active": true,
+      "is_superuser": false,
+      "is_staff": false,
+      "last_login": "2011-07-02 15:07:14",
+      "groups": [],
+      "user_permissions": [],
+      "password": "pbkdf2_sha256$1$cloudytest$6HijMMfG+LpoSl3F0LwM3yLzFYMxGiy0fzT/XAoAnkU=",
+      "email": "pilot@example.com",
+      "date_joined": "2011-07-02 15:07:14"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "auth.user",
+    "fields": {
+      "username": "simple",
+      "first_name": "Sam",
+      "last_name": "Simple",
+      "is_active": true,
+      "is_superuser": false,
+      "is_staff": false,
+      "last_login": "2011-07-02 15:07:14",
+      "groups": [],
+      "user_permissions": [],
+      "password": "pbkdf2_sha256$1$cloudytest$6HijMMfG+LpoSl3F0LwM3yLzFYMxGiy0fzT/XAoAnkU=",
+      "email": "simple@example.com",
+      "date_joined": "2011-07-02 15:07:14"
+    }
+  },  {
+    "pk": 1,
+    "model": "accounts.userprofile",
+    "fields": {
+      "city": "",
+      "can_upload": true,
+      "month_balance": 0,
+      "dob": "1985-07-02",
+      "gender": "M",
+      "miles_balance": 0,
+      "avatar": "",
+      "phone": "",
+      "disk_space_balance": 0,
+      "user": 2,
+      "address": "",
+      "fplan_switch_date": "2011-07-02 15:07:23",
+      "aerodrom": "",
+      "plan": 2,
+      "api_key": "TEST_API_KEY",
+      "postcode": ""
+    }
+  },
+  {
+    "pk": 2,
+    "model": "accounts.userprofile",
+    "fields": {
+      "city": "",
+      "can_upload": true,
+      "month_balance": 0,
+      "dob": "1985-07-02",
+      "gender": "M",
+      "miles_balance": 0,
+      "avatar": "",
+      "phone": "",
+      "disk_space_balance": 0,
+      "user": 3,
+      "address": "",
+      "fplan_switch_date": "2011-07-02 15:07:23",
+      "aerodrom": "",
+      "plan": 1,
+      "api_key": "TEST_API_KEY_BIS",
+      "postcode": ""
+    }
+  }
+]

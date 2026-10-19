@@ -1,0 +1,12 @@
+{% if not debug %}
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $.getScript('https://snapabug.appspot.com/snapabug.js', function(){
+            SnapABug.initAsync("{{widgetid}}");
+        });
+    });
+    </script>
+    <div id="SnapABug_W"></div>
+    <div id="SnapABug_WP"></div>
+    <div id="SnapABug_Applet"></div>
+{% endif %}

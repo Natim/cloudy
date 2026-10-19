@@ -1,0 +1,50 @@
+{% load static %}
+<div class="popup" id="{% block popup-id %}hiddenlb-popup{% endblock %}">
+  <div class="head">
+    Ce carnet de vol n'est plus accessible !
+    <a href="#" class="close"><img src="{% static 'img/carnet/picto-close-blue.png' %}" /></a>
+  </div>
+  <div class="details error">
+    Ce carnet de vol n'est plus accessible !
+    <br>
+
+    Mais n'ayez crainte ! Ses données ne sont pas perdues. Il vous suffit
+    de souscrire de nouveau au pack First Class de Cloudy.
+
+    <a href="{# TODO % url 'payment:pcloudy' %}" class="standard-link">Cliquez ici</a> pour changer immédiatement de
+    pack.
+  </div>
+  <div class="body ct">
+
+    {% block content %}
+    {% endblock %}
+
+    <div class="price-bg">
+      <h1 class="price">
+        <span class="currency">€</span>
+        <span class="value">2.99</span>
+        <span class="frequency">
+          <span>/ mois</span>
+          <p class="infos">soit 35 euros par an</p>
+        </span>
+      </h1>
+    </div>
+
+    <div class="pricing-offer-box">
+      <ul class="points">
+        <li>Nombre de carnets de vol illimités</li>
+        <li>Importez vos carnets existants</li>
+        <li>Calculez vos totaux en un clic</li>
+        <li>Consultez des statistiques détaillées</li>
+        <li>Exportez vos carnets sous divers formats</li>
+        <li>Suivez le coût de vos heures de vol</li>
+        <li>Partagez vos vols avec vos amis</li>
+        <li>Espace de stockage illimité !</li>
+        <li>Recevez des rappels par SMS ou email d'expiration de licences ou de qualifications</li>
+      </ul>
+    </div>
+
+    <a href="{# TODO % url 'payment:pcloudy' %}" class="btn red">Je choisis le pack First Class</a>
+  </div>
+
+</div>

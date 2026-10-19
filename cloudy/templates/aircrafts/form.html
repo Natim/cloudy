@@ -1,0 +1,49 @@
+{% extends "aircrafts/base.html" %}
+
+{% load thumbnail %}
+{% load compress %}
+
+{% block lbaircraft_id %}aircrafts{% endblock %}
+
+
+{% block sub-content %}
+    <h2>Ajouter un aéronef</h2>
+
+    <form enctype="multipart/form-data" action="." method="post" id="add-aircraft-form">
+        {% csrf_token %}
+        {% with form_craft as form %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+            {% if field.is_hidden %}
+                {{ field }}
+            {% else %}
+               {% include "partials/form-field-wrap.html" %}
+            {% endif %}
+        {% endfor %}
+
+        {% if aircraft %}
+            {% for photo in aircraft.pictures.all %}
+               <a href="{{MEDIA_URL}}{{ photo.file }}" class="nostyle"><img src="{% thumbnail photo.file 100x100 crop='smart' %}" alt="aeronef pic" /></a>
+            {% empty %}
+                <img src="{{STATIC_URL}}img/placeholder.png" />
+            {% endfor %}
+        {% endif %}
+
+        {% endwith %}
+        <br />
+        <p class="submit">
+            <button type="submit" name="submit" value="Login">Enregistrer l'Aéronef</button>
+        </p>
+
+    </form>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#id_airport").autocomplete({
+                appendTo: "#add-aircraft-form",
+                delay: 0,
+                source: "{% url 'logbooks:airport_autocomplete' logbook.id %}"
+            });
+        });
+    </script>
+{% endblock %}

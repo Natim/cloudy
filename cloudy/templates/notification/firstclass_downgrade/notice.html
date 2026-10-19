@@ -1,0 +1,12 @@
+{% extends "mails/base_body.txt" %}
+{% block content_fr %}
+Bonjour,
+
+Vous venez de repasser au pack Economy Class de Cloudy car vous n'avez pas mis à jour vos informations de paiement. <a href="{% url 'payment:pcloudy' %}">Cliquez ici</a> pour repasser au pack First Class !
+{% endblock %}
+
+{% block content_en %}
+Hello,
+
+You just checked into the Economy Class of Cloudy because you have not updated your payment information. <a href="{% url 'payment:pcloudy' %}">Click here</a> to go back to the First Class pack!
+{% endblock %}

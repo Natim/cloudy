@@ -1,0 +1,43 @@
+{% extends "accounts/base_registration.html" %}
+
+
+{% block title %}Registration complete{% endblock %}
+{% block body_class %}{{ block.super }} registration_complete{% endblock %}
+
+
+{% block head-title %}
+Activation de votre compte
+{% endblock %}
+
+{% block content %}
+<br />
+<div class="txt">
+  <p>Votre inscription est maintenant terminée, vous devez désormais valider votre compte.
+  <p>
+
+  <p>Nous venons de vous envoyer un e-mail contenant un lien d'activation sur lequel vous devrez cliquer afin de valider
+    la création de votre compte à l'adresse :
+  <p>
+  <p style="text-align: center;">
+    <b>{% if request.GET.email %} {{ request.GET.email }} {% endif %}</b>
+  </p>
+  </p>Si vous décidez de ne pas valider la création de votre compte, ce lien expirera de lui même dans quelques jours.
+  </p>
+
+  <p>Rendez vous dès maintenant dans votre boîte de réception afin de procéder à l'activation !</p>
+
+  <p>Si vous ne recevez pas cet e-mail de confirmation, nous vous invitons à vérifier votre dossier Courrier Indésirable
+    (SPAM) ou à contacter le Support à l'adresse support@cloudy.fr</p>
+  <br />
+</div>
+
+<div class="slim-sidebar">
+  <div class="blue-box">
+    <h2>Merci !</h2>
+    <p class="quote">
+      Pour toute question, demande d'information ou même tout simplement pour nous dire ce que vous pensez de Cloudy
+      écrivez nous à l'adresse support@cloudy.fr.
+    </p>
+  </div>
+</div>
+{% endblock %}

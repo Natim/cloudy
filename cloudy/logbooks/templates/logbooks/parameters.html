@@ -1,0 +1,41 @@
+{% extends "logbooks/param_base.html" %}
+
+{% block lbparams_id %}params{% endblock %}
+
+{% block param-content %}
+
+        <h2>Renommer mon carnet de vol</h2>
+
+        <form method="post" action="?f=name" id="name-logbook">
+            {% csrf_token %}
+            {% with edit_lbook_form as form %}
+                {{ form.non_field_errors }}
+                {% for field in form %}
+                    {% include "partials/form-field-wrap.html" %}
+                {% endfor %}
+            {% endwith %}
+            <p class="submit">
+                <button type="submit" class="short" name="submit">Enregistrer</button>
+            </p>
+       </form>
+
+        <h2>Supprimer mon carnet de vol</h2>
+        <form method="post" action="?f=delete" id="name-logbook">
+            {% csrf_token %}
+
+            {% with delete_lbook_form as form %}
+
+            <div id="tos-check">
+                 {{ form.should_delete }}
+            </div>
+            <div class="tos-wrap">
+                 {{ form.should_delete.help_text}}
+            </div>
+            {% endwith %}
+
+            <p class="submit">
+                  <button type="submit" class="short" name="submit">Supprimer</button>
+            </p>
+        </form>
+
+{% endblock %}

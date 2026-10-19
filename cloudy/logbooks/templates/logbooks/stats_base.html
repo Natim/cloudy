@@ -1,0 +1,75 @@
+{% extends "site_base_logbook.html" %}
+
+{% load static %}
+{% load stats_tags %}
+{% load core_tags %}
+
+{% block head %}
+<link href="{% static 'compass/stylesheets/logbook.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'compass/stylesheets/logbook_popups.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'js/leaflet/leaflet.css' %}" rel="stylesheet" type="text/css" />
+
+<script src="{% static 'js/chartjs/chart.umd.js' %}" type="text/javascript"></script>
+<script type="text/javascript" src="{% static 'js/leaflet/leaflet.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/stats_selector.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/stats.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/json2.js' %}"></script>
+
+{% endblock %}
+
+
+{% block content %}
+{% block stats_header %}
+<script type="text/javascript">
+  var dateRange = cloudyStats.getBeginEndSelectDateRange();
+  var begin_date = dateRange.begin_date;
+  var end_date = dateRange.end_date;
+  cloudyStats.logbookId = "{{logbook_id}}";
+  cloudyStats.beginDate = begin_date;
+  cloudyStats.endDate = end_date;
+
+</script>
+
+<div class="promo-4col page">
+  <div class="total-cell left">
+    <h1>Statistiques globales</h1>
+    <div class="period-date">
+      <span id="date_range_place"></span> <span id="date_place_whole"> (<span id="begin_date_place"></span> - <span
+          id="end_date_place"></span>)</span>
+    </div>
+  </div>
+  <form id="totals-range-form">
+    <div class="total-cell">
+
+      <label>Filtre période :</label>
+      {% include "partials/range_selector.html" %}
+    </div>
+    {% date_selector_popup %}
+  </form>
+</div>
+{% endblock %}
+
+
+
+{% block stats_content %}
+{% endblock %}
+
+
+<div class="box-top-profile"></div>
+<div class="box-main-stats">
+  <div class="horizontal">
+    <h2>Carte des zones de vol</h2>
+    <div id="map" style="width:890px; height: 460px;"></div>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        cloudyStats.map("map");
+      });
+    </script>
+  </div>
+</div>
+<div class="box-bottom-backend"></div>
+
+
+{% endblock %}

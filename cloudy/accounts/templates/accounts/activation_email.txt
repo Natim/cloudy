@@ -1,0 +1,20 @@
+{% extends "mails/base_body.txt" %}
+{% block content_fr %}
+Bonjour,
+
+Merci d'avoir créé votre compte sur Cloudy.
+
+Afin d'activer votre compte, nous vous invitons à cliquer sur le lien suivant :
+https://cloudy.fr{% url 'registration_activate' activation_key %}
+Ce lien restera actif pendant {{ expiration_days }} jour{{ expiration_days|pluralize }}.
+{% endblock %}
+
+{% block content_en %}
+Hello,
+
+Thank you for creating your account on Cloudy.
+
+To activate your account, we invite you to click on the following link:
+https://cloudy.fr{% url 'registration_activate' activation_key %}
+This link will remain active for {{ expiration_days }} day{{ expiration_days|pluralize }}.
+{% endblock %}

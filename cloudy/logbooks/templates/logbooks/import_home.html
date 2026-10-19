@@ -1,0 +1,62 @@
+{% extends "site_base_logbook.html" %}
+
+{% load static %}
+{% load core_tags %}
+
+
+{% block body_id %}logbooks{% endblock %}
+{% block actions-id %}import{% endblock %}
+
+
+{% block head %}
+<link href="{% static 'compass/stylesheets/logbook.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'compass/stylesheets/logbook_popups.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+{% endblock %}
+
+{% block nav-logbook %}
+<div class="head">
+  <div class="name">
+    Import du carnet
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="col-on-left page">
+  <div class="box-top-profile"></div>
+  <div class="box-main-profile">
+    <div class="col">
+      <ul class="nav-left" id="{% block lbaircraft_id %}{% endblock %}">
+        {% block left-menu %}
+        <li><a href="#" id="aircrafts">Import</a></li>
+        {% endblock %}
+      </ul>
+    </div>
+
+    <div class="content" id="{% block content_id %}{% endblock %}">
+      {% block sub-content %}
+      <div class="choice">
+
+        <h3 class="import">1. Importez automatiquement votre ancien carnet</h3>
+        <div class="link-buttons-wrap">
+          <a href="{% url 'logbooks:auto_import' logbook.id %}" class="btn-mini red">Importez automatiquement</a>
+        </div><br />
+
+        {% if logbook %}
+        <div class="report">
+          <h3 class="report">2. Effectuez un report de vos heures existantes</h3>
+          <div>
+            <a href="{% url 'logbooks:report' logbook.id %}" class="btn-mini red">Reportez mes heures existantes</a>
+          </div>
+        </div><br />
+        {% endif %}
+      </div>
+      {% endblock %}
+    </div>
+
+  </div>
+  <div class="box-bottom-profile"></div>
+</div>
+{% endblock %}

@@ -1,0 +1,3 @@
+{% block content_fr %}{% endblock %}
+
+{% block content_en %}{% endblock %}

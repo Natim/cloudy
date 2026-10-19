@@ -1,0 +1,37 @@
+{% extends "site_base_logbook.html" %}
+
+{% load static %}
+{% load core_tags %}
+{% load stats_tags %}
+
+{% block body_id %}logbooks{% endblock %}
+{% block actions-id %}action-aircrafts{% endblock %}
+
+{% block head %}
+<link href="{% static 'compass/stylesheets/logbook.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'compass/stylesheets/logbook_popups.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+{% endblock %}
+
+{% block content %}
+<div class="col-on-left page">
+  <div class="box-top-profile"></div>
+  <div class="box-main-profile">
+    <div class="col">
+      <ul class="nav-left" id="{% block lbaircraft_id %}{% endblock %}">
+        {% block left-menu %}
+        <li><a href="{% url 'logbooks:aircrafts_index' logbook.id %}" id="aircrafts">Aéronefs</a></li>
+        {% endblock %}
+      </ul>
+    </div>
+
+    <div class="content" id="{% block content_id %}{% endblock %}">
+      {% block sub-content %}
+      {% endblock %}
+    </div>
+
+  </div>
+  <div class="box-bottom-profile"></div>
+</div>
+{% endblock %}

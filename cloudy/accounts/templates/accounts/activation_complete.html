@@ -1,0 +1,27 @@
+{% extends "accounts/base_registration.html" %}
+
+{% block title %}Activation du compte réussie{% endblock %}
+
+{% block content_title %}
+Activation du compte réussie
+{% endblock %}
+
+
+{% block content %}
+<h2>Activation du compte réussie</h2>
+<br />
+<div class="txt">
+  <p>Merci, votre compte Cloudy est maintenant activé, vous allez être redirigé vers la page de login dans quelques
+    secondes.
+  </p>
+  <p><a href="{% url 'auth_login' %}">Je me connecte à Cloudy !</a></p>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+  setTimeout(function () {
+    window.location.href = "{% url 'auth_login' %}";
+  }, 5000);
+</script>
+{% endblock %}

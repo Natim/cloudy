@@ -1,0 +1,62 @@
+@import "backend";
+
+.fieldwrapper {
+  margin-left: 20px;
+  margin-bottom: 10px;
+  //height: 35px;
+
+  div.selector {
+    width: 200px !important;
+    span {
+      width: 165px !important;
+    }
+    select {
+      width: 205px !important;
+    }
+  }
+  .left-label {
+    width: 73px !important;
+  }
+  .big-label {
+    width: 140px !important;
+  }
+
+  .label-radio {
+    float: none;
+    width: 50px;
+  }
+  label {
+    font-weight: bold;
+    text-align:right;
+    color: $brown;
+    width: 100px;
+    display:inline;
+    float:left;
+    margin: 10px 10px 0px 0px;
+  }
+
+  .input-small {
+    @include mini-input;
+    float:left;
+    font-size: 14px;
+    margin-right: 10px;
+  }
+
+  .input-medium {
+    @include medium-input;
+    float:left;
+    font-size: 14px;
+  }
+  .icon-calendar {
+    display:block;
+    float: left;
+    background: {
+      image: url(../../img/carnet/icon-calendar.png);
+          repeat:  no-repeat;
+    };
+    width: 14px;
+    height: 14px;
+    margin: 12px 0px 0px 5px;
+  }
+  clear: both;
+}

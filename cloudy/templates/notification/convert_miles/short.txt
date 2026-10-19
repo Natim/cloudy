@@ -1,0 +1,2 @@
+{% extends "mails/base_subject.txt" %}
+{% block content %}Félicitations ! Vous venez de convertir vos miles Cloudy - Congratulations! You have just converted your Cloudy miles{% endblock %}

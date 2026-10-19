@@ -1,0 +1,124 @@
+<form action="{% url 'logbooks:add_log' logbook_id %}" method="post" enctype='multipart/form-data' id="add-log-form">
+  {% csrf_token %}
+
+  <div class="panes">
+    <!-- Pane 1-->
+    <div>
+      <div class="column">
+        {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+        {% endfor %}
+        <div class="box-form">
+          <h3>Informations sur le vol</h3>
+          <div class="fieldwrapper">
+            <label for="id_{{form.date.name}}">{{ form.date.label|capfirst }}<span class='required'>*</span></label>
+            {{ form.date }}
+            {{ form.date.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.ltype.name}}">{{ form.place.label|capfirst }}<span class='required'>*</span></label>
+            {{ form.place }}
+            {{ form.place.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.imma.name}}">{{ form.aircraft.label|capfirst }}<span class='required'>*</span></label>
+            {{ form.aircraft }}
+            {{ form.aircraft.errors }}
+          </div>
+
+
+          <div class="spacer"></div>
+        </div>
+        <div class="box-form">
+          <h3>Informations sur le saut</h3>
+          <div class="fieldwrapper">
+            <label for="id_{{form.canopy.name}}">{{ form.canopy.label|capfirst }}<span class='required'>*</span></label>
+            {{ form.canopy }}
+            {{ form.canopy.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.altitude.name}}">{{ form.altitude.label|capfirst }}<span
+                class='required'>*</span></label>
+            {{ form.altitude }}
+            {{ form.altitude.errors }} <span class="helptext" style="width: 170px;">(hauteur de largage en {{ logbook.height_format_str }})</span>
+          </div>
+
+
+        </div>
+      </div>
+      <div class="column-right">
+        <label class="label-message">Programme du saut</label>
+        {{ form.perf_exercice }}
+        {{ form.perf_exercice.errors }}
+        <div class="spacer"></div>
+        <label class="label-message">Exercice en chute</label>
+        {{ form.freefall_training }}
+        {{ form.freefall_training.errors }}
+        <br />
+        <label class="label-message">Exercice sous voile</label>
+        {{ form.canopy_piloting }}
+        {{ form.canopy_piloting.errors }}
+        <div class="spacer"></div>
+      </div>
+    </div>
+    <!-- Pane 2 -->
+    <div>
+      <div class="column">
+        <div class="box-form">
+          <h3>Facultatif</h3>
+          <div class="fieldwrapper">
+            <div class="subwrapper-right">
+              <label for="id_{{form.optional_filter.name}}">{{ form.optional_filter.label|capfirst }}</label>
+              {{ form.optional_filter }}
+              {{ form.optional_filter.errors }}
+            </div>
+            <div class="subwrapper-right">
+              <label for="id_{{form.altitude_open.name}}">{{ form.altitude_open.label|capfirst }}</label>
+              {{ form.altitude_open }}
+              {{ form.altitude_open.errors }}<span class="helptext" style="width: 170px;">(hauteur d'ouverture en {{ logbook.height_format_str }})</span>
+            </div>
+
+            <div class="subwrapper-right">
+              <label for="id_{{form.falling_time.name}}">{{ form.falling_time.label|capfirst }}</label>
+              {{ form.falling_time }}
+              {{ form.falling_time.errors }} <span class='helptext'>(secondes)</span>
+            </div>
+            <div class="subwrapper-right">
+              <label for="id_{{form.bag.name}}">{{ form.bag.label|capfirst }}</label>
+              {{ form.bag }}
+              {{ form.bag.errors }}
+            </div>
+
+
+            <div class="spacer"></div>
+          </div>
+        </div>
+        <div class="box-form">
+          <h3>Vos commentaires</h3>
+          <br />
+          <div class="fieldwrapper">
+            {{ form.coms }}
+            <span class="caracters-limit"> </span>
+            {{ form.coms.errors }}
+            <div class="spacer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="column-right">
+        <div class="box-form">
+          <h3>Vos souvenirs</h3>
+          <p> Photos, videos, documents (log de nav, dossier météo, ...)</p>
+          <div class="fieldwrapper">
+            {{ form.media }}
+          </div>
+          <div class="spacer"></div>
+        </div>
+      </div>
+    </div>
+    <!-- end panes -->
+  </div>
+  <p class="submit">
+    <input type="submit" value="Enregistrer ce saut" class="btn red" />
+    &nbsp;&nbsp; <a href="#" class="reset-form">Recommencer</a>
+  </p>
+</form>

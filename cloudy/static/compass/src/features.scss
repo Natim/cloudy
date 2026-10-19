@@ -1,0 +1,602 @@
+// This import applies a global reset to any page that imports this stylesheet.
+@import "blueprint/reset";
+
+// To configure blueprint, edit the partials/base.sass file.
+@import "partials/base";
+
+// Import all the default blueprint modules so that we can access their mixins.
+@import "blueprint";
+@import "blueprint/grid";
+@import "blueprint/scaffolding";
+@import "blueprint/debug";
+
+@import "compass/utilities/general/clearfix";
+@import "compass/css3/gradient";
+@import "compass/css3";
+@import "compass/utilities/lists/horizontal-list";
+
+
+
+// To generate css equivalent to the blueprint css but with your
+// configuration applied, uncomment:
+// @include blueprint
+
+// But Compass recommends that you scope your blueprint styles
+// So that you can better control what pages use blueprint
+// when stylesheets are concatenated together.
+@include blueprint-scaffolding("body.bp");
+
+@import "common";
+@import "header";
+@import "footer";
+
+#main {
+    @include container;
+
+    h1 {
+       display: none;
+    }
+
+
+
+ .content {
+
+	@include column(18, true);
+
+
+	margin-top: 25px;
+
+	.logo-img {
+		@include column(4);
+ 	}
+
+	.mobile-app  {
+		@include column(17);
+		@include push-margins(1);
+		color: $dark-grey;
+		font-size: 14px;
+
+		a {
+			color: $dark-blue;
+			&:hover {
+				color: $dark-red;
+			}
+		}
+		h2 {
+			color: $dark-blue;
+			font-size: 26px;
+	        color: $dark-blue;
+	        font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+			clear:both;
+		}
+		.mobile-img {
+			float:left;
+			margin-right: 10px;
+		}
+		.discover-app {
+			float:left;
+			margin-right: 3px;
+		}
+		.mobile-text
+		{
+			float: left;
+			width: 450px;
+			margin-top: 50px;
+		}
+	}
+	.content-text {
+		@include column(13, true);
+		@include push-margins(1);
+		color: $dark-grey;
+		font-size: 14px;
+
+		h2.title-plane {
+			height: 52px;
+			font-size: 26px;
+			color: $dark-blue;
+			font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+			padding-left: 59px !important;
+			padding-top: 5px !important;
+			margin-bottom: 10px !important;
+			background: {
+			      image: image-url("../../static/img/icon-focus-plane.png");
+			      repeat:  no-repeat;
+			      position: top left;
+			  };
+		}
+
+		a {
+			@include a-style;
+		}
+	}
+}
+
+    #features-top {
+        height: 184px;
+
+        background: {
+            image: image-url("../../static/img/features-top-bg.png");
+            repeat:  no-repeat;
+            position: 0px  -9px;
+        };
+
+        #mob-logo {
+          position: absolute;
+		  margin: 0 auto;
+          top:  128px;
+          margin-left: 807px;
+		  margin-top: 0px;
+        }
+
+        #paper-plane {
+            position: absolute;
+            width: 141px;
+            height: 62px;
+            margin-top: 85px;
+            margin-left: 180px;
+            left: 50%;
+            background: {
+                image: image-url("../../static/img/dotted_plane.png");
+                repeat:  no-repeat;
+                position: top left;
+            };
+        }
+
+        .buttons {
+
+            @include column(18, true);
+
+            #signup-button {
+
+                @include column(6, true);
+                margin-left: 430px;
+
+
+                margin-top: 100px;
+                margin-bottom: 10px;
+                font-size: 13px;
+
+                height: 38px;
+                color: white;
+
+                @include text-shadow(black, 1px, 1px, 0);
+                @include box-shadow(black, 1px, 1px, 2px);
+                border: 1px solid $dark-red-start;
+                @include border-radius(3px, 3px);
+                @include linear-gradient(color-stops($dark-red-end, $dark-red-start));
+                background-color: $dark-red-start;
+
+                &:hover {
+                    color: $light-grey;
+                    @include box-shadow(black, 1px, 2px, 2px);
+                    @include linear-gradient(color-stops($dark-red-end, $dark-red-end));
+                    background-color: $dark-red-end;
+
+                     -webkit-animation-name: resize;
+                    -webkit-animation-duration: 0.5s;
+                    -webkit-animation-iteration-count: 5;
+                    -webkit-animation-direction: alternate;
+                    -webkit-animation-timing-function: ease-in-out;
+
+
+                }
+                &:active {
+                    color: $light-grey;
+                    @include box-shadow(black, 0px, 0px, 0px);
+                    margin-top: 103px;
+                    margin-bottom: 9px;
+                }
+
+                span.txt {
+                    @include column(7);
+                    margin: 10px 0 0 8px;
+                    height: 19px;
+
+                    background: {
+                        image: image-url("../../static/img/features-text-signup.png");
+                        repeat:  no-repeat;
+                        position: top left;
+                        z-index: 1000;
+                    };
+                }
+            }
+        }
+    }
+
+		#features-second {
+            @include column(24, true);
+            height: 113px;
+			margin: 10px 0px 20px 0px;
+            background: {
+                image: image-url("../../static/img/features-block-two-bg.png");
+                repeat:  no-repeat;
+                position: top left;
+           };
+            .cycle-quotes {
+                @include column(20, true);
+				@include push-margins(3);
+                padding:0px;
+                background: {
+                    image: image-url("../../static/img/quote_l.png");
+                    repeat:  no-repeat;
+                    position: 10px 20px;
+                };
+
+                p {
+
+                    margin:0px;
+                    padding:0px;
+                    @include column(15);
+                    background: {
+                        image: image-url("../../static/img/quote_r.png");
+                        repeat:  no-repeat;
+                        position: 605px 20px;
+
+                    };
+                    padding: 5px 0 5px 0;
+                    margin-top: 30px;
+				    padding-bottom: 40px;
+                    @include prepend(2);
+
+                    font-family:  'GentiumBasicRegular';
+                    letter-spacing: 0;
+                    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=hIEfix.png,sizingMethod=crop);
+                    zoom:1;
+                    line-height: 25px;
+                    font-weight: normal;
+                    color: $dark-blue3;
+                    font-size: 21px;
+
+                }
+                span {
+                    @include column(14, true);
+                    @include prepend(2);
+                    font-size: 14px;
+                    color: $grey-quote;
+				    margin-top: -30px;
+				    text-align: center;
+                }
+            }
+
+        }
+
+		#features-third {
+            @include column(24, true);
+            padding-top: 10px;
+
+				.box-main {
+					padding-left: 30px;
+
+                    .content {
+
+                            h2 {
+                                font-size: 26px;
+                                color: $dark-blue;
+                                font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+                                padding: 0px 0px 5px 0px;
+                                margin-bottom: 0px;
+                            }
+                            p {
+                                font-size: 14px;
+                                padding: 5px;
+                                margin: 0;
+                                color: $dark-grey;
+                            }
+                     }
+				}
+
+
+				#features-content {
+					@include column(16);
+					@include prepend(1);
+					margin-right: 40px;
+
+
+					a {
+						@include a-style;
+
+					}
+					.features-line-content {
+						@include column(16);
+
+						border-bottom: 1px solid $border-col;
+
+						.features-col-content {
+							/* @include column(8); */
+							width: 300px; float: left;
+							color: $brown;
+							font-size: 14px;
+							padding: 30px 15px 30px 0px;
+
+							h2 {
+								font-size: 21px;
+								color: $dark-blue;
+								font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+								padding: 0px 0px 5px 0px;
+								margin-bottom: 0px;
+							}
+							p {
+								padding: 0;
+								margin: 0;
+							}
+
+							.features-img {
+                                width: 300px;
+								float: left;
+								padding-top: 10px;
+	                         }
+							.icon-alert {
+								background: {
+				                    image: image-url("../../static/img/icon-alert.png");
+				                    repeat:  no-repeat;
+				                    position: top 2px;
+				                };
+								height: 77px;
+								width: 125px;
+								float: right;
+								display: block;
+								margin: -55px -25px 0px 0px;
+							}
+
+							.icon-cost {
+								background: {
+				                    image: image-url("../../static/img/icon-cost.png");
+				                    repeat:  no-repeat;
+				                    position: top 2px;
+				                };
+								height: 77px;
+								width: 130px;
+								float: right;
+								display: block;
+								margin: -72px 0px 0px 0px;
+							}
+
+                            .icon-export {
+								background: {
+				                    image: image-url("../../static/img/icon-export.png");
+				                    repeat:  no-repeat;
+				                    position: top 2px;
+				                };
+					            height: 100px;
+								width: 330px;
+								float: right;
+								display: block;
+								margin: -80px 0px 0px 0px;
+							}
+
+							.icon-memories {
+								background: {
+				                    image: image-url("../../static/img/icon-memories.png");
+				                    repeat:  no-repeat;
+				                    position: top 2px;
+				                };
+								height: 92px;
+								width: 220px;
+								float: right;
+								display: block;
+								margin: -70px 110px 0px 0px;
+							}
+
+							.icon-mobile {
+								background: {
+				                    image: image-url("../../static/img/icon-mobile.png");
+				                    repeat:  no-repeat;
+				                    position: top 2px;
+				                };
+								height: 90px;
+								width: 120px;
+								float: right;
+								display: block;
+								margin: -70px 210px 0px 0px;
+							}
+
+							.icon-multiple {
+								background: {
+				                    image: image-url("../../static/img/icon-multiple.png");
+				                    repeat:  no-repeat;
+				                    position: top 2px;
+				                };
+								height: 100px;
+								width: 150px;
+								float: right;
+								display: block;
+								margin: -90px 180px 0px -10px;
+							}
+
+							.icon-import {
+								background: {
+				                    image: image-url("../../static/img/icon-import.png");
+				                    repeat:  no-repeat;
+				                    position: top 2px;
+				                };
+								height: 100px;
+								width: 150px;
+								float: right;
+								display: block;
+								margin: -80px 180px 0px -10px;
+							}
+
+							.icon-share {
+								background: {
+				                    image: image-url("../../static/img/icon-share.png");
+				                    repeat:  no-repeat;
+				                    position: top 2px;
+				                };
+								height: 92px;
+								width: 122px;
+								float: right;
+								display: block;
+								margin: -69px 0px 0px 0px;
+							}
+
+							.icon-stats {
+								background: {
+				                    image: image-url("../../static/img/icon-stats.png");
+				                    repeat:  no-repeat;
+				                    position: top 2px;
+				                };
+								height: 60px;
+								width: 140px;
+								float: right;
+								display: block;
+								margin: -45px -20px 0px 0px;
+							}
+						}
+					}
+					.no-border {
+						border-bottom: none;
+					}
+				}
+		}
+
+		.slim-sidebar {
+			@include column(5, true);
+			padding-top: 25px;
+
+			.blue-box {
+				@include column(4, true);
+				background: $ultra-light-blue;
+				@include border-radius(3px, 3px);
+				margin-bottom: 15px;
+				margin-left: 20px;
+
+				padding-bottom: 15px;
+				h2 {
+					font-size: 21px;
+					text-align: center;
+					color: $dark-blue;
+					font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+					padding: 5px 0px 5px 10px;
+					margin-bottom: 0px;
+				}
+
+				p {
+					padding: 0px 5px 0px 10px;
+				}
+				#partners-list {
+					@include column(2,true);
+
+
+					.partner-img {
+						margin: 10px 0px 10px 30px;
+					}
+				}
+
+			}
+		}
+
+	}
+
+	.contact-box {
+		margin-bottom: 10px;
+		margin-left: 100px;
+		h2 {
+			font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+			color: $dark-blue;
+			font-size: 18px !important;
+			margin: 0px;
+		}
+		a {
+			color: $dark-blue;
+			&:hover {
+				color: $dark-red;
+			}
+		}
+	}
+
+	.mobile-button {
+		@include column(6, true);
+        margin-left: 70px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        font-size: 18px !important;
+        padding: 5px 0px 0px 30px;
+        height: 33px;
+        color: white !important;
+		text-decoration: none !important;
+        @include text-shadow(black, 1px, 1px, 0);
+        @include box-shadow(black, 1px, 1px, 2px);
+        border: 1px solid $dark-red-start;
+        @include border-radius(3px, 3px);
+        @include linear-gradient(color-stops($dark-red-end, $dark-red-start));
+        background-color: $dark-red-start;
+
+        &:hover {
+            color: $light-grey !important;
+            @include box-shadow(black, 1px, 2px, 2px);
+            @include linear-gradient(color-stops($dark-red-end, $dark-red-end));
+            background-color: $dark-red-end;
+
+             -webkit-animation-name: resize;
+            -webkit-animation-duration: 0.5s;
+            -webkit-animation-iteration-count: 5;
+            -webkit-animation-direction: alternate;
+            -webkit-animation-timing-function: ease-in-out;
+
+
+        }
+        &:active {
+            color: $light-grey !important;
+            @include box-shadow(black, 0px, 0px, 0px);
+            margin-top: 13px;
+            margin-bottom: 9px;
+        }
+	}
+
+/* Errors --------------------------------------------*/
+.error404 {
+	background: {
+        image: image-url("../../static/img/404.png");
+        repeat:  no-repeat;
+    };
+width: 1000px;
+height: 941px;
+}
+
+.error500 {
+	background: {
+        image: image-url("../../static/img/500.png");
+        repeat:  no-repeat;
+    };
+width: 1000px;
+height: 941px;
+}
+
+.return-button {
+	@include column(5, true);
+    margin-left: 150px;
+    margin-top: 720px;
+    margin-bottom: 10px;
+    font-size: 18px !important;
+    padding: 5px 0px 0px 20px;
+    height: 33px;
+    color: white !important;
+	text-decoration: none !important;
+    @include text-shadow(black, 1px, 1px, 0);
+    @include box-shadow(black, 1px, 1px, 2px);
+    border: 1px solid $dark-red-start;
+    @include border-radius(3px, 3px);
+    @include linear-gradient(color-stops($dark-red-end, $dark-red-start));
+    background-color: $dark-red-start;
+
+    &:hover {
+        color: $light-grey !important;
+        @include box-shadow(black, 1px, 2px, 2px);
+        @include linear-gradient(color-stops($dark-red-end, $dark-red-end));
+        background-color: $dark-red-end;
+
+         -webkit-animation-name: resize;
+        -webkit-animation-duration: 0.5s;
+        -webkit-animation-iteration-count: 5;
+        -webkit-animation-direction: alternate;
+        -webkit-animation-timing-function: ease-in-out;
+
+
+    }
+    &:active {
+        color: $light-grey !important;
+        @include box-shadow(black, 0px, 0px, 0px);
+
+        margin-bottom: 9px;
+    }
+}

@@ -1,0 +1,16 @@
+{% extends "mails/base_body.txt" %}
+{% block content_fr %}
+Cher {{full_name}},
+
+Vous avez été affecté à l'importation suivante :
+
+{{url}}
+{% endblock %}
+
+{% block content_en %}
+Dear {{full_name}},
+
+You have been assigned to the following import:
+
+{{url}}
+{% endblock %}

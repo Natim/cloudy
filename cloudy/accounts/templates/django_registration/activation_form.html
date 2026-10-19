@@ -1,0 +1,31 @@
+{% extends "accounts/base_registration.html" %}
+
+{% block title %}Activation du compte{% endblock %}
+
+{% block head-title %}
+Activation de votre compte
+{% endblock %}
+
+{% block content %}
+<br />
+<div class="txt">
+  {% if form.errors or activation_error %}
+  <p>La clé d'activation est invalide ou a expiré et ne peut pas être utilisée pour activer ce compte.</p>
+  <p>N'hésitez pas à contacter le support à l'adresse support@cloudy.fr</p>
+  {% elif form.activation_key.value %}
+  <p>Activation de votre compte en cours…</p>
+  <form method="post" action="{% url 'django_registration_activate' %}" id="activation-form">
+    {% csrf_token %}
+    {{ form.activation_key.as_hidden }}
+    <p class="submit">
+      <button type="submit">Activer mon compte</button>
+    </p>
+  </form>
+  <script type="text/javascript">
+    document.getElementById("activation-form").submit();
+  </script>
+  {% else %}
+  <p>Le lien d'activation est incomplet. Utilisez le lien reçu par e-mail, ou contactez support@cloudy.fr</p>
+  {% endif %}
+</div>
+{% endblock %}

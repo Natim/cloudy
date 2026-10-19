@@ -1,0 +1,25 @@
+{% extends "logbooks/param_base.html" %}
+
+{% block lbparams_id %}report{% endblock %}
+
+{% block param-content %}
+
+<h2>Report</h2>
+
+{{ reportform.non_field_errors }}
+
+<form action="{% url 'logbooks:report' logbook_id %}" method="post" enctype='multipart/form-data' id="report-form">
+
+  {% csrf_token %}
+  {% with reportform as form %}
+  {% include "form_default.html" %}
+
+  {% endwith %}
+
+  <p class="submit">
+    <button type="submit" class="long" name="submit">Reporter ces données</button>
+  </p>
+
+</form>
+
+{% endblock %}

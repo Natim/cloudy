@@ -1,0 +1,42 @@
+{% extends "site_base_profile.html" %}
+{% load static %}
+
+{% block body_id %}profile{% endblock %}
+{% block profile_id %}adminacc{% endblock %}
+
+{% block head %}
+	<link href="{% static 'compass/stylesheets/backend.css' %}" media="screen, projection" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+
+{% block content %}
+	<h2>Changez votre mot de passe</h2>
+
+	{% with passwd_form as form %}
+	<form action="{% url 'account_admin_passwd' %}" method="post"   id="pass-form">
+		{% csrf_token %}
+		{{ form.non_field_errors }}
+        {% include "form_default.html" %}
+ 	    <p class="submit">
+	    	<button type="submit" name="submit" value="Login">Changer mon mot de passe</button>
+	    </p>
+	</form>
+	{% endwith %}
+
+	<hr class="sep" />
+
+	<h2>Gérer vos alertes</h2>
+
+
+	{% with settings_form as form %}
+	<form action="{% url 'account_admin_settings' %}" method="post"   id="pass-form">
+		{% csrf_token %}
+		{{ form.non_field_errors }}
+        {% include "form_default.html" %}
+ 	    <p class="submit">
+	    	<button type="submit" class="short" name="submit" value="Login">Confirmer</button>
+	    </p>
+	</form>
+	{% endwith %}
+
+{% endblock %}

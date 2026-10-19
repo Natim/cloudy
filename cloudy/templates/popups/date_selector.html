@@ -1,0 +1,23 @@
+{% load static %}
+
+<div class="total-cell-form popup" id="customrangeselector" style="display:none">
+  <div class="head">
+    Date personnalisée
+    <a href="#" class="close"><img src="{% static 'img/carnet/picto-close-blue.png' %}" /></a>
+  </div>
+  <div class="body">
+    <div class="fieldWrapper">
+      <label>Date de début :</label>
+      <input type='date' name="start" class="input-medium cdate" id="selector_begin_date">
+      <a href="#" class="icon-calendar icon-calendar-begin"></a>
+    </div>
+    <div class="fieldWrapper">
+      <label>Date de fin :</label>
+      <input type='date' name="end" class="input-medium cdate" id="selector_end_date">
+      <a href="#" class="icon-calendar icon-calendar-end"></a>
+    </div>
+
+    <input type="button" id="selector_submit" value="Afficher les resultats" class="btn red">
+
+  </div>
+</div>

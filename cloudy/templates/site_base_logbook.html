@@ -1,0 +1,280 @@
+{% load static %}
+{% load core_tags %}
+{% load logbook_tags %}
+{% load compress %}
+{% load i18n %}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml" xml:lang="fr">
+
+<head>
+  <meta name="google-site-verification" content="Fe_ZW57heiMtVqR-Klj0DTIsvD7w7AWdGlBiTcjPnbo" />
+  <title>Cloudy - {% block title %}Cloudy{% endblock %}</title>
+  {% compress css %}
+  <link href="{% static 'compass/stylesheets/print.css' %}" media="print" rel="stylesheet" type="text/css" />
+  <link href="{% static 'raw_css/date.css' %}" media="screen, projection" rel="stylesheet" type="text/css" />
+  <link href="{% static 'raw_css/uniform.default.css' %}" media="screen, projection" rel="stylesheet" type="text/css" />
+  <link href="{% static 'raw_css/calendar.css' %}" media="screen, projection" rel="stylesheet" type="text/css" />
+  <link href="{% static 'raw_css/jquery-ui-1.8.14.custom.css' %}" media="screen, projection" rel="stylesheet"
+    type="text/css" />
+  {% endcompress %}
+  <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
+
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+
+
+  <!--[if lt IE 8]>
+     <link href="/stylesheets/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
+     <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE8.js"></script>
+  <![endif]-->
+
+
+  <!--[if !IE 7]>
+      <style type="text/css">
+          #wrap {display:table;height:100%}
+          <script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script>
+      </style>
+  <![endif]-->
+
+  <!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.5.2.min.js"></script>-->
+
+  <script type="text/javascript">
+    {% if logbook.time_format %}
+    var TIME_FORMAT = {{ logbook.time_format }};
+    {% else %}
+    var TIME_FORMAT = 0;
+    {% endif %}
+    {% if logbook.height_format %}
+    var HEIGHT_FORMAT = {{ logbook.height_format }};
+    {% else %}
+    var HEIGHT_FORMAT = 0;
+    {% endif %}
+    {% block jsvars %}
+    {% endblock %}
+  </script>
+
+  <script type="text/javascript" src="{% static 'js/jquery-1.4.2.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/jquery_ready_guard.js' %}"></script>
+  {% compress js %}
+  <script type="text/javascript" src="{% static 'js/cloudy.js' %}"></script>
+  {% endcompress %}
+  {% compress js %}
+  <script type="text/javascript" src="{% static 'js/jquery-ui.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/date.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/jquery.simpleSlide_min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/validation/jquery.validate.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/cloudy_logbooks.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/jquery.uniform.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/jquery.scrollTo-1.4.2-min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/overlay.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/jquery.simpletip-1.3.1.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/mustache.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/fileuploader.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/jquery.tools.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/jquery.geturlvar.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/cloudy_signup.js' %}"></script>
+  {% endcompress %}
+
+  {% block head %}{% endblock %}
+</head>
+
+<body id="{% block body_id %}{% endblock %}">
+  <div id="wrap">
+    <!-- Top header -->
+    <div id="top-notif">
+      {% if messages %}
+      {% for message in messages %}
+      <div{% if message.tags %} class="notif {{ message.tags }}" {% endif %}>{{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+
+  <div id="top-header">
+    <div id="logo">
+      <a href="{% url 'home' %}"><img src="{% static 'img/logo.png' %}" /></a>
+    </div>
+    <div id="wrap-top-head">
+      {% include 'partials/header-logged.html' %}
+    </div>
+  </div>
+
+  <div id="top-bar">
+    <div class="nav-top"></div>
+    <div class="add">
+      <a href="#" class="btn red {% if not logbooks %}empty{% endif%}" id="trigger-add-logbook" rel="#add-flight-popup">
+        <img src="{% static 'img/carnet/picto-calendar.png' %}" /> Ajouter un carnet
+      </a>
+      {% for lb in logbooks %}
+      <a href="{% url 'logbooks:logbook' lb.id %}"
+        class="btn {{ lb.cat }} {% if lb.id == logbook.id %}selected{% endif %}  {% if not lb.visbl %}hidden{% endif %}"
+        {%if not lb.visbl %}rel="#hiddenlb-popup" {% endif %}>
+        {{ lb.name|truncatewords:2 }}
+      </a>
+      {% endfor %}
+      <div class="clr"></div>
+    </div>
+    {% if logbook %}
+    <div class="action" id="{% block actions-id %}{%endblock %}">
+      <a href="#" class="add-flight btn {% if show_log_form  %}show_form{% endif %}" id="trigger-add-log"
+        rel="#add-log-popup">
+        <img src="{% static 'img/icon-add.png' %}" class="icon-add" />
+        {% if logbook.can_fly %}Ajouter un vol{% else %}Ajouter un saut{% endif %}
+      </a>
+      {% with user.get_profile.has_payed_plan as has_payed_plan %}
+      <a href="{% url 'logbooks:logbook' logbook.id %}" class="first carnet">Carnet</a>
+      <a href="{% url 'logbooks:totals' logbook.id %}" class="calculator">Totaux</a>
+      {% if not has_payed_plan %}
+      <a href="#" class="stats unavailable" rel="#fc-only-popup-stats" id="logb-stats">Statistiques</a>
+      {% else %}
+      <a href="{% url 'logbooks:stats' logbook.id %}" class="stats">Statistiques</a>
+      {% endif %}
+      <div class="exp-imp">
+        <a href="#" class="export" id="trigger-export" rel="#export-popup">Export</a>
+        <a href="{% url 'logbooks:import_home' logbook.id %}" class="import">Import</a>
+        {% if logbook.can_fly %}
+        <a href="{% url 'logbooks:aircrafts_index' logbook.id %}" class='aircrafts'>Aéronefs</a>
+        {% endif %}
+        <a href="{% url 'logbooks:parameters' logbook.id %}" class="parameters">Paramètres</a>
+      </div>
+      {% endwith %}
+
+      <div class="clr"></div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!--  {# Display available notices (small yellow boxes). #}
+        {# show_unseen_noticies_for_user request.user #} -->
+
+  {# Let's preload the popups so as we can quickly show them to the user #}
+  {% logbook_popup %}
+  {% export_popup %}
+
+  {# If there is a logbook available, we display the button for flight adding #}
+  {% if logbook %}
+  {% addlog_popup logbook %}
+  {% endif %}
+
+  {# Popups triggered when an eco user clicks on a first class feature #}
+  {% firstclass_only_popup %}
+  {% firstclass_only_popup_stats %}
+  {% hiddenlogbook_popup %}
+
+  <div id="carnet">
+    {% if logbook %}
+    {% block nav-logbook %}
+    <div class="head">
+      <div class="name">
+        {# Display the logbook name between english quotes "". #}
+        &#8220;{{ logbook.name }}&#8221;
+
+        {# If there are logs we display the year of the log entries #}
+        {% if logs %}
+        - {{ logs.0.date|date:"Y" }}
+        {% else %}
+        {# Or we use the current year (it's an empty logbook) #}
+        - {% now "Y" %}
+        {% endif %}
+
+        {# Add a note for admins so as they try not to screw everything up #}
+      </div>
+
+      {# If we have some logs #}
+      {% if logs %}
+      {% if logs|length >= 1 %}
+      {# Display the sub title according to the data we display #}
+      {% if logs|length == 1 %}
+      {# So if there is only one log we use the singular form #}
+      <h2>Vol du {{ logs.0.date|date:"d/m"}}</h2>
+      {% else %}
+      {# Otherwise we display the date of the first log, followed by the date of the last one #}
+      {% with logs|last as last_log %}
+      <h2>
+        Vols du {{ logs.0.date|date:"d/m"}}
+        au {{ last_log.date|date:"d/m"}}
+      </h2>
+      {% endwith %}
+      {% endif %}
+      {% endif %}
+
+      {# Display the pagination #}
+      {% if pages_count %}
+      {% paginator logbook pages_count page %}
+      {% endif %}
+      {% endif %}
+
+    </div>
+    {% endblock %}
+    {% endif %}
+
+    <div class="content">
+      {% block content %}{% endblock %}
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  {% block footer %}
+  {% include "popups/gcu_register.html" %}
+  <div id="footer">
+    <div id="clouds-bottom"></div>
+    <div class="footer-links">
+      <ul>
+        <li><a href="{% url 'press:list' %}">Presse</a></li>
+        <li><a href="{% url 'pricing' %}">Tarifs</a></li>
+        <li><a href="{% url 'features' %}">Fonctionnalités</a></li>
+        <li><a href="{% url 'support' %}">Aide / Support</a></li>
+      </ul>
+      <ul class="col-center">
+        <li><a href="{% url 'gcu' %}">Mentions légales</a></li>
+        <li><a href="#" id="gcu_link" rel="#gcu-popup">C. G. Vente</a></li>
+        <li><a href="{% url 'contactus' %}">Contactez-nous</a></li>
+        <!--<li><a href="#">L'équipage</a></li>-->
+      </ul>
+      <p>Besoin d'aide ? Écrivez nous à <a href='mailto:support@cloudy.fr'>support@cloudy.fr</a></p>
+    </div>
+    <div class="footer-follows">
+      <div class="quick-links">
+      </div>
+      <a href="http://www.facebook.com/cloudy.fr" target="_blank">
+        <div class="bt-follow-facebook"></div>
+      </a>
+      <a href="http://twitter.com/cloudy_fr" target="_blank">
+        <div class="bt-follow-tw"></div>
+      </a>
+    </div>
+  </div> <!-- end footer -->
+  {% endblock %}
+
+
+  {% block js %}
+  <script type="text/javascript">
+    $(document).ready(function () {
+      // on/off toggle buttons on add logbook popup
+      // If free account only allow 1 select
+      $('a.custom-check-box').click(function () {
+        {% if not request.user.get_profile.has_payed_plan %}
+        $(this).parent().siblings().removeClass("on");
+        {% endif %}
+        if ($(this).parent().hasClass('disable') == false) {
+          $(this).parent().toggleClass("on");
+        }
+      });
+    });
+
+    var logbookType = "{{ logbook.cat }}";
+    var logbookId = "{{ logbook.id }}";
+    var logbookPage = "{{ page }}";
+    var logbookRootUrl = "{% url 'logbooks:home' %}";
+
+  </script>
+  {% endblock %}
+
+  {% block morejs %}
+  {% endblock %}
+  </script>
+
+</body>
+
+</html>

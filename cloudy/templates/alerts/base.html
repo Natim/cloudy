@@ -1,0 +1,119 @@
+{% extends "site_base_profile.html" %}
+
+{% load core_tags %}
+{% load logbook_tags %}
+{% load alerts %}
+
+
+{% block head %}
+    <link href="{{STATIC_URL}}compass/stylesheets/alerts.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <script type="text/javascript">
+        var CURRENT_QTYPE = null;
+        {% if qualification %}
+            var EDIT = true;
+            var ORIG_SUBTYPE = "{{qualification.license_type.sub_type}}";
+            var ORIG_TYPE = "{{qualification.license_type.type}}";
+            var ORIG_ID = {{qualification.license_type.pk}};
+            CURRENT_QTYPE = {{qualification.license_type.to_json|safe}};
+            {% if qualification.has_email_alert %}
+                var ORIG_EMAIL_ALERT=true;
+            {% else %}
+                var ORIG_EMAIL_ALERT=false;
+            {% endif %}
+            {% if qualification.has_sms_alert %}
+                var ORIG_SMS_ALERT=true;
+            {% else %}
+                var ORIG_SMS_ALERT=false;
+            {% endif %}
+            {% if qualification.has_any_alert %}
+                var ORIG_DAYS_BEFORE = {{qualification.days_before}};
+            {% else %}
+                var ORIG_DAYS_BEFORE = null;
+            {% endif %}
+        {% else %}
+            var EDIT = false;
+        {% endif %}
+    </script>
+
+    <script type="text/javascript" src="{{STATIC_URL}}js/cloudy_base_alerts.js"></script>
+    {% block head_special_js %}{% endblock %}
+{% endblock %}
+
+
+{% block left-menu %}
+    <li><a href="{% url 'alerts:qualification' %}" id="qual">Qualifications et licences</a></li>
+    <li><a href="{% url 'alerts:medical' %}" id="med">Médical</a></li>
+    <li><a href="{% url 'alerts:glide' %}" id="gli">Alertes glissantes</a></li>
+{% endblock %}
+
+
+
+{% block content %}
+
+        <div class="alert-list">
+
+            {% for qualif in qualifications %}
+
+            <div class="cloudy-alert">
+
+                <div class="cell c0">
+                    <h2 id="{{qualif.license_type.name}}">{{qualif.license_type.name|capfirst}}</h2>
+                    <div class="btnwrapper">
+                       {% block edit_btn %}
+                       {% endblock %}
+                   </div>
+                    <div class="reminders">
+                    {% if not qualif.has_any_alert %}
+                        <span class="icon ic-clock">Pas de date d'alerte enregistrée</span><br \>
+                    {% else %}
+                        <span class="icon ic-clock">Alertes {{qualif.days_before}} jour{{qualif.days_before|pluralize}} avant</span>
+                            <!--<div class="alert-icons">
+                            {% if qualif.has_email_alert %}
+                                <span class="icon ic-mail">Email</span>
+                            {% endif %}
+                            {% if qualif.has_sms_alert %}
+                                <span class="icon ic-sms">SMS</span>
+                            {% endif %}
+                            </div>-->
+                    {% endif %}
+                    </div>
+                </div>
+
+                {% if qualif.expiry_date %}
+                    <div class="cell c3">
+                        Expire le :
+                        <strong class="date">{{qualif.expiry_date|date:"DATE_FORMAT"}}</strong>
+                    </div>
+                {% endif %}
+                <div class="cell c2">
+                    {% if qualif.photo %}
+                        <span class="icon ic-file">
+                        <a href="{{MEDIA_URL}}{{qualif.photo}}" class="file">{{qualif.photo.name|sexy_me|truncchar:10}}</a>
+                        </span><br />
+                        <br />
+                    {% endif %}
+                </div>
+                <div class="clr"></div>
+                <a href="{% if qtype == 'medical' %}{% url 'alerts:delete_medical' qualif.pk %}{% else %}{% url 'alerts:delete_qualification' qualif.pk %}{% endif %}" title="Supprimer"
+                 rel="Êtes-vous sûr de vouloir définitivement supprimer cette alerte ?" class="delete">
+                    <img src="{{STATIC_URL}}img/carnet/icon-close.png" />
+                </a>
+            </div>
+             {% endfor %}
+
+
+        </div>
+
+    {% block form_display %}{% endblock %}
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    {% if qualification %}
+        $(document).ready(function(){
+            $.scrollTo( '.scrollto', 500);
+        });
+    {% endif %}
+</script>
+{% endblock %}

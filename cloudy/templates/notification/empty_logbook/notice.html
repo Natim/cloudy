@@ -1,0 +1,12 @@
+{% extends "mails/base_body.txt" %}
+{% block content_fr %}
+Bonjour,
+
+Votre carnet Cloudy semble vide, afin de commencer à le remplir vous pouvez importer votre carnet existant ou reporter vos totaux d'heures de vol à ce jour en cliquant <a href="/logbooks/{{logbook.id}}/import/">ici</a>.
+{% endblock %}
+
+{% block content_en %}
+Hello,
+
+Your Cloudy logbook is empty, so you can start filling in your existing book or upload your flight hours totals to date by clicking <a href="/logbooks/{{logbook.id}}/import/">here</a>.
+{% endblock %}

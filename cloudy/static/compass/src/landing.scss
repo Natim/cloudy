@@ -1,0 +1,323 @@
+// This import applies a global reset to any page that imports this stylesheet.
+@import "blueprint/reset";
+
+// To configure blueprint, edit the partials/base.sass file.
+@import "partials/base";
+
+// Import all the default blueprint modules so that we can access their mixins.
+@import "blueprint";
+@import "blueprint/grid";
+@import "blueprint/scaffolding";
+@import "blueprint/debug";
+
+@import "compass/utilities/general/clearfix";
+@import "compass/css3/gradient";
+@import "compass/css3";
+@import "compass/utilities/lists/horizontal-list";
+
+
+// To generate css equivalent to the blueprint css but with your
+// configuration applied, uncomment:
+// @include blueprint
+
+// But Compass recommends that you scope your blueprint styles
+// So that you can better control what pages use blueprint
+// when stylesheets are concatenated together.
+@include blueprint-scaffolding("body.bp");
+
+@import "common";
+@import "header";
+@import "footer";
+
+
+#main {
+    @include container;
+
+    h1 {
+       display: none;
+    }
+
+    #home-top {
+        height: 265px;
+
+        background: {
+            image: image-url("../../static/img/home-top-bg.png");
+            repeat:  no-repeat;
+            position: 0px  -9px;
+        };
+
+        #mob-logo {
+          position: absolute;
+		  margin: 0 auto;
+          top:  128px;
+          margin-left: 807px;
+			margin-top: 0px;
+        }
+
+
+       #clouds-top {
+            position: absolute;
+            width: 549px;
+            height: 137px;
+            margin-top: 160px;
+            left: 50%;
+            margin-left: -520px;
+
+            background: {
+                image: image-url("../../static/img/top-home-clouds.png");
+                repeat:  no-repeat;
+                position: top left;
+            };
+        }
+
+        #paper-plane {
+            position: absolute;
+            width: 141px;
+            height: 62px;
+            margin-top: 110px;
+            margin-left: 260px;
+            left: 50%;
+            background: {
+                image: image-url("../../static/img/dotted_plane.png");
+                repeat:  no-repeat;
+                position: top left;
+            };
+        }
+
+        .buttons {
+
+            @include column(18, true);
+
+            #signup-button {
+
+                @include column(7, true);
+                @include push-margins(12);
+
+
+                margin-top: 125px;
+                margin-bottom: 10px;
+                font-size: 13px;
+
+                height: 45px;
+                color: white;
+
+                @include text-shadow(black, 1px, 1px, 0);
+                @include box-shadow(black, 1px, 1px, 2px);
+                border: 1px solid $dark-red-start;
+                @include border-radius(3px, 3px);
+                @include linear-gradient(color-stops($dark-red-end, $dark-red-start));
+                background-color: $dark-red-start;
+
+                &:hover {
+                    color: $light-grey;
+                    @include box-shadow(black, 1px, 2px, 2px);
+                    @include linear-gradient(color-stops($dark-red-end, $dark-red-end));
+                    background-color: $dark-red-end;
+
+                     -webkit-animation-name: resize;
+                    -webkit-animation-duration: 0.5s;
+                    -webkit-animation-iteration-count: 5;
+                    -webkit-animation-direction: alternate;
+                    -webkit-animation-timing-function: ease-in-out;
+
+
+                }
+                &:active {
+                    color: $light-grey;
+                    @include box-shadow(black, 0px, 0px, 0px);
+                    margin-top: 126px;
+                    margin-bottom: 9px;
+                }
+
+                span.txt {
+                    @include column(7);
+                    margin: 10px 0 0 8px;
+                    height: 22px;
+
+                    background: {
+                        image: image-url("../../static/img/text-signup-button.png");
+                        repeat:  no-repeat;
+                        position: top left;
+                        z-index: 1000;
+                    };
+                }
+            }
+
+            #take-a-tour {
+                @include push-margins(12);
+                @include column(4, true);
+                text-decoration: none;
+                color: $dark-red-font;
+                font-size: 15px;
+                font-weight: 300;
+                padding: 0 5px 0 0;
+                border-bottom: 1px dashed  $dark-red-font;
+                &:hover {
+                    border-bottom: 1px solid  $dark-red-font;
+                }
+
+            }
+        }
+    }
+
+
+    #focus {
+      	 @include column(24, true);
+          padding-top: 10px;
+
+
+			.content {
+				@include column(19, true);
+				@include push-margins(2);
+				margin-top: 25px;
+
+				.logo-img {
+					@include column(6);
+					margin-top: 55px;
+					height: 175px;
+					width: 128px;
+				}
+
+				.content-text {
+					@include column(14, true);
+					@include push-margins(3);
+					color: $dark-grey;
+					font-size: 14px;
+
+					ul {
+						margin-top: 10px;
+						li {
+							list-style-type: none;
+						}
+					}
+					p {
+						font-weight: bold;
+						margin-bottom: 10px;
+					}
+					h2 {
+						height: 52px;
+						font-size: 21px;
+						color: $dark-blue;
+						font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+						padding-left: 59px;
+						padding-top: 5px;
+						margin-bottom: 10px;
+					}
+
+					.title-plane {
+						background: {
+			          image: image-url("../../static/img/icon-focus-plane.png");
+			          repeat:  no-repeat;
+			          position: top left;
+			      };
+					}
+					.title-baloon {
+						background: {
+			          image: image-url("../../static/img/icon-focus-baloon.png");
+			          repeat:  no-repeat;
+			          position: top left;
+			      };
+					}
+
+					.title-glider {
+						background: {
+			          image: image-url("../../static/img/icon-focus-glider.png");
+			          repeat:  no-repeat;
+			          position: top left;
+			      };
+					}
+
+					.title-helico {
+						background: {
+			          image: image-url("../../static/img/icon-focus-helico.png");
+			          repeat:  no-repeat;
+			          position: top left;
+			      };
+					}
+
+					.title-ulm {
+						background: {
+			          image: image-url("../../static/img/icon-focus-ulm.png");
+			          repeat:  no-repeat;
+			          position: top left;
+			      };
+					}
+
+					.title-parachute {
+						background: {
+			          image: image-url("../../static/img/icon-focus-parachute.png");
+			          repeat:  no-repeat;
+			          position: top left;
+			      };
+					}
+
+					.title-free-flight {
+						background: {
+			          image: image-url("../../static/img/icon-focus-free-flight.png");
+			          repeat:  no-repeat;
+			          position: top left;
+			      };
+					}
+
+					.title-drone {
+						background: {
+			          image: image-url("../../static/img/icon-focus-drone.png");
+			          repeat:  no-repeat;
+			          position: top left;
+			      };
+					}
+
+					#signup-focus {
+
+						  @include column(5, true);
+							@include push-margins(5);
+						  margin-top: 0px;
+						  font-size: 14px;
+
+						  height: 27px;
+						  color: white;
+
+						  @include text-shadow(black, 1px, 1px, 0);
+						  @include box-shadow(black, 1px, 1px, 2px);
+						  border: 1px solid $dark-red-start;
+						  @include border-radius(3px, 3px);
+						  @include linear-gradient(color-stops($dark-red-end, $dark-red-start));
+						  background-color: $dark-red-start;
+
+						  &:hover {
+						      color: $light-grey;
+						      @include box-shadow(black, 1px, 2px, 2px);
+						      @include linear-gradient(color-stops($dark-red-end, $dark-red-end));
+						      background-color: $dark-red-end;
+
+						       -webkit-animation-name: resize;
+						      -webkit-animation-duration: 0.5s;
+						      -webkit-animation-iteration-count: 5;
+						      -webkit-animation-direction: alternate;
+						      -webkit-animation-timing-function: ease-in-out;
+
+						  }
+						  &:active {
+						      color: $light-grey;
+						      @include box-shadow(black, 0px, 0px, 0px);
+						      margin-top: 11px;
+						      margin-bottom: -1px;
+						  }
+
+						  span.txt {
+						      @include column(5);
+						      margin: 8px 0 0 10px;
+						      height: 13px;
+
+						      background: {
+						          image: image-url("../../static/img/text-signup-button-mini.png");
+						          repeat:  no-repeat;
+						          position: top left;
+						          z-index: 1000;
+						      };
+						  }
+					}
+				}
+			}
+		}
+}

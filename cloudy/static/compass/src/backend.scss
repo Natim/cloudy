@@ -1,0 +1,639 @@
+// This import applies a global reset to any page that imports this stylesheet.
+@import "blueprint/reset";
+
+// To configure blueprint, edit the partials/base.sass file.
+@import "partials/base";
+
+// Import all the default blueprint modules so that we can access their mixins.
+@import "blueprint";
+@import "blueprint/grid";
+@import "blueprint/scaffolding";
+@import "blueprint/debug";
+
+@import "compass/utilities/general/clearfix";
+@import "compass/css3/gradient";
+@import "compass/css3";
+@import "compass/utilities/lists/horizontal-list";
+
+
+// To generate css equivalent to the blueprint css but with your
+// configuration applied, uncomment:
+// @include blueprint
+
+// But Compass recommends that you scope your blueprint styles
+// So that you can better control what pages use blueprint
+// when stylesheets are concatenated together.
+@include blueprint-scaffolding("body.bp");
+
+@import "common";
+@import "header";
+@import "footer";
+
+$super-light-grey: #fafafa;
+
+/* Rewrite part of header */
+
+#top-header {
+  #logo {
+      @include column(4);
+      margin-top: 15px;
+  }
+     #wrap-top-head {
+
+        min-height: 35px;
+        font-size: 12px;
+
+        background: {
+            image: image-url("../../static/img/hd-top-sgnup.png");
+            repeat:  no-repeat;
+            position: 444px  0px;
+        };
+    }
+
+  #logged{
+      @include column(11, true);
+          @include push-margins(7);
+    padding-top: 5px;
+          padding-left: 30px;
+  }
+
+}
+
+/* form */
+
+form.classic{
+  @include blueprint-form;
+
+
+  .inputs{
+    textarea,input,select{
+      background:$light-grey;
+      border:1px solid $grey-border;
+      @include box-shadow($grey, 1px, 1px, 2px, 0, true);
+      padding:4px;
+      margin-left:5px;
+      font-family:inherit;
+      font-size:inherit;
+      color:$dark-grey;
+    }
+    input:focus, select:focus{
+      border-color:$dark-blue;
+      background-color:#f1f6f9;
+    }
+    label{
+      display:inline-block;
+      padding:5px;
+      width:200px;
+      text-align:right;
+    }
+    .file{
+      background:white;
+      border:0 none;
+    }
+  }
+  .chk, .radio{
+    input{
+      width:auto !important;
+      border:0 none;
+      background:transparent;
+    }
+    label{
+      font-weight:normal;
+      display:inline;
+    }
+  }
+  .uploaded-files{
+    margin:0;
+    padding:0;
+    li{
+      list-style-type:none;
+      margin:2px 0;
+      padding:3px 7px;
+      width:200px;
+      @include border-radius(3px, 3px);
+      background:$grey-border;
+
+      .cancel{
+        float:right;
+        font-weight:bold;
+        color:$dark-red;
+        text-decoration:none;
+      }
+    }
+  }
+}
+.fL{float:left;}
+.clr{clear:both;}
+.btn{
+  @include border-radius(4px, 4px);
+  @include box-shadow(#ddd, 0px, 0px, 2px);
+  display:inline-block;
+  text-decoration:none;
+  cursor:pointer;
+}
+.btn:hover{
+  @include box-shadow(#999, 0px, 0px, 3px);
+}
+.red{
+  border:1px solid $dark-red;
+  background-color:$dark-red-start;
+  @include linear-gradient(color-stops($dark-red-end, $dark-red-start));
+  color:white;
+}
+.red:hover{color:white;}
+.dark{
+  background-color:$dark-blue;
+  border:1px solid $dark-blue;
+  color:white;
+}
+.icon{
+  padding-left:20px;
+  background-position:0 50%;
+  background-repeat:no-repeat;
+}
+.ic-mail{background-image:url(../../img/carnet/picto-email.png);}
+.ic-clock{background-image:url(../../img/carnet/picto-clock.png);}
+.ic-file{background-image:url(../../img/carnet/paperclip-red.png);}
+.ic-sms{background-image:url(../../img/carnet/picto-cellphone.png);background-position:4px 50%;}
+
+.page{
+
+}
+
+.layer{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:url(../../img/carnet/ie_alpha35_black.png);
+  background:rgba(0,0,0,0.35);
+}
+
+
+
+.col-on-left{
+    @include column(24, true);
+  padding: 0;
+  margin-bottom:30px;
+  overflow: hidden;
+  min-height: 500px;
+  .col {
+      @include column(6, true);
+    border-right:1px solid #ddd;
+    background: $super-light-grey;
+      margin-bottom: -2000px;
+    padding-bottom: 2000px;
+    margin-top: -6px;
+    margin-left: 2px;
+    ul.nav-left   {
+        height: 100%;
+        margin:0;
+      padding:0;
+
+      li{
+        margin:0;
+        padding:0;
+        list-style-type:none;
+        font-weight:bold;
+
+        a {
+              display: block;
+          padding:15px 0 15px 15px;
+          border-bottom:1px solid #ddd;
+          text-decoration:none;
+          color:$dark-red;
+          background:white;
+          font-size: 13px;
+        }
+        a:hover{
+          background:rgba(255,255,255, 0.4);
+        }
+
+      }
+    }
+  }
+}
+
+/*  Content base profile */
+div.col-on-left div.content {
+    @include column(16, true);
+    @include prepend(1);
+
+    padding-top: 10px;
+    h2 {
+    font-size: 25px;
+    font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+    color: $dark-blue;
+     }
+
+     form {
+      @include nice-form;
+     }
+
+     hr.sep {
+      width: 100%;
+        height: 0px;
+        border: none;
+      border-bottom: 1px solid #eee;
+     }
+}
+
+/*  Nav left selection */
+ul#profile.nav-left a#profile,
+ul#adminacc.nav-left a#adminacc,
+ul#sponsor.nav-left a#sponsor,
+ul#qual.nav-left a#qual,
+ul#med.nav-left a#med,
+ul#gli.nav-left a#gli,
+ul#cmiles a#cmiles,
+ul#histo a#histo,
+ul#pcloudy a#pcloudy,
+ul#params.nav-left a#params,
+ul#aircrafts.nav-left a#aircrafts,
+ul#report.nav-left a#report
+{
+  background: #80abbb;
+  background:url(../../img/carnet/nav-current.png) no-repeat scroll left center;
+  width: 245px;
+  color: white;
+  border-bottom: none;
+}
+
+
+.page-title{
+  font-weight:bold;
+  font-size:20px;
+  padding: 0 0 0 20px;
+}
+
+
+.promo-4col{
+    @include column(24, true);
+  background:url(../../img/carnet/promo-cols.png) no-repeat;
+  padding:5px 0;
+  margin-bottom:5px;
+  margin-top:5px;
+  height:128px;
+  width: 955px;
+
+  .cell{
+      @include column(5);
+    padding:5px 15px;
+    height:90px;
+    border-left:1px solid #ddd;
+
+    span.title {
+        @include column(5, true);
+      font-weight:bold;
+      color: #555;
+      font-size:15px;
+      padding: 0px;
+      margin: 0px;
+    }
+    span.balance {
+
+      color: #555;
+      b.alert {
+        color: $dark-red;
+      }
+    }
+    .btn, span{
+      font-size:12px;
+      font-weight:normal;
+    }
+    span{
+      padding: 0px;
+      display:block;
+      margin-bottom:10px;
+      font-size:13px;
+      color:$grey-border;
+    }
+    strong{
+      color:$dark-blue;
+    }
+    .btn{
+      padding:4px 8px;
+
+    }
+    div.fat{
+        @include column(3);
+
+      position: relative;
+      top: -10px;
+      margin-right: 10px;
+      padding: 0px;
+        font-weight:normal;
+      color:$dark-blue;
+      font-size:48px;
+    }
+    .bar{
+      position:relative;
+      height:15px;
+      width:170px;
+      background:$grey-border;
+      @include linear-gradient(color-stops($light-grey, $grey-border));
+      border:1px solid $grey-border;
+      div{
+        position:absolute;
+        top:0;
+        left:0;
+        height:100%;
+        background:$dark-blue;
+        @include linear-gradient(color-stops(#365f80, $dark-blue3));
+      }
+
+    }
+  }
+  .first{
+    border-left:0 none !important;
+  }
+}
+
+a.btn.red {
+  color: white;
+  &:hover {
+    margin-top: 1px;
+  }
+}
+/* ugly but no time to fix properly */
+a#convert.btn.red {
+  margin-top: 26px;
+  &:hover {
+    margin-top: 27px;
+  }
+}
+
+
+#top-bar {
+    @include column(24, true);
+  margin: 10px 0px 10px 0;
+
+  a{
+    display:inline-block;
+    text-decoration:none;
+    background-repeat:no-repeat;
+  }
+  .action {
+     @include box-shadow(#ccc, 1px, 1px, 1px);
+  }
+
+  .add {
+    width: 946px;
+    height: 43px;
+    background:url(../../img/carnet/top-bar.png) no-repeat;
+    padding:10px 5px 0px 5px;
+
+    .icon-return {
+      margin-bottom: -3px;
+      margin-right: 3px;
+    }
+    .btn, .field {
+      @include border-radius(3px, 3px);
+      padding: 6px 10px 6px 10px;
+      margin:0px 2px 0 2px;
+      font-weight:bold;
+      color:white;
+      font-size:13px;
+    }
+
+    .btn {
+      background-color:#80abbb;
+      border:1px solid #498798;
+    }
+
+    .red{
+      background-color: #8E090E;
+      float:right;
+      margin-right: 8px;
+      border: 1px solid #9A1C20;
+    }
+
+    .right{
+      float:right;
+      margin-right: 8px;
+    }
+    .field{
+      padding:5px;
+      width:140px;
+      border:2px solid $dark-blue;
+      color:$dark-blue;
+    }
+
+  }
+
+
+  .action{
+    @include border-radius(0 0 4px 4px, 0 0 4px 4px);
+    border-bottom:1px solid #ccc;
+    border-left:1px solid #ccc;
+
+    border-top:0 none;
+    a{
+      background-position:4px 50%;
+      display:block;
+      float:left;
+      color:$dark-grey;
+      padding:6px 8px;
+      border-right:1px solid #dcdddf;
+      font-size:13px;
+      height: 18px;
+    }
+
+    a{
+      padding-left:25px;
+    }
+    .carnet{
+      background-image:url(../../img/icon-carnet.png);
+    }
+    .stats{
+      background-image:url(../../img/icon-statistics.png);
+    }
+
+    .calculator {
+      background-image:url(../../img/icon-calculator.png);
+    }
+
+    .plane {
+      background-image:url(../../img/icon-plane.png);
+      padding-left:30px;
+    }
+
+    .parameters {
+      background-image:url(../../img/icon-parameters.png);
+    }
+
+    .share {
+      background-image:url(../../img/icon-sharing.png);
+    }
+
+    a:hover, a:focus{
+      background-color:$dark-red;
+      color:white;
+    }
+    a.first{
+      @include border-radius(0 0 0 4px,0 0 0 4px);
+    }
+    a.last{
+      @include border-radius(0 0 4px 0,0 0 4px 0);
+    }
+    .add-flight {
+      float:right;
+      font-weight: normal;
+    }
+    .icon-add {
+      margin-bottom: -3px;
+      margin-right: 2px;
+    }
+    .btn {
+      @include border-radius(3px, 3px);
+      padding: 3px 10px 3px 10px;
+      margin:0px 2px 0 2px;
+      font-weight:bold;
+      color:white;
+      font-size:13px;
+      margin-right: 8px;
+      margin-top: 2px;
+      background-color:$dark-blue;
+      border:1px solid #498798;
+      &:hover{
+        background-color:$dark-blue;
+        color:white;
+        border:1px solid #498798;
+      }
+      &:focus{
+        background-color:$dark-blue;
+        color:white;
+        border:1px solid #498798;
+      }
+
+    }
+
+    .exp-imp{
+      //float:right;
+      a{
+        border-right:1px solid #dcdddf;
+        border-left:0 none;
+        padding-left:25px;
+        height: 18px;
+      }
+      .export{
+        background-image:url(../../img/carnet/picto-pdf.png);
+
+      }
+      .import{
+        background-image:url(../../img/carnet/picto-excel.png);
+      }
+      .aircrafts{
+        background-image:url(../../img/icon-aircrafts.png);
+      }
+    }
+
+  }
+}
+
+/* submenu higlight */
+div#action-logbook.action a.first.carnet,
+div#action-totals.action a.calculator,
+div#action-stats.action a.stats,
+div#action-parameters.action a.parameters,
+div#action-aircrafts.action a.aircrafts,
+div#import.action a.import
+ {
+  background-color:$dark-red;
+  color:white;
+}
+
+/* override bold for add flight button */
+a#trigger-add-log.add-flight.btn {
+  font-weight: normal;
+}
+
+body#profile a#vensemble.btn,
+body#galertes a#galertes.btn,
+body#ofact a#ofact.btn,
+body#mmiles a#mmiles.btn {
+  background-color:$dark-blue;
+}
+
+body#profile a#vensemble.btn {
+  background-image:url(../../img/picto-profile-hover.png) !important;
+  padding-left: 30px !important;
+  background-position: 5px 5px;
+}
+
+body#galertes a#galertes.btn {
+  background-image:url(../../img/picto-alarm-hover.png) !important;
+  padding-left: 30px !important;
+  background-position: 5px 5px;
+}
+
+body#ofact a#ofact.btn {
+  background-image:url(../../img/picto-fact-hover.png) !important;
+  padding-left: 30px !important;
+  background-position: 5px 5px;
+}
+
+body#mmiles a#mmiles.btn {
+  background-image:url(../../img/picto-miles-hover.png) !important;
+  padding-left: 30px !important;
+  background-position: 5px 5px;
+}
+
+a#vensemble {
+  background-image:url(../../img/picto-profile.png) !important;
+  padding-left: 30px !important;
+  background-position: 5px 5px;
+}
+
+a#galertes {
+  background-image:url(../../img/picto-alarm.png) !important;
+  padding-left: 30px !important;
+  background-position: 5px 5px;
+}
+
+a#ofact {
+  background-image:url(../../img/picto-fact.png) !important;
+  padding-left: 30px !important;
+  background-position: 5px 5px;
+}
+
+a#mmiles {
+  background-image:url(../../img/picto-miles.png) !important;
+  padding-left: 30px !important;
+  background-position: 5px 5px;
+}
+
+#wrap{
+  overflow:visible;
+  position:relative;
+}
+
+.box-top-profile {
+    @include column(24, true);
+    background: {
+        image: url(../../img/carnet/top-profile-bg.png);
+        repeat:  no-repeat;
+    };
+    height: 10px;
+margin-top: 10px;
+}
+
+.box-bottom-profile {
+    @include column(24, true);
+    background: {
+        image: url(../../img/carnet/bottom-profile-bg.png);
+        repeat:  no-repeat;
+    };
+    height: 20px;
+}
+
+.box-main-profile {
+  @include column(24, true);
+  min-height: 470px;
+  background: {
+          image: url(../../img/carnet/main-profile-bg.png);
+          repeat:  repeat-y;
+      };
+  width: 953px;
+}

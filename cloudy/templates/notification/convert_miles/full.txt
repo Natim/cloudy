@@ -1,0 +1,16 @@
+{% extends "mails/base_body.txt" %}
+{% block content_fr %}
+Bonjour {{ user.get_full_name }},
+
+Vous venez d'être crédité de {{month_earned}} mois d'abonnement First Class gratuit{{month_earned|pluralize}} en utilisant {{miles_burned}} de vos miles Cloudy.
+
+Vous bénéficiez dès maintenant de tous les avantages du pack First Class de Cloudy.
+{% endblock %}
+
+{% block content_en %}
+Hello {{ user.get_full_name }},
+
+You have just been credited with {{month_earned}} month{{month_earned|pluralize}} of free First Class subscription using {{miles_burned}} of your Cloudy miles.
+
+You now benefit from all the advantages of the First Class package from Cloudy.
+{% endblock %}

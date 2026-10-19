@@ -1,0 +1,65 @@
+[
+{
+    "model": "faq.faq",
+    "pk": 1,
+    "fields": {
+        "question": "Je suis perdu(e), que faire ?",
+        "answer": "En cas de problème, de soucis, d'incompréhension ou d'énervement, pas de panique ! \r\n\r\nAppliquez la \"procédure de recherche de panne\" en vous rendant sur la page www.cloudy.fr/support \r\n\r\nSi vous ne trouviez toujours pas de solution à votre problème pas d'inquiétude, une équipe de professionnels est là pour vous répondre rapidement à l'adresse support@cloudy.fr",
+        "post_date": "2011-04-16T20:55:22Z"
+    }
+},
+{
+    "model": "faq.faq",
+    "pk": 2,
+    "fields": {
+        "question": "Comment ajouter une alerte ? ",
+        "answer": "Rendez vous dans votre profil puis cliquez sur le Bouton intitulé \"Mes alertes\" \r\n\r\nSuivez ensuite les instructions à l'écran afin d'ajouter ou supprimer une alerte sur une qualification ou une licence",
+        "post_date": "2011-04-16T20:55:44Z"
+    }
+},
+{
+    "model": "faq.faq",
+    "pk": 3,
+    "fields": {
+        "question": "Comment modifier mon mot de passe ?",
+        "answer": "Rien de plus simple ! En haut à droite de votre compte Cloudy cliquez sur votre prénom\r\n\r\nVous serez automatiquement redirigés vers la page d'administration du compte sur laquelle vous pourrez changer à la fois votre mot de passe et vos préférences de contact",
+        "post_date": "2011-04-16T20:56:03Z"
+    }
+},
+{
+    "model": "faq.faq",
+    "pk": 4,
+    "fields": {
+        "question": "Comment modifier mon adresse e-mail de contact ?",
+        "answer": "Rien de plus simple ! En haut à droite de votre compte Cloudy cliquez sur \"Mon Compte\"\r\n\r\nVous serez automatiquement redirigés vers la page d'administration du compte sur laquelle vous pourrez changer à la fois votre nom, votre prénom mais également votre adresse e-mail et photo de profil ou même votre numéro de téléphone portable et votre aérodrome de base.",
+        "post_date": "2011-04-16T20:56:18Z"
+    }
+},
+{
+    "model": "faq.faq",
+    "pk": 6,
+    "fields": {
+        "question": "Comment éditer un vol ?",
+        "answer": "Afin d'éditer un vol, il existe 2 solutions.\r\n\r\nLa solution n°1 consiste à cliquer sur la ligne puis la case du carnet concernée et à effectuer les modifications directement dans la boite jaune qui apparait à l'écran\r\n\r\nLa solution n°2 consiste tout simplement à cliquer sur le bouton Editer qui apparaît à côté de chaque ligne du carnet et d'effectuer ainsi les changements",
+        "post_date": "2011-04-16T20:56:58Z"
+    }
+},
+{
+    "model": "faq.faq",
+    "pk": 7,
+    "fields": {
+        "question": "Comment ajouter un vol ?",
+        "answer": "Pour ajouter un vol rendez vous sur le menu carnet de votre interface. Sélectionnez ensuite le carnet dans lequel vous souhaitez ajouter un vol puis cliquez sur le bouton bleu intitulé \"Ajouter un vol\" \r\n\r\nRemplissez ensuite le formulaire d'ajout de vol puis enregistrer ce dernier",
+        "post_date": "2011-04-16T20:57:32Z"
+    }
+},
+{
+    "model": "faq.faq",
+    "pk": 8,
+    "fields": {
+        "question": "Comment ajouter un carnet ?",
+        "answer": "C'est très simple, une fois sur l'écran principal de votre compte Cloudy cliquez sur le gros bouton rouge en haut à droite de la page intitulé \"Ajouter un carnet\"\r\n\r\nUne fois sur l'écran de sélection des carnets à ajouter déplacez le sélecteur \"ON/OFF\" en face du ou des carnets souhaités puis cliquez sur \"Ajouter\" \r\n\r\nVos carnets se créeront ensuite automatiquement",
+        "post_date": "2011-04-16T20:57:51Z"
+    }
+}
+]

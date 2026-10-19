@@ -1,0 +1,75 @@
+{% extends "site_base_public.html" %}
+
+{% load static %}
+{% load compress %}
+{# load rendertext #}
+{% load quotes_tags %}
+{# TODO load lightsearch_forms #}
+
+{% block body_id %}support{% endblock %}
+
+{% block head %}
+{% compress css %}
+<link href="{% static 'compass/stylesheets/home.css' %}" media="screen, projection" rel="stylesheet" type="text/css" />
+{% endcompress %}
+<script type="text/javascript" src="{% static 'js/cloudy_home.js' %}"></script>
+{% endblock %}
+
+{% block main %}
+<!-- Main -->
+<div id="main">
+  <div id="support-top">
+    <div id="clouds-top"></div>
+
+  </div>
+
+  <div id="box-support">
+
+    <div id="support-content">
+      <div class="box-title">
+        <a href="{% url 'faq:list' %}">
+          <h2 class="faq">
+            FAQ
+          </h2>
+        </a>
+        <div class="baseline">
+          Retrouvez ici la réponse à toutes vos questions
+        </div>
+      </div>
+      <div class="box-title">
+        <a href="{% url 'contactus' %}">
+          <h2 class="question">
+            UNE QUESTION ?
+          </h2>
+        </a>
+        <div class="baseline">
+          Un problème ? Une question ? Contactez nous !
+        </div>
+      </div>
+      <div class="box-title">
+        <a href="http://www.vimeo.com/cloudyfr" target="_blank">
+          <h2 class="tuto">
+            TUTORIELS
+          </h2>
+        </a>
+        <div class="baseline">
+          Découvrez Cloudy en vidéos (en français)
+        </div>
+      </div>
+      <div class="box-title">
+        <a href="http://cloudyfr.uservoice.com" target="_blank">
+          <h2 class="juridical">
+            CLOUDIDÉES
+          </h2>
+        </a>
+        <div class="baseline">
+          Par ici les suggestions et les demandes d'amélioration de Cloudy
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="content">
+  </div>
+
+  {% endblock %}

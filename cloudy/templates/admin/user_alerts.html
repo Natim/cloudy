@@ -1,0 +1,33 @@
+{% extends "admin/change_form.html" %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/alerts/alert">Back to alert list </a>{% if title %} &rsaquo;  {% endif %}</div>{% endblock %}
+
+{% block content %}
+<h1>{{ user.get_full_name }} alert with id {{ alert.id }} </h1>
+<br />
+
+<h2>Active alert</h2>
+    <br/>
+    <b>Nom qualif:</b>
+    {{ qual_type.name }}
+    <br/>
+    <b>Type qualif:</b>
+    {{ qual_type.categ }}
+    <br/>
+
+    {% if qual.photo.get.name %}
+        <b>File:</b>
+        <a href="{{MEDIA_URL}}/{{qual.photo}}" class="file">{{qual.photo}}</a>
+        <br/>
+    {% endif %}
+
+    <b>Expiry date :</b>
+        {{ qual.expiry_date }}
+    <br/>
+
+    <b>Alerts : </b>
+    	<i>{{ alert.kind }}</i><br/>
+    	<i>{{ alert.days_before }} day(s) before</i>
+    <br/>
+
+{% endblock %}

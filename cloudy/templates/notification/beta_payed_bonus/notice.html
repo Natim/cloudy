@@ -1,0 +1,12 @@
+{% extends "mails/base_body.txt" %}
+{% block content_fr %}
+Bonjour,
+
+Cloudy étant encore en version Beta, nous vous offrons {{month_earned}} mois d'abonnement First Class gratuit{{month_earned|pluralize}} !
+{% endblock %}
+
+{% block content_en %}
+Hello,
+
+Cloudy is still in Beta version, so we offer you {{month_earned}} month{{month_earned|pluralize}} of First Class membership for free!
+{% endblock %}

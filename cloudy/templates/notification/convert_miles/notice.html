@@ -1,0 +1,16 @@
+{% extends "mails/base_body.txt" %}
+{% block content_fr %}
+Bonjour,
+
+Vous venez de gagner {{month_earned}} mois d'abonnement First Class gratuit{{month_earned|pluralize}} en utilisant {{miles_burned}} de vos miles Cloudy.
+
+Vous bénéficiez dès maintenant de tous les avantages du pack First Class de Cloudy, merci !
+{% endblock %}
+
+{% block content_en %}
+Hello,
+
+You have just won {{month_earned}} month{{month_earned|pluralize}} of free First Class subscription using {{miles_burned}} of your Cloudy miles.
+
+You now enjoy all the advantages of the First Class pack of Cloudy, thank you!
+{% endblock %}

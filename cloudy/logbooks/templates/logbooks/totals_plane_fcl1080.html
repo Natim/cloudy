@@ -1,0 +1,237 @@
+{% extends "site_base_logbook.html" %}
+
+{% load static %}
+{% load core_tags %}
+{% load stats_tags %}
+{% load compress %}
+
+{% block body_id %}logbooks{% endblock %}
+{% block actions-id %}action-totals{%endblock %}
+
+{% block head %}
+{% compress css %}
+<link href="{% static 'compass/stylesheets/logbook.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'compass/stylesheets/logbook_popups.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+{% endcompress %}
+{% endblock %}
+
+{% block morejs %}
+<script type="text/javascript" src="{% static 'js/stats_selector.js' %}"></script>
+{% endblock %}
+
+{% block nav-logbook %}
+{% endblock %}
+
+{% block content %}
+<div class="promo-4col page">
+  <div class="total-cell left">
+    <h1>Totaux {{logbook.name}}</h1>
+    <div class="period-date">
+      <span id="date_range_place"></span> <span id="date_place_whole"> (<span id="begin_date_place"></span> - <span
+          id="end_date_place"></span>)</span>
+    </div>
+  </div>
+  <form id="totals-range-form">
+    <div class="total-cell">
+
+      <label>Filtre période :</label>
+      {% include "partials/range_selector.html" %}
+    </div>
+
+    <!-- Je sais c'est pas propre, c'est juste pour montrer comment ça marche. -->
+    {% date_selector_popup %}
+  </form>
+</div>
+
+<div class="box-top-profile"></div>
+<div class="box-main-profile">
+
+  <div class="total-line">
+    <div class="total-blue">
+      <div class="total-box-top"></div>
+      <div class="total-box-main">
+        <div class="title-box">
+          Total général
+        </div>
+        <div class="total">
+          {% format_total totals total_total_time_flight decorated %}
+        </div>
+        <div class="bottom-line">
+          <div class="total-day">
+            <div class="sub-total">
+              {% format_total totals total_single_pilot_time decorated %}
+            </div>
+            <div class="period">
+              Mono Pilote
+            </div>
+          </div>
+          <div class="total-night">
+            <div class="sub-total">
+              {% format_total totals total_multi_pilot_time decorated %}
+            </div>
+            <div class="period">
+              Multi Pilote
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="total-box-bottom"></div>
+    </div>
+
+
+
+    <div class="total-blue">
+      <div class="total-box-top"></div>
+      <div class="total-box-main">
+        <div class="title-box">
+          Durée en condition opérationnelle
+        </div>
+        <div class="total">
+          {% format_total totals total_op_time decorated %}
+        </div>
+        <div class="bottom-line">
+          <div class="total-day">
+            <div class="sub-total">
+              {% format_total totals total_op_time_night decorated %}
+            </div>
+            <div class="period">
+              Nuit
+            </div>
+          </div>
+          <div class="total-night">
+            <div class="sub-total">
+              {% format_total totals total_op_time_ifr decorated %}
+            </div>
+            <div class="period">
+              IFR
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="total-box-bottom"></div>
+    </div>
+
+    <div class="total-blue">
+      <div class="total-box-top"></div>
+      <div class="total-box-main">
+        <div class="title-box">
+          Simulateur de vol
+        </div>
+        <div class="total">
+          {% format_total totals total_synthetic_time decorated %}
+        </div>
+      </div>
+      <div class="total-box-bottom"></div>
+    </div>
+
+  </div>
+
+  <div class="total-line">
+    <div class="total-blue-long">
+      <div class="total-box-top"></div>
+      <div class="total-box-main-single-row">
+        <div class="title-box">
+          Total heure de vol
+        </div>
+        <div class="total">
+          {% format_total totals total_pilot_time decorated %}
+        </div>
+        <div class="bottom-line">
+          <div class="total-black-left-4">
+            <div class="col-total">
+              Cdb
+              {% format_total totals total_pilot_time_in_cmd decorated %}
+            </div>
+            <div class="col-total">
+              Co-pilote
+              {% format_total totals total_pilot_timpe_cop decorated %}
+            </div>
+            <div class="col-total">
+              Double cmd
+              {% format_total totals total_pilot_time_dual decorated %}
+            </div>
+            <div class="col-total">
+              Inst.
+              {% format_total totals total_pilot_time_inst decorated %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="total-box-bottom"></div>
+    </div>
+
+  </div>
+  <div class="total-line">
+
+    <div class="total-blue">
+      <div class="total-box-top"></div>
+      <div class="total-box-main">
+        <div class="title-box">
+          Décollages
+        </div>
+        <div class="total">
+          {% format_total totals total_take_off raw %}
+        </div>
+        <div class="bottom-line">
+          <div class="total-day">
+            <div class="sub-total">
+              {% format_total totals total_take_off_day raw %}
+            </div>
+            <div class="period">
+              Jour
+            </div>
+          </div>
+          <div class="total-night">
+            <div class="sub-total">
+              {% format_total totals total_take_off_night raw %}
+            </div>
+            <div class="period">
+              Nuit
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="total-box-bottom"></div>
+    </div>
+
+
+    <div class="total-blue">
+      <div class="total-box-top"></div>
+      <div class="total-box-main">
+        <div class="title-box">
+          Atterrissages
+        </div>
+        <div class="total">
+          {% format_total totals total_landing raw %}
+        </div>
+        <div class="bottom-line">
+          <div class="total-day">
+            <div class="sub-total">
+              {% format_total totals total_landing_day raw %}
+            </div>
+            <div class="period">
+              Jour
+            </div>
+          </div>
+          <div class="total-night">
+            <div class="sub-total">
+              {% format_total totals total_landing_night raw %}
+            </div>
+            <div class="period">
+              Nuit
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="total-box-bottom"></div>
+    </div>
+
+  </div>
+
+
+</div>
+<div class="box-bottom-backend"></div>
+<script type="text/javascript">$(document).ready(function () { $.uniform.update("#filter"); });</script>
+{% endblock %}

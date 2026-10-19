@@ -1,0 +1,40 @@
+{% extends "payment/base_pack.html" %}
+{% load core_tags %}
+
+ {% block profile_id %}histo{% endblock %}
+
+{% block head %}
+    <link href="{{STATIC_URL}}compass/stylesheets/payment.css" media="screen, projection" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+
+{% block content %}
+    <h2>Historique de vos factures</h2>
+        {% if orders %}
+        <table class="common">
+        <tr>
+            <th>Date</th>
+            <th>Montant(€)</th>
+            <th>Id#</th>
+            <th>Produit</th>
+            <th>Pdf</th>
+        </tr>
+        {% for order in orders %}
+            <tr class="{% cycle 'odd' ' ' %}">
+                <td>{{ order.date|date:"D d b Y" }}</td>
+                <td>{{ order.ramount|floatformat }}</td>
+                <td>{{ order.uuid }}</td>
+                <td>{{ order.invoice.label }}</td>
+                <td class="pdf">
+                {% if  order.invoice %}
+                    <a href="{{STATIC_URL}}/{{ order.invoice.pdf }}"> <img src="{{STATIC_URL}}/img/pdf-icon.png" alt="pdf" /></a>
+                {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+        {% else %}
+             <p>Aucune facture émise pour le moment.</p>
+             <div style="min-height: 380px;"></div>
+        {% endif %}
+{% endblock %}

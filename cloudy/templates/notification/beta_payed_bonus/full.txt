@@ -1,0 +1,16 @@
+{% extends "mails/base_body.txt" %}
+{% block content_fr %}
+Bonjour {{ user.get_full_name }},
+
+Dans le cadre de la version Beta de Cloudy la totalité des fonctionnalités ne sont pas disponibles.
+
+Si vous rencontrez un problème, prenez contact avec nous à l'adresse support@cloudy.fr
+{% endblock %}
+
+{% block content_en %}
+Hello {{ user.get_full_name }},
+
+As a part of the Beta version of Cloudy, all features are not available.
+
+If you encounter a problem, please contact us at support@cloudy.fr
+{% endblock %}

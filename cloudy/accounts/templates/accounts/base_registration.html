@@ -1,0 +1,35 @@
+{% extends "site_base_public.html" %}
+{% load static %}
+{% block title %}Registration{% endblock %}
+
+{% block body_id %}registration{% endblock %}
+
+{% load compress %}
+
+{% block head %}
+{% compress css %}
+<link href="{% static 'compass/stylesheets/print.css' %}" media="print" rel="stylesheet" type="text/css" />
+<link href="{% static 'compass/stylesheets/screen.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<link href="{% static 'raw_css/date.css' %}" media="screen, projection" rel="stylesheet" type="text/css" />
+<link href="{% static 'raw_css/uniform.default.css' %}" media="screen, projection" rel="stylesheet" type="text/css" />
+{% endcompress %}
+{% endblock %}
+
+{% block main %}
+<div id="main">
+  <div id="content">
+    <div class="box-top-title">
+      <h2>{% block head-title %}{% endblock %}</h2>
+    </div>
+    <hr class="top-sep" />
+    <div class="box-main">
+      {% block content %}
+      {% endblock %}
+    </div>
+    <div class="box-bottom"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer-signup-button %} {% endblock %}

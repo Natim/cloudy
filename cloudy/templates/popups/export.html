@@ -1,0 +1,58 @@
+{%load static%}
+
+<div class="popup" id="export-popup">
+  <div class="head">
+    Exportez votre carnet
+    <a href="#" class="close"><img src="{% static 'img/carnet/picto-close-blue.png' %}" /></a>
+  </div>
+  <div class="details">
+    Choisissez votre format d'export préféré.
+  </div>
+  <div class="body ct">
+    <div>
+      <h3 class="csv">1. Exportez au format Excel (.csv)</h3>
+      <a href="{% if logbook %}{% url 'logbooks:export' logbook.id 'csv' %}{% endif %}" class="btn red">Exporter en
+        CSV</a>
+    </div>
+    <div>
+      <h3 class="pdf">2. Exportez au format identique à votre carnet (.pdf)</h3>
+
+      {% if not request.user.get_profile.has_payed_plan %}
+      <a href="#" class="btn disable">Exporter en PDF</a>
+      <div class="cont">
+        <p>Le module d'export au format PDF est une fonction du pack <a href="{#TODO # url 'payment:pcloudy' #}">First
+            Class</a>.<br />
+          Téléchargez un exemple <a href="{% static 'pdf/exemple_export_dgac.pdf' %}" target="_blank">d'export PDF</a>
+          DGAC avion.</p>
+      </div>
+      {% else %}
+      <a href="{% if logbook %}{% url 'logbooks:export' logbook.id 'pdf' %}{% endif %}" class="btn red"
+        id="pdf-export-link">Exporter en PDF</a>
+      {% endif %}
+    </div>
+    {% if request.user.get_profile.has_payed_plan %}
+    <div class="extra">
+      <form>
+        Afficher les lignes de découpe sur le pdf: <input type="checkbox" name="lines" value="l"
+          id="pdf-export-line-trigger" />
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function () {
+    $('#pdf-export-line-trigger').change(function () {
+      var checked = $(this).attr('checked');
+      var pdf_url = "{% if logbook %}{% url 'logbooks:export' logbook.id 'pdf' %}{% endif %}";
+
+      if (checked === true) {
+        $("#pdf-export-link").attr('href', pdf_url + "?mode=show_cuts");
+      }
+      else {
+        $("#pdf-export-link").attr('href', pdf_url);
+      }
+    });
+
+  });
+</script>

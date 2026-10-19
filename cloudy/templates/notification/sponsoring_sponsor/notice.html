@@ -1,0 +1,12 @@
+{% extends "mails/base_body.txt" %}
+{% block content_fr %}
+Bonjour,
+
+Vous venez de parrainer {{ nephew.get_full_name }} et vous gagnez {{ m }} miles Cloudy ! Merci !
+{% endblock %}
+
+{% block content_en %}
+Hello,
+
+You just sponsored {{ nephew.get_full_name }} and you win {{m}} Cloudy miles! Thanks!
+{% endblock %}

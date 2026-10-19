@@ -1,0 +1,144 @@
+// This import applies a global reset to any page that imports this stylesheet.
+@import "blueprint/reset";
+
+// To configure blueprint, edit the partials/base.sass file.
+@import "partials/base";
+
+// Import all the default blueprint modules so that we can access their mixins.
+@import "blueprint";
+@import "blueprint/grid";
+@import "blueprint/scaffolding";
+@import "blueprint/debug";
+
+@import "compass/utilities/general/clearfix";
+@import "compass/css3/gradient";
+@import "compass/css3";
+@import "compass/utilities/lists/horizontal-list";
+
+
+// To generate css equivalent to the blueprint css but with your
+// configuration applied, uncomment:
+// @include blueprint
+
+// But Compass recommends that you scope your blueprint styles
+// So that you can better control what pages use blueprint
+// when stylesheets are concatenated together.
+@include blueprint-scaffolding("body.bp");
+
+@import "common";
+@import "header";
+@import "footer";
+
+#team_container {
+	position: relative;
+	display: block;
+	width: 890px;
+	padding: 0px 0px 0px 20px;
+	a {
+		color: $dark-blue;
+		&:hover {
+			color: $dark-red;
+			text-decoration:none;
+		}
+	}
+}
+
+.team_top {
+	position: relative;
+	display: block;
+	margin: 0px 0px 30px 40px;
+	width: 820px;
+	height: 141px;
+	background-image: url('/images/../../static/img/team_header.gif');
+}
+
+.team_pict_left {
+	position: relative;
+	display: block;
+	float: left;
+	width: 161px;
+	height: 171px;
+	border: 5px solid #be0c13;
+	margin: 0px 20px 0px 0px;
+}
+
+.team_text_left {
+	position: relative;
+	display: block;
+	float: left;
+	width: 648px;
+	height: 141px;
+	padding: 10px 20px 20px 20px;
+	border: 5px solid #f0a02f;
+	margin: 0px 0px 0px 0px;
+	p {
+		margin: 18px 0px 5px 0px;
+		line-height: 15px;
+		height: 75px;
+		font-size: 13px !important;
+	}
+}
+
+.team_text_left span, .team_text_right span {
+	font-family: 'ArchivoBlack', Impact, "Arial Black", sans-serif;
+	color: #9a1c20;
+	font-size: 24px;
+}
+
+.team_pict_right {
+	position: relative;
+	display: block;
+	float: right;
+	width: 161px;
+	height: 171px;
+	border: 5px solid #be0c13;
+	margin: 0px 0px 0px 20px;
+}
+
+.team_text_right {
+	position: relative;
+	display: block;
+	float: right;
+	width: 648px;
+	height: 141px;
+	padding: 10px 20px 20px 20px;
+	border: 5px solid #f0a02f;
+	margin: 0px 0px 0px 0px;
+	p {
+		margin: 8px 0px 5px 0px;
+		line-height: 16px;
+		height: 75px;
+		font-size: 13px !important;
+	}
+}
+
+.team_block {
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	-o-border-radius: 8px;
+	border-radius: 8px;
+}
+
+.team_spacer {
+	font-size: 0px;
+	width: 0px;
+	height: 30px;
+	clear: both;
+}
+.twitter-position {
+	margin-top: 15px;
+	float: left;
+}
+
+.linkedin-position {
+	margin-right: 20px;
+	margin-top: 2px;
+}
+
+.team_perso_pict_max { background: url('/images/../../static/img/pict_team_max.jpg') no-repeat center; }
+.team_perso_pict_greg { background: url('/images/../../static/img/pict_team_greg.jpg') no-repeat center; }
+.team_perso_pict_thib { background: url('/images/../../static/img/pict_team_thib.jpg') no-repeat center; }
+.team_perso_pict_anthony { background: url('/images/../../static/img/pict_team_anthony.jpg') no-repeat center; }
+.team_perso_pict_thomas { background: url('/images/../../static/img/pict_team_thomas.jpg') no-repeat center; }
+.team_perso_pict_julie { background: url('/images/../../static/img/pict_team_julie.jpg') no-repeat center; }
+.team_perso_pict_pascal { background: url('/images/../../static/img/pict_team_pascal.jpg') no-repeat center; }

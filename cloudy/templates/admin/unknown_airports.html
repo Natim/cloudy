@@ -1,0 +1,14 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}List of unknown airports{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <h1>List of unknown airports codes</h1>
+  <ul>
+  {% for airport in airports %}
+      <li>{{airport.0}} ({{airport.1}})</li>
+  {% endfor %}
+  </ul>
+</div>
+{% endblock %}

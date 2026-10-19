@@ -1,0 +1,8 @@
+[Unit]
+Description=Cloudy qualification alerts
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/www/cloudy
+Environment=DJANGO_SETTINGS_MODULE=cloudy.settings
+ExecStart=/home/www/cloudy/.venv/bin/python manage.py send_qualification_alerts
