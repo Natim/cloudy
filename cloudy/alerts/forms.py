@@ -39,7 +39,8 @@ class QualificationForm(forms.ModelForm):
         "photo",
     ]
 
-    def __init__(self, *args, **kw):
+    def __init__(self, *args, owner=None, **kw):
+        self._owner = owner
         super().__init__(*args, **kw)
 
     qualif_uid = forms.CharField(
@@ -85,13 +86,12 @@ class QualificationForm(forms.ModelForm):
 
     class Meta:
         model = Qualification
-        exclude = ("license_type",)
-        widgets = {
-            "ownr": forms.HiddenInput(),
-        }
+        exclude = ("license_type", "ownr")
 
     def save(self, commit=True):
         instance = super().save(commit=False)
+        if self._owner is not None:
+            instance.ownr = self._owner
 
         qtype = QualificationType.objects.get(pk=self.cleaned_data["qualif_uid"])
 

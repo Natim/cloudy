@@ -8,8 +8,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 # }}}
 # Django imports {{{
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 
 from cloudy.core.models import FileModel
 
@@ -29,20 +30,24 @@ from .models import Aircraft
 
 @login_required
 @fetch_logbook
-# @render_to("aircrafts/index.html")  # TODO
 def index(request, logbook_id):
-    data = {}
     logbook = request.logbook
-    data["logbook"] = logbook
-    data["logbooks"] = request.logbooks  # Because our templates are such a mess
-    data["aircrafts"] = logbook.aircraft_set.all()
-    return data
+    return render(
+        request,
+        "aircrafts/index.html",
+        {
+            "logbook": logbook,
+            "logbooks": request.logbooks,
+            "aircrafts": logbook.aircraft_set.all(),
+        },
+    )
 
 
 @login_required
+@require_POST
 @fetch_logbook
 def delete(request, logbook_id, aircraft_id):
-    aircraft = Aircraft.objects.get(pk=int(aircraft_id))
+    aircraft = get_object_or_404(Aircraft, pk=int(aircraft_id), logbook=request.logbook)
     imma = aircraft.imma
     aircraft.delete()
     messages.success(request, "L'aéronef %s vient d'être supprimé." % imma)
@@ -96,17 +101,16 @@ def form(request, logbook_id, aircraft_id=None):
     aircraft = None
     if aircraft_id is not None:
         aircraft_id = int(aircraft_id)
-        aircraft = Aircraft.objects.get(pk=aircraft_id)
+        aircraft = get_object_or_404(Aircraft, pk=aircraft_id, logbook=request.logbook)
 
     if request.method == "POST":
-        form = AircraftForm(request.POST)
+        form = AircraftForm(request.POST, logbook=request.logbook)
         if aircraft_id is not None:
-            aircraft = Aircraft.objects.get(pk=aircraft_id)
-            form = AircraftForm(request.POST, instance=aircraft)
+            aircraft = get_object_or_404(Aircraft, pk=aircraft_id, logbook=request.logbook)
+            form = AircraftForm(request.POST, instance=aircraft, logbook=request.logbook)
 
         if form.is_valid():
-            obj = form.save(commit=False)
-            obj.save()
+            obj = form.save()
             if len(request.FILES.keys()) > 0:
                 db_file = FileModel(owner=request.user, file=request.FILES["pictures"])
                 db_file.save()
@@ -118,14 +122,10 @@ def form(request, logbook_id, aircraft_id=None):
         if not (request.user.userprofile.has_payed_plan() or request.logbook.aircraft_set.all().count() < 1):
             return redirect(reverse("payment:pcloudy") + "?pack=aircrafts")
 
-        form = AircraftForm(
-            initial={
-                "logbook": request.logbook,
-            }
-        )
+        form = AircraftForm(logbook=request.logbook)
         if aircraft_id is not None:
-            aircraft = Aircraft.objects.get(pk=aircraft_id)
-            form = AircraftForm(instance=aircraft)
+            aircraft = get_object_or_404(Aircraft, pk=aircraft_id, logbook=request.logbook)
+            form = AircraftForm(instance=aircraft, logbook=request.logbook)
 
     data = {
         "logbook": request.logbook,

@@ -38,8 +38,7 @@ class AircraftTest(TestCase):
         resp = self.c.post(reverse("logbooks:aircrafts_form", args=[logbook1.pk]), data, follow=True)
         self.assertEqual(resp.status_code, 200)
         self.assertFormError(
-            resp,
-            "form_craft",
+            resp.context["form_craft"],
             None,
             "Vous ne pouvez pas posséder deux aéronefs avec la même immatriculation sure le même carnet.",
         )
@@ -64,8 +63,7 @@ class AircraftTest(TestCase):
         resp = self.c.post(reverse("logbooks:aircrafts_form", args=[logbook1.pk]), data, follow=True)
         self.assertEqual(resp.status_code, 200)
         self.assertFormError(
-            resp,
-            "form_craft",
+            resp.context["form_craft"],
             None,
             "Vous devez souscrire à l'offre First Class afin de pouvoir enregistrer plus d'un aéronef.",
         )

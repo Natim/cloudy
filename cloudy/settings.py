@@ -107,6 +107,13 @@ MIDDLEWARE = [
 # Django's default same-origin policy omits Referer on OSM tile requests; they 403.
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
+if not DEBUG:
+    SESSION_COOKIE_SECURE = env_bool("DJANGO_SESSION_COOKIE_SECURE", True)
+    CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", True)
+    SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", True)
+    SECURE_HSTS_SECONDS = int(env("DJANGO_SECURE_HSTS_SECONDS", "31536000"))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", True)
+
 ROOT_URLCONF = "cloudy.urls"
 WSGI_APPLICATION = "cloudy.wsgi.application"
 
@@ -170,6 +177,8 @@ CONSTANCE_CONFIG = {
     "DISKSPACE_PAYED_MAXMB": (4000, "Max number of MB of storage for payed plan"),
     "SIGNUP_AUTHORIZED": (True, "Is Signup authorized ?"),
     "MAIL_ON_SUBSCRIBE": (False, "Mail managers when a new user subscribes?"),
+    "BETA": (False, "Apply beta month bonus on First Class activation"),
+    "BETA_MONTH_BONUS": (0, "Extra month balance when BETA is enabled"),
 }
 
 AUTH_PASSWORD_VALIDATORS = [

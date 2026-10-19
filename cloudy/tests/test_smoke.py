@@ -337,7 +337,9 @@ def test_graphs_map_returns_json_array(user_with_profile):
     )
 
     payload = json.dumps({"begin_date": "none", "end_date": "none", "logbook_id": str(logbook.pk)})
-    response = Client().get(reverse("stats:map_places"), {"payload": payload})
+    client = Client()
+    client.login(username="smoke", password="secret")
+    response = client.get(reverse("stats:map_places"), {"payload": payload})
 
     assert response.status_code == 200
     data = response.json()

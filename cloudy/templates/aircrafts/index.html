@@ -32,9 +32,10 @@
                     {% endfor %}
                 </td>
                  <td>
-                    <a href="{% url 'logbooks:aircrafts_delete' logbook.id aircraft.pk %}"
-            rel="Êtes-vous sûr de vouloir définitivement supprimer cet aéronef ?"
-            class='delete icon-delete'>&nbsp;</a>
+                    <form method="post" action="{% url 'logbooks:aircrafts_delete' logbook.id aircraft.pk %}" class="aircraft-delete-form">
+                        {% csrf_token %}
+                        <button type="submit" class="delete icon-delete" title="Supprimer">&nbsp;</button>
+                    </form>
                 </td>
             </tr>
         {% endfor %}
@@ -54,10 +55,9 @@
 
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function(){
-            $('a.delete').click(function() {
-                return confirm($(this).attr('rel'));
+            $('form.aircraft-delete-form').submit(function() {
+                return confirm("Êtes-vous sûr de vouloir définitivement supprimer cet aéronef ?");
             });
-
         });
     </script>
 

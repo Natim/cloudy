@@ -56,12 +56,20 @@ class CloudyRegistrationView(ActivationRegistrationView):
 
 
 def login(request, template_name):
+    from django.utils.http import url_has_allowed_host_and_scheme
+
     redirect_to = request.GET.get("next", reverse("logbooks:home"))
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.login(request):
             redirect_to = request.POST.get("redirect_to", reverse("logbooks:home"))
             if not redirect_to:
+                redirect_to = reverse("logbooks:home")
+            if not url_has_allowed_host_and_scheme(
+                url=redirect_to,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure(),
+            ):
                 redirect_to = reverse("logbooks:home")
             return HttpResponseRedirect(redirect_to)
     else:

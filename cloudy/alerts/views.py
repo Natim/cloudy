@@ -7,7 +7,7 @@ from django.contrib import messages
 # Django imports {{{
 from django.core import serializers
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from cloudy.accounts.decorators import user_has_plan
@@ -133,14 +133,14 @@ def qualification(request, uid=None, qtype="qualification"):
     data = {"qualifications": qualifications}
 
     if uid is not None:
-        qualification = Qualification.objects.get(pk=uid)
+        qualification = get_object_or_404(Qualification, pk=uid, ownr=request.user)
         data["qualification"] = qualification
 
     if request.method == "POST":
-        form = QualificationForm(request.POST, request.FILES)
+        form = QualificationForm(request.POST, request.FILES, owner=request.user)
 
         if uid is not None:
-            form = QualificationForm(request.POST, request.FILES, instance=qualification)
+            form = QualificationForm(request.POST, request.FILES, instance=qualification, owner=request.user)
 
         if form.is_valid():
             form.save()
@@ -151,10 +151,10 @@ def qualification(request, uid=None, qtype="qualification"):
             return HttpResponseRedirect(reverse("alerts:" + qtype))
 
     else:
-        form = QualificationForm(initial={"ownr": request.user})
+        form = QualificationForm(owner=request.user)
 
         if uid is not None:
-            form = QualificationForm(instance=qualification)
+            form = QualificationForm(instance=qualification, owner=request.user)
 
     data["form"] = form
     data["qtype"] = qtype
@@ -187,7 +187,7 @@ def glide(request, uid=None, qtype="glide"):
     form = QualificationGlissanteForm()
 
     if uid is not None:
-        qualification = QualificationGlissante.objects.get(pk=uid)
+        qualification = get_object_or_404(QualificationGlissante, pk=uid, ownr=request.user)
         form = QualificationGlissanteForm(instance=qualification)
 
     if request.method == "POST":

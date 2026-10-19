@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import TestCase
 
+from cloudy.accounts.models import UserProfile
 from cloudy.alerts.models import Alert, Qualification, QualificationType
 from cloudy.core.utils import count_files, patch_settings
 
@@ -19,21 +20,10 @@ SETTINGS = {
 }
 
 
-# Clear the users and profiles database. It's fuckin' dirty, but it's freshen's
-# fault (does not go trough the Django test case with all the database-related
-# sweetness).
-class CleanTestCase(TestCase):
-    def _fixture_setup(self):
-        for u in User.objects.all():
-            u.userprofile.delete()
-            u.delete()
-        return super()._fixture_setup()
-
-
 # Test email alerts ***********************************************************
 
 
-class EmailTest(CleanTestCase):
+class EmailTest(TestCase):
     fixtures = ["accounts.json", "profiles.json", "qualifications.json"]
 
     def setUp(self):
@@ -44,7 +34,7 @@ class EmailTest(CleanTestCase):
 
     def test_email(self):
         # Grab a user
-        user = User.objects.all()[0]
+        user = UserProfile.objects.first().user
 
         # Create a Qualification
         exp = self.today + timedelta(5)
@@ -73,13 +63,14 @@ class EmailTest(CleanTestCase):
         alert.delete()
 
 
-class SMSTest(CleanTestCase):
+class SMSTest(TestCase):
     """SMS alerts are email-only in Django 6; keep fixture coverage via email dispatch."""
 
     fixtures = ["accounts.json", "profiles.json", "qualifications.json"]
 
     def setUp(self):
         system(f"rm -Rf {SMS_PATH} && mkdir -p {SMS_PATH}")
+        system(f"rm -Rf {MAIL_PATH} && mkdir -p {MAIL_PATH}")
 
         self.user = User.objects.all()[1]
 
@@ -119,7 +110,7 @@ class SMSTest(CleanTestCase):
         alert.delete()
 
 
-class AlertsTriggeringTest(CleanTestCase):
+class AlertsTriggeringTest(TestCase):
     fixtures = ["accounts.json", "profiles.json", "qualifications.json"]
 
     def setUp(self):
@@ -129,7 +120,7 @@ class AlertsTriggeringTest(CleanTestCase):
             q.delete()
         for q in Alert.objects.all():
             q.delete()
-        self.user = User.objects.all()[0]
+        self.user = UserProfile.objects.first().user
 
     def test_far_date(self):
         exp = self.today + timedelta(365)

@@ -62,14 +62,6 @@ class UserProfile(models.Model):
 
     cgv_date = models.DateField("Signup CGV", default=date.today)
 
-    def __init__(self, *args, **kwargs):
-        """
-        Add has_book_avion, has_book_* methods to the profile.
-        """
-        for book_type in settings.LOG_BOOKS_TYPE:
-            setattr(self, "has_book_%s" % book_type, self.has_logbook_of_type(book_type))
-        super().__init__(*args, **kwargs)
-
     def __unicode__(self):
         return self.user.get_full_name()
 
@@ -135,16 +127,16 @@ class UserProfile(models.Model):
         """
         if self.plan == 1:
             return -1
-        delta = timezone.now() - self.fplan_switch_date
+        switch_date = self.fplan_switch_date
+        if timezone.is_naive(switch_date):
+            switch_date = timezone.make_aware(switch_date)
+        delta = timezone.now() - switch_date
         return delta.days
 
     def has_logbook_of_type(self, type_name):
-        """
-        Check if the user has a logbook of this type
-        TODO
-        """
-        # raise NotImplementedError
-        return False
+        """True if the user has a visible, non-deleted logbook of this category."""
+        books = LogBookBase.existing_for_user(self.user.pk)
+        return any(book.cat == type_name for book in books)
 
     def logbooks(self, filters={}):
         """

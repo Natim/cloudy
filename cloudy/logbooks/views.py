@@ -8,7 +8,7 @@ from os import path
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ValidationError
+from django.core.exceptions import FieldDoesNotExist, ValidationError
 from django.core.files.base import ContentFile
 from django.forms.utils import ErrorList
 
@@ -19,7 +19,7 @@ from django.shortcuts import redirect, render
 from django.template import defaultfilters
 from django.template.defaultfilters import slugify
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone as django_timezone
 from django.views.decorators.http import require_POST
 
 from cloudy.core.models import FileModel
@@ -47,6 +47,33 @@ from cloudy.logbooks.models import LogBase, LogBookBase
 from cloudy.notifications import services as notification
 from cloudy.time_format import TIME_FORMAT_CHOICES
 from cloudy.utils import json_fail, json_ok
+
+LIVE_EDIT_FORBIDDEN_FIELDS = frozenset(
+    {
+        "id",
+        "pk",
+        "lbook",
+        "lbook_id",
+        "content_type",
+        "content_type_id",
+        "deleted",
+        "visbl",
+        "cdate",
+        "update",
+        "files",
+    }
+)
+
+
+def _live_edit_field_allowed(log, field_name):
+    if field_name in LIVE_EDIT_FORBIDDEN_FIELDS or "." in field_name:
+        return False
+    try:
+        log._meta.get_field(field_name)
+    except FieldDoesNotExist:
+        return False
+    return True
+
 
 # }}}
 
@@ -105,7 +132,10 @@ def home(request, logbook_id=None, page_nbr=None, template="logbooks/home", extr
     if is_empty:
         # This message should be displayed only during the first two months
         # after the user created its logbook.
-        if (datetime.now() - logbook.cdate) < timedelta(days=2 * 31):
+        cdate = logbook.cdate
+        if django_timezone.is_naive(cdate):
+            cdate = django_timezone.make_aware(cdate)
+        if (django_timezone.now() - cdate) < timedelta(days=2 * 31):
             notification.send([request.user], "empty_logbook", {"logbook": logbook})
 
     # Go to the last page if the page number is -1
@@ -162,7 +192,6 @@ def home(request, logbook_id=None, page_nbr=None, template="logbooks/home", extr
     return render(request, template, context)
 
 
-@csrf_exempt
 @login_required
 @require_POST
 def add_log_book(request):
@@ -406,7 +435,6 @@ def parameters(request, logbook_id=None, template="logbooks/parameters.html"):
     )
 
 
-@csrf_exempt
 @login_required
 @fetch_logbook
 def add_log(request, logbook_id, log_id=None, template="logbooks/home"):
@@ -571,6 +599,9 @@ def _edit_live_log(request, logbook_id, log_id):
     new_value = request.POST["val"]
     field = request.POST["field"]
 
+    if not _live_edit_field_allowed(log, field):
+        return json_fail("Champ non modifiable")
+
     if getattr(logbook, "cat", "") == "plane_fcl1080" and field in {
         "departure_place",
         "arrival_place",
@@ -729,8 +760,9 @@ def import_auto(request, logbook_id):
     return render(request, "logbooks/import_auto.html", context)
 
 
-@csrf_exempt
 @login_required
+@require_POST
+@fetch_logbook
 def del_log(request, logbook_id, log_id):
     """
     Flag a log as deleted
