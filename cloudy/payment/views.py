@@ -94,6 +94,9 @@ def stripe_webhook(request):
             ProcessedStripeEvent.objects.create(event_id=event_id, event_type=event_type)
     except IntegrityError:
         return HttpResponse(status=200)
+    except Exception:
+        logger.exception("Stripe webhook handler failed for event %s", event_id)
+        return HttpResponse(status=500)
 
     return HttpResponse(status=200)
 
