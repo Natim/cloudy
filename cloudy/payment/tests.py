@@ -79,6 +79,18 @@ class StripeCheckoutSecurityTestCase(TestCase):
 
     @patch("cloudy.payment.views.stripe.checkout.Session.list_line_items")
     @patch("cloudy.payment.views._activate_first_class")
+    def test_checkout_skips_unpaid_status(self, mock_activate, mock_list):
+        mock_list.return_value = MagicMock(data=[MagicMock(price=MagicMock(id="price_first_class"))])
+        session = {
+            "id": "cs_test",
+            "client_reference_id": str(self.user.id),
+            "payment_status": "unpaid",
+        }
+        _handle_checkout_completed(session)
+        mock_activate.assert_not_called()
+
+    @patch("cloudy.payment.views.stripe.checkout.Session.list_line_items")
+    @patch("cloudy.payment.views._activate_first_class")
     def test_webhook_activates_for_configured_price(self, mock_activate, mock_list):
         mock_list.return_value = MagicMock(data=[MagicMock(price=MagicMock(id="price_first_class"))])
         session = {
@@ -86,6 +98,7 @@ class StripeCheckoutSecurityTestCase(TestCase):
             "client_reference_id": str(self.user.id),
             "customer": "cus_x",
             "subscription": "sub_x",
+            "payment_status": "paid",
         }
         _handle_checkout_completed(session)
         mock_activate.assert_called_once()

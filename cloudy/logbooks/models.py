@@ -167,7 +167,7 @@ class DateHandler:  # {{{
         if not all(map(lambda x: IntHandler.validate(x, opts), chunks)):
             return False
 
-        int_chunks = map(int, chunks)
+        int_chunks = list(map(int, chunks))
 
         try:
             int_chunks.reverse()
@@ -188,7 +188,7 @@ class DateHandler:  # {{{
     def from_csv(cls, x, opts):
         sep = opts["date_separator"]
         chunks = x.split(sep)
-        chunks = map(int, chunks)
+        chunks = list(map(int, chunks))
         chunks.reverse()
         now = datetime.now()
         return now.replace(*chunks)
@@ -475,9 +475,6 @@ class LogBookBase(StatsModelBase):  # TODO
 
         if response["success"]:
             response["count"] = line_num
-            transaction.commit()
-        else:
-            transaction.rollback()
 
         return response
 

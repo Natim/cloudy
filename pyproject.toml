@@ -104,4 +104,8 @@ testpaths = [
     "cloudy/payment",
     "cloudy/time_format",
     "cloudy/core/tests",
+    "cloudy/logbooks",
+    "cloudy/imports",
+    "cloudy/alerts",
+    "cloudy/aircrafts",
 ]

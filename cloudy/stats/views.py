@@ -19,6 +19,7 @@ from datetime import datetime, timedelta
 # Third-party apps {{{
 from dateutil.parser import parse as parse_dateutil
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import Http404, HttpResponse
 
@@ -77,6 +78,29 @@ def airport_for_place(elem):
 redis = Redis(**settings.CONSTANCE_REDIS_CONNECTION)
 
 
+def _logbook_for_request(request, logbook_id):
+    """Return the logbook if the user may read its stats; otherwise raise Http404."""
+    try:
+        logbook = LogBookBase.get_by_id(logbook_id)
+    except LogBookBase.DoesNotExist:
+        raise Http404 from None
+    if logbook is None:
+        raise Http404
+    if not (request.user.is_staff or request.user.is_superuser):
+        if not request.user.is_authenticated or logbook.ownr_id != request.user.id:
+            raise Http404
+    return logbook
+
+
+def _logbook_from_payload(request, request_payload):
+    try:
+        logbook_id = request_payload["logbook_id"]
+    except KeyError as exc:
+        raise Http404 from exc
+    return _logbook_for_request(request, logbook_id)
+
+
+@login_required
 @require_GET
 def airports(request, maximum=5):
     """
@@ -95,11 +119,7 @@ def airports(request, maximum=5):
     # Convert the request payload to a pythonic object
     request_payload = json.loads(request.GET["payload"])
 
-    # Grab the logbook we are dealing with according to the request types
-    actual_logbook = LogBookBase.get_by_id(request_payload["logbook_id"])
-
-    if actual_logbook == None:
-        raise Http404
+    actual_logbook = _logbook_from_payload(request, request_payload)
 
     # Compute the string representation of the time_slice because totals are
     # indexed by repr of time_slice and filters in database.
@@ -143,14 +163,12 @@ def airports(request, maximum=5):
     return HttpResponse(json.dumps(sorted_results))
 
 
+@login_required
 @require_GET
 def map_places(request):
     request_payload = json.loads(request.GET["payload"])
 
-    actual_logbook = LogBookBase.get_by_id(request_payload["logbook_id"])
-
-    if actual_logbook is None:
-        raise Http404
+    actual_logbook = _logbook_from_payload(request, request_payload)
 
     first = (
         None
@@ -204,16 +222,13 @@ def map_places(request):
     return HttpResponse(output, content_type="application/json")
 
 
+@login_required
 @require_GET
 def count_foo(request, max_res=None):
     # Convert the request payload to a Python object
     request_payload = json.loads(request.GET["payload"])
 
-    # Grab the logbook we are dealing with
-    actual_logbook = LogBookBase.get_by_id(request_payload["logbook_id"])
-
-    if actual_logbook == None:
-        raise Http404
+    actual_logbook = _logbook_from_payload(request, request_payload)
 
     # Compute the string representation of the time_slice because totals are
     # indexed by repr of time_slice and filters in database.
@@ -251,6 +266,7 @@ def count_foo(request, max_res=None):
     return HttpResponse(json.dumps(sorted_results))
 
 
+@login_required
 @require_GET
 def get_choices(request):
     """
@@ -267,11 +283,7 @@ def get_choices(request):
     # Convert the request payload to a pythonic object
     request_payload = json.loads(request.GET["payload"])
 
-    # Grab the logbook we are dealing with according to the request types
-    actual_logbook = LogBookBase.get_by_id(request_payload["logbook_id"])
-
-    if actual_logbook == None:
-        raise Http404
+    actual_logbook = _logbook_from_payload(request, request_payload)
 
     # Compute the string representation of the time_slice because totals are
     # indexed by repr of time_slice and filters in database.
@@ -309,6 +321,7 @@ def get_choices(request):
     return HttpResponse(json.dumps(results))
 
 
+@login_required
 @require_GET
 def graphs_data(request):
     """
@@ -334,11 +347,7 @@ def graphs_data(request):
     # Convert the request payload to a pythonic object
     request_payload = json.loads(request.GET["payload"])
 
-    # Grab the logbook we are dealing with according to the request types
-    actual_logbook = LogBookBase.get_by_id(request_payload["logbook_id"])
-
-    if actual_logbook == None:
-        raise Http404
+    actual_logbook = _logbook_from_payload(request, request_payload)
 
     # Compute the string representation of the time_slice because totals are
     # indexed by repr of time_slice and filters in database.

@@ -51,8 +51,12 @@ def create_checkout_session(request):
             line_items=[{"price": price_id, "quantity": 1}],
         )
         return JsonResponse({"sessionId": checkout_session.id})
-    except Exception as exc:
-        return JsonResponse({"error": {"message": str(exc)}}, status=400)
+    except Exception:
+        logger.exception("Stripe checkout session creation failed")
+        return JsonResponse(
+            {"error": {"message": "Unable to start checkout. Please try again later."}},
+            status=400,
+        )
 
 
 @csrf_exempt
@@ -66,11 +70,15 @@ def stripe_webhook(request):
     except ValueError, stripe.error.SignatureVerificationError:
         return HttpResponse(status=400)
 
-    if ProcessedStripeEvent.objects.filter(event_id=event.id).exists():
-        return HttpResponse(status=200)
-
     event_type = event["type"]
     data_object = event["data"]["object"]
+
+    _processed, created = ProcessedStripeEvent.objects.get_or_create(
+        event_id=event.id,
+        defaults={"event_type": event_type},
+    )
+    if not created:
+        return HttpResponse(status=200)
 
     if event_type == "checkout.session.completed":
         _handle_checkout_completed(data_object)
@@ -78,10 +86,7 @@ def stripe_webhook(request):
         _handle_invoice_paid(data_object)
     elif event_type == "customer.subscription.deleted":
         _handle_subscription_deleted(data_object)
-    else:
-        return HttpResponse(status=200)
 
-    ProcessedStripeEvent.objects.create(event_id=event.id, event_type=event_type)
     return HttpResponse(status=200)
 
 
@@ -121,6 +126,12 @@ def _session_has_first_class_price(session: dict) -> bool:
 
 
 def _handle_checkout_completed(session: dict) -> None:
+    if session.get("payment_status") not in (None, "paid"):
+        logger.warning(
+            "Ignoring checkout.session.completed with payment_status=%s",
+            session.get("payment_status"),
+        )
+        return
     user_id = session.get("client_reference_id")
     if not user_id:
         return

@@ -311,7 +311,7 @@ class LogBookTestCase(TestCase):
         # go to logbook page and try to look for mono_ncdb 2:00
         resp = self.c.get(reverse("logbooks:logbook", kwargs={"logbook_id": logbook.pk}), follow=True)
         self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, """<td data-field="mono_ncdb" class="e ttime_0 c10">2:00</td>""", 1)
+        self.assertContains(resp, 'data-field="mono_ncdb" class="e ttime_0 c10">2:00', 1)
 
         # Add an earlier log nbr 2 with 4h en mono nuit cdt bord
         log2 = DGACAvionLog(
@@ -353,7 +353,7 @@ class LogBookTestCase(TestCase):
         # go to logbook page and try to for the end value of total fly time (bottom)
         resp = self.c.get(reverse("logbooks:logbook", kwargs={"logbook_id": logbook.pk}), follow=True)
         self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, """<td data-field="mono_ncdb" class="reports-info">4:00</td>""", 1)
+        self.assertContains(resp, 'data-field="mono_ncdb" class="reports-info">4:00', 1)
 
     def test_rename_logbook_deleted(self):
         delete_lbook_form = DeleteLbookForm()

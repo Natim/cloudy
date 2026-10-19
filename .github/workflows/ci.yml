@@ -70,5 +70,11 @@ jobs:
       - name: Install the project
         run: uv sync --locked --dev
 
+      - name: Django system checks
+        run: uv run python manage.py check --deploy
+
+      - name: Migration drift check
+        run: uv run python manage.py makemigrations --check --dry-run
+
       - name: Pytest
         run: uv run pytest

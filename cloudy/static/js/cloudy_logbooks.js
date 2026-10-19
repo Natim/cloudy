@@ -2,6 +2,22 @@
 /*global $: true, simpleSlide: true, cloudy: true, Mustache: true, cloudyFormBuilder: true, TIME_FORMAT:true, logbookRootUrl: true, logbookId: true, logbookPage:true, qq: true */
 
 
+function cloudyGetCsrfToken() {
+    var name = "csrftoken";
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        var cookies = document.cookie.split(";");
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 /* Hide date and edit over row buttons */
 function clear_row_on_hover_buttons() {
     $("div.date-slip").hide();
@@ -471,8 +487,14 @@ CloudyFormBuilder.prototype.updateLog = function(form, logId, fieldName, fieldVa
     formDataDic += "&field=" + fieldName + "&val=" + fieldVal;
     var instance = this;
 
-    $.post(postUrl, formDataDic,
-         function(data) {
+    $.ajax({
+        type: "POST",
+        url: postUrl,
+        data: formDataDic,
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader("X-CSRFToken", cloudyGetCsrfToken());
+        },
+        success: function(data) {
             if (data.success===true) {
                 instance.td.html(newtdVal);
                 report_times_update();
@@ -485,9 +507,9 @@ CloudyFormBuilder.prototype.updateLog = function(form, logId, fieldName, fieldVa
             if (reload===true) {
                 location.reload();
             }
-         },
-         "json"
-    );
+        },
+        dataType: "json"
+    });
 };
 
 /*
@@ -1121,6 +1143,9 @@ $(document).ready(function() {
             $.ajax({
                 type: "POST",
                 url: postUrl,
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", cloudyGetCsrfToken());
+                },
                 success: function(data) {
                     // reload page
                     location.reload();
