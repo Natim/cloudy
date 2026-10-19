@@ -223,7 +223,6 @@ def append_new_page(elements=[], prev_totals={}, logs=[], show_cuts=True, year_s
     lab.y = 163
     lab.setText("Report _______")
     lab.fontName = "ARIAL"
-    lab.strokeColor = colors.Color(0.1, 0.1, 0.1, 0)
     lab.fillColor = colors.Color(0.1, 0.1, 0.1, 0.8)
     lab.fontSize = 9
     report.add(lab)
@@ -410,7 +409,6 @@ def gen_footer(cummul_totals={}):
     lab.setText(min_to_str(total_m))
     lab.fontName = HAND_FONT
     lab.fontSize = 9
-    lab.strokeColor = colors.Color(0.1, 0.1, 0.1, 0)
     lab.fillColor = colors.Color(0.1, 0.1, 0.1, 0.8)
     draw_canvas.add(lab)
     elements.append(draw_canvas)
@@ -424,7 +422,6 @@ def gen_footer(cummul_totals={}):
     lab.setText(min_to_str(cummul_totals["total_flytime_cdb"]))
     lab.fontName = HAND_FONT
     lab.fontSize = 9
-    lab.strokeColor = colors.Color(0.1, 0.1, 0.1, 0)
     lab.fillColor = colors.Color(0.1, 0.1, 0.1, 0.8)
     draw_canvas.add(lab)
     elements.append(draw_canvas)

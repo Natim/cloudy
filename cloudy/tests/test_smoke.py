@@ -467,6 +467,25 @@ def test_fcl1080_pdf_builds_with_one_log():
     assert buf.getvalue().startswith(b"%PDF")
 
 
+def test_logbook_pdfs_do_not_require_text_outlines(monkeypatch):
+    """Transparent label strokes used to force ReportLab text-to-path, which needs FreeType."""
+    from io import BytesIO
+
+    def _no_text_paths(*args, **kwargs):
+        raise RuntimeError("text2Path should not be used")
+
+    monkeypatch.setattr("reportlab.graphics.charts.textlabels._text2Path", _no_text_paths)
+
+    from cloudy.DGAC_avion_logbook.dgac_avion_pdfgen import gen_carnet_de_vol as avion
+    from cloudy.DGAC_planeur_logbook.dgac_planeur_pdfgen import gen_carnet_de_vol as planeur
+    from cloudy.FFPLUM_ulm_logbook.ffplum_ulm_pdfgen import gen_carnet_de_vol as ulm
+
+    for build in (avion, planeur, ulm):
+        buf = BytesIO()
+        build(http_response=buf, title="test", show_cuts=False, logs=[], reports={})
+        assert buf.getvalue().startswith(b"%PDF")
+
+
 def test_server_error_renders_cloudy_page_without_request_context():
     """Django's 500 handler renders 500.html with an empty context."""
     from django.template.loader import get_template

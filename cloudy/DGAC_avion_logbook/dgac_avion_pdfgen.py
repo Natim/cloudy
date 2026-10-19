@@ -859,7 +859,6 @@ def gen_header_right(prev_totals={}):
     lab.dx = 0
     lab.setText("ARRIVEES\n     I.F.R")
     lab.fontName = "ARIAL"
-    lab.strokeColor = colors.Color(0.26, 0.26, 0.26, 0)
     lab.fillColor = colors.Color(0.26, 0.26, 0.26, 0.9)
     lab.fontSize = 9.5
     ifr.add(lab)

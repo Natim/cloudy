@@ -228,7 +228,6 @@ def append_new_page(elements=[], prev_totals={}, logs=[], show_cuts=True, year_s
     lab.y = 242
     lab.setText("Report .......................................................")
     lab.fontName = "ARIAL"
-    lab.strokeColor = colors.Color(0.1, 0.1, 0.1, 0)
     lab.fillColor = colors.Color(0.1, 0.1, 0.1, 0.9)
     lab.fontSize = 6
     report.add(lab)
