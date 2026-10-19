@@ -395,6 +395,13 @@ def test_logbook_pdf_export_uses_content_type(user_with_profile, monkeypatch):
     assert response.content.startswith(b"%PDF-fake")
 
 
+def test_dgac_avion_pdf_header_closes_reports_paragraph():
+    from cloudy.DGAC_avion_logbook.dgac_avion_pdfgen import gen_header_left
+
+    header = gen_header_left()
+    assert header is not None
+
+
 def test_fcl1080_pdf_builds_empty_logbook():
     from io import BytesIO
 
@@ -458,3 +465,22 @@ def test_fcl1080_pdf_builds_with_one_log():
     buf = BytesIO()
     gen_carnet_de_vol(http_response=buf, title="test", show_cuts=False, logs=[log], reports={})
     assert buf.getvalue().startswith(b"%PDF")
+
+
+def test_server_error_renders_cloudy_page_without_request_context():
+    """Django's 500 handler renders 500.html with an empty context."""
+    from django.template.loader import get_template
+    from django.test import RequestFactory
+    from django.views.defaults import server_error
+
+    html = get_template("500.html").render({})
+    assert "error500" in html
+    assert "Retour à l'accueil" in html
+    assert "Server Error (500)" not in html
+
+    response = server_error(RequestFactory().get("/logbooks/4385/export/pdf/"))
+    assert response.status_code == 500
+    body = response.content.decode()
+    assert 'class="error500"' in body
+    assert "features.css" in body
+    assert "Server Error (500)" not in body

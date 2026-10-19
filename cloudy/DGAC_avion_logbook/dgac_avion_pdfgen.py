@@ -503,7 +503,7 @@ def gen_header_left(prev_totals={}):
     img = Image(ASSETS["ARROW_IMG"], 0.65 * cm, 0.3 * cm)
     stylesheet = getSampleStyleSheet()
     para = Paragraph(
-        """<para align=right spaceb=3 fontSize=7.5 fontName=BIBI color=(.3,.3,.3)><i>Reports.</i>""",
+        """<para align=right spaceb=3 fontSize=7.5 fontName=BIBI color=(.3,.3,.3)><i>Reports.</i></para>""",
         stylesheet["BodyText"],
     )
 

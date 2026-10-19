@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>Cloudy - Erreur 500</title>
+  <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
+  <link href="{% static 'compass/stylesheets/features.css' %}" media="screen, projection" rel="stylesheet" type="text/css">
+  <style>
+    .error500 .return-button {
+      width: auto;
+      padding-right: 22px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body class="public">
+  <div id="wrap">
+    <div id="top-header">
+      <div id="wrap-top-head"></div>
+    </div>
+
+    <div id="header">
+      <div id="logo">
+        <a href="/"><img src="{% static 'img/logo.png' %}" alt="Cloudy"></a>
+      </div>
+      <ul id="header-nav">
+        <li id="lhome"><a href="/">Accueil</a></li>
+        <li id="lfeatures"><a href="/features/">Fonctionnalités</a></li>
+        <li id="lpricing"><a href="/pricing/">Tarifs</a></li>
+        <li id="lsupport"><a href="/support/">Support</a></li>
+      </ul>
+    </div>
+
+    <div class="error500" role="main" aria-label="Erreur 500. Le vol est retardé pour des raisons techniques.">
+      <a class="return-button" href="/">Retour à l'accueil</a>
+    </div>
+
+    <div id="footer">
+      <div id="clouds-bottom"></div>
+      <div class="footer-links">
+        <ul>
+          <li><a href="/press/">Presse</a></li>
+          <li><a href="/pricing/">Tarifs</a></li>
+          <li><a href="/features/">Fonctionnalités</a></li>
+          <li><a href="/support/">Aide / Support</a></li>
+        </ul>
+        <ul class="col-center">
+          <li><a href="/gcu/">Mentions légales</a></li>
+          <li><a href="/contactus/">Contactez-nous</a></li>
+        </ul>
+        <p>Besoin d'aide ? Écrivez nous à <a href="mailto:support@cloudy.fr">support@cloudy.fr</a></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
