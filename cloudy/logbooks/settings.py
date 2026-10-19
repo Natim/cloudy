@@ -9,7 +9,8 @@ MAP = {
     "plane_dgac": DGACAvionLogBook,
     "glider_dgac": DGACPlaneurLogBook,
     "plane_fcl1080": FCL1080LogBook,
-    "helicopter_dgac": DGACAvionLogBook,  # WHAT THE HELL IS THAT? COPTER=PLANE?
+    # Helicopter carnets use the same DGAC avion schema; only cat and templates differ.
+    "helicopter_dgac": DGACAvionLogBook,
     "ulm_ffplum": FFPLUMUlmLogBook,
     "balloon_dgac": DGACBallonLogBook,
     "parachute_cloudy": FFPLogBook,

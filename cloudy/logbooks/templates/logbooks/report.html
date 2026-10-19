@@ -8,7 +8,7 @@
 
 {{ reportform.non_field_errors }}
 
-<form action="{% url 'logbooks:report' logbook_id %}" method="post" enctype='multipart/form-data' id="report-form">
+<form action="{% url 'logbooks:report' logbook.id %}" method="post" enctype='multipart/form-data' id="report-form">
 
   {% csrf_token %}
   {% with reportform as form %}

@@ -56,43 +56,48 @@ from django.utils.translation import gettext as _
 
 class DictionaryField(models.Field):
     description = _("Dictionary object")
-
-    # __metaclass__ = models.SubfieldBase  # TODO ???
+    default_error_messages = {
+        "invalid": _("Value must be a JSON object."),
+    }
 
     def get_internal_type(self):
         return "TextField"
 
-    def to_python(self, value):
-        if value is None:
-            return None
-        elif value == "":
-            return {}
-        elif isinstance(value, str):
-            try:
-                return dict(json.loads(value))
-            except ValueError, TypeError:
-                raise exceptions.ValidationError(self.error_messages["invalid"])
-
+    def _coerce_dict(self, value):
         if isinstance(value, dict):
             return value
-        else:
+        if value is None or value == "":
+            return {}
+        if isinstance(value, str):
+            try:
+                parsed = json.loads(value)
+            except (ValueError, TypeError) as exc:
+                raise exceptions.ValidationError(self.error_messages["invalid"]) from exc
+            if isinstance(parsed, dict):
+                return parsed
+        raise exceptions.ValidationError(self.error_messages["invalid"])
+
+    def to_python(self, value):
+        return self._coerce_dict(value)
+
+    def from_db_value(self, value, expression, connection):
+        # SubfieldBase used to call to_python() on load. Without this, the
+        # column comes back as the stored JSON string and form code crashes
+        # on initial.get().
+        try:
+            return self._coerce_dict(value)
+        except exceptions.ValidationError:
             return {}
 
     def get_prep_value(self, value):
         if not value:
             return ""
-        elif isinstance(value, str):
+        if isinstance(value, str):
             return value
-        else:
-            return json.dumps(value)
+        return json.dumps(value)
 
     def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
-        return self.get_prep_value(value)
-
-    def clean(self, value, model_instance):
-        value = super().clean(value, model_instance)
-        return self.get_prep_value(value)
+        return self.get_prep_value(self.value_from_object(obj))
 
     def formfield(self, **kwargs):
         defaults = {"widget": DictionaryWidget}

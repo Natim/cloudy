@@ -468,10 +468,12 @@ class LogBookBase(StatsModelBase):  # TODO
         except (csv.Error, CSVException) as exp:
             response["success"] = False
             response["message"] = f"Erreur Ligne {line_num}: {exp.msg}"
+            transaction.set_rollback(True)
         except UnicodeDecodeError as exp:
             response["success"] = False
             msg = f"Erreur Ligne {line_num}: {exp}"
             response["message"] = msg
+            transaction.set_rollback(True)
 
         if response["success"]:
             response["count"] = line_num

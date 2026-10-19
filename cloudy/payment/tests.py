@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from cloudy.accounts.models import UserProfile
 from cloudy.payment.models import PaymentOrder, ProcessedStripeEvent
-from cloudy.payment.views import _handle_checkout_completed
+from cloudy.payment.views import _handle_checkout_completed, _handle_invoice_paid
 
 
 class PaymentOrderTestCase(TestCase):
@@ -79,6 +79,21 @@ class StripeCheckoutSecurityTestCase(TestCase):
 
     @patch("cloudy.payment.views.stripe.checkout.Session.list_line_items")
     @patch("cloudy.payment.views._activate_first_class")
+    def test_checkout_skips_missing_payment_status(self, mock_activate, mock_list):
+        mock_list.return_value = MagicMock(data=[MagicMock(price=MagicMock(id="price_first_class"))])
+        session = {
+            "id": "cs_test",
+            "client_reference_id": str(self.user.id),
+            "customer": "cus_x",
+            "subscription": "sub_x",
+        }
+        _handle_checkout_completed(session)
+        mock_activate.assert_not_called()
+        self.user.userprofile.refresh_from_db()
+        self.assertEqual(self.user.userprofile.stripe_customer_id, "cus_x")
+
+    @patch("cloudy.payment.views.stripe.checkout.Session.list_line_items")
+    @patch("cloudy.payment.views._activate_first_class")
     def test_checkout_skips_unpaid_status(self, mock_activate, mock_list):
         mock_list.return_value = MagicMock(data=[MagicMock(price=MagicMock(id="price_first_class"))])
         session = {
@@ -102,3 +117,82 @@ class StripeCheckoutSecurityTestCase(TestCase):
         }
         _handle_checkout_completed(session)
         mock_activate.assert_called_once()
+
+    @patch("cloudy.payment.views._activate_first_class")
+    def test_invoice_paid_activates_eco_plan(self, mock_activate):
+        self.user.userprofile.stripe_customer_id = "cus_invoice"
+        self.user.userprofile.save(update_fields=["stripe_customer_id"])
+        invoice = {
+            "customer": "cus_invoice",
+            "lines": {"data": [{"price": {"id": "price_first_class"}}]},
+        }
+        _handle_invoice_paid(invoice)
+        mock_activate.assert_called_once()
+
+    @patch("cloudy.payment.views._activate_first_class")
+    def test_invoice_paid_renews_first_class_without_reactivate(self, mock_activate):
+        self.user.userprofile.stripe_customer_id = "cus_invoice"
+        self.user.userprofile.plan = 2
+        self.user.userprofile.save(update_fields=["stripe_customer_id", "plan"])
+        invoice = {
+            "customer": "cus_invoice",
+            "lines": {"data": [{"price": {"id": "price_first_class"}}]},
+        }
+        _handle_invoice_paid(invoice)
+        mock_activate.assert_not_called()
+        self.user.userprofile.refresh_from_db()
+        self.assertEqual(self.user.userprofile.plan, 2)
+
+
+@override_settings(
+    STRIPE_FIRST_CLASS_SUBSCRIPTION="price_first_class",
+    STRIPE_API_KEY="sk_test",
+    STRIPE_WEBHOOK_SECRET="whsec_test",
+)
+class StripeWebhookIdempotencyTestCase(TestCase):
+    @patch("cloudy.payment.views.stripe.Webhook.construct_event")
+    @patch("cloudy.payment.views._handle_checkout_completed")
+    def test_webhook_records_event_only_after_handler(self, mock_handle, mock_construct):
+        mock_construct.return_value = {
+            "id": "evt_retry",
+            "type": "checkout.session.completed",
+            "data": {"object": {"id": "cs_test"}},
+        }
+        client = Client()
+        response = client.post(
+            reverse("payment:stripe_webhook"),
+            data=b"{}",
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE="sig",
+        )
+        self.assertEqual(response.status_code, 200)
+        mock_handle.assert_called_once()
+        self.assertEqual(ProcessedStripeEvent.objects.filter(event_id="evt_retry").count(), 1)
+
+    @patch("cloudy.payment.views.stripe.Webhook.construct_event")
+    @patch("cloudy.payment.views._handle_checkout_completed")
+    def test_webhook_retry_after_handler_failure(self, mock_handle, mock_construct):
+        mock_construct.return_value = {
+            "id": "evt_fail",
+            "type": "checkout.session.completed",
+            "data": {"object": {"id": "cs_test"}},
+        }
+        mock_handle.side_effect = [RuntimeError("boom"), None]
+        client = Client()
+        failed = client.post(
+            reverse("payment:stripe_webhook"),
+            data=b"{}",
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE="sig",
+        )
+        self.assertEqual(failed.status_code, 500)
+        self.assertEqual(ProcessedStripeEvent.objects.filter(event_id="evt_fail").count(), 0)
+
+        response = client.post(
+            reverse("payment:stripe_webhook"),
+            data=b"{}",
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE="sig",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(ProcessedStripeEvent.objects.filter(event_id="evt_fail").count(), 1)

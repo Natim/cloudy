@@ -4,6 +4,7 @@ import stripe
 from constance import config
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError, transaction
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -70,22 +71,29 @@ def stripe_webhook(request):
     except ValueError, stripe.error.SignatureVerificationError:
         return HttpResponse(status=400)
 
-    event_type = event["type"]
-    data_object = event["data"]["object"]
+    if isinstance(event, dict):
+        event_id = event["id"]
+        event_type = event["type"]
+        data_object = event["data"]["object"]
+    else:
+        event_id = event.id
+        event_type = event.type
+        data_object = event.data.object
 
-    _processed, created = ProcessedStripeEvent.objects.get_or_create(
-        event_id=event.id,
-        defaults={"event_type": event_type},
-    )
-    if not created:
+    if ProcessedStripeEvent.objects.filter(event_id=event_id).exists():
         return HttpResponse(status=200)
 
-    if event_type == "checkout.session.completed":
-        _handle_checkout_completed(data_object)
-    elif event_type == "invoice.paid":
-        _handle_invoice_paid(data_object)
-    elif event_type == "customer.subscription.deleted":
-        _handle_subscription_deleted(data_object)
+    try:
+        with transaction.atomic():
+            if event_type == "checkout.session.completed":
+                _handle_checkout_completed(data_object)
+            elif event_type == "invoice.paid":
+                _handle_invoice_paid(data_object)
+            elif event_type == "customer.subscription.deleted":
+                _handle_subscription_deleted(data_object)
+            ProcessedStripeEvent.objects.create(event_id=event_id, event_type=event_type)
+    except IntegrityError:
+        return HttpResponse(status=200)
 
     return HttpResponse(status=200)
 
@@ -125,13 +133,35 @@ def _session_has_first_class_price(session: dict) -> bool:
     return False
 
 
+def _price_id_from_line(line: dict) -> str | None:
+    price = line.get("price")
+    if price is None:
+        return None
+    if isinstance(price, str):
+        return price
+    if isinstance(price, dict):
+        return price.get("id")
+    return getattr(price, "id", None)
+
+
+def _invoice_has_first_class_price(invoice: dict) -> bool:
+    expected = settings.STRIPE_FIRST_CLASS_SUBSCRIPTION
+    if not expected:
+        logger.warning("STRIPE_FIRST_CLASS_SUBSCRIPTION not configured")
+        return False
+    lines = invoice.get("lines") or {}
+    if hasattr(lines, "get"):
+        line_items = lines.get("data", [])
+    else:
+        line_items = getattr(lines, "data", [])
+    for line in line_items:
+        price_id = _price_id_from_line(line if isinstance(line, dict) else line)
+        if price_id == expected:
+            return True
+    return False
+
+
 def _handle_checkout_completed(session: dict) -> None:
-    if session.get("payment_status") not in (None, "paid"):
-        logger.warning(
-            "Ignoring checkout.session.completed with payment_status=%s",
-            session.get("payment_status"),
-        )
-        return
     user_id = session.get("client_reference_id")
     if not user_id:
         return
@@ -150,11 +180,22 @@ def _handle_checkout_completed(session: dict) -> None:
         return
 
     profile = user.userprofile
+    update_fields = []
     if session.get("customer"):
         profile.stripe_customer_id = session["customer"]
+        update_fields.append("stripe_customer_id")
     if session.get("subscription"):
         profile.stripe_subscription_id = session["subscription"]
-    profile.save(update_fields=["stripe_customer_id", "stripe_subscription_id"])
+        update_fields.append("stripe_subscription_id")
+    if update_fields:
+        profile.save(update_fields=update_fields)
+
+    if session.get("payment_status") != "paid":
+        logger.warning(
+            "Skipping First Class activation for checkout.session.completed with payment_status=%s",
+            session.get("payment_status"),
+        )
+        return
     _activate_first_class(profile, user)
 
 
@@ -166,6 +207,14 @@ def _handle_invoice_paid(invoice: dict) -> None:
         profile = UserProfile.objects.get(stripe_customer_id=customer_id)
     except UserProfile.DoesNotExist:
         return
+    if not _invoice_has_first_class_price(invoice):
+        return
+
+    user = profile.user
+    if profile.plan != 2:
+        _activate_first_class(profile, user)
+        return
+
     profile.fplan_switch_date = timezone.now()
     profile.save(update_fields=["fplan_switch_date"])
 

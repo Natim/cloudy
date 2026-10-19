@@ -108,4 +108,5 @@ testpaths = [
     "cloudy/imports",
     "cloudy/alerts",
     "cloudy/aircrafts",
+    "cloudy/accounts",
 ]

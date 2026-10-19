@@ -1,15 +1,20 @@
 import re
+import tempfile
 from datetime import datetime
+from pathlib import Path
 
 import redis
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.db import connection
 from django.test import TestCase
 from django.test.client import Client
 from django.urls import reverse
+from django.utils import timezone
 
 from cloudy.accounts.models import UserProfile
 from cloudy.core.utils import contains_html, patch_settings
-from cloudy.DGAC_avion_logbook.models import DGACAvionLog
+from cloudy.DGAC_avion_logbook.models import DGACAvionLog, DGACAvionLogBook
 from cloudy.logbooks.forms import DeleteLbookForm
 from cloudy.logbooks.models import LogBase, LogBookBase
 
@@ -355,6 +360,40 @@ class LogBookTestCase(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'data-field="mono_ncdb" class="reports-info">4:00', 1)
 
+    def test_helicopter_dgac_uses_avion_model_and_template(self):
+        resp = self.c.post(reverse("logbooks:addlogbook"), {"helicopter_dgac": "1"}, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        logbook = LogBookBase.objects.filter(deleted=False).get()
+        self.assertEqual(logbook.cat, "helicopter_dgac")
+        self.assertIsInstance(logbook._cast(), DGACAvionLogBook)
+        detail = self.c.get(reverse("logbooks:logbook", kwargs={"logbook_id": logbook.pk}))
+        self.assertEqual(detail.status_code, 200)
+        self.assertTemplateUsed(detail, "logbooks/home_helicopter_dgac.html")
+
+    def test_csv_import_rolls_back_on_later_error(self):
+        logbook = self._create_logbook()._cast()
+        sample = (
+            Path(__file__).resolve().parents[1]
+            / "imports"
+            / "fixtures"
+            / "csvs"
+            / "AVION"
+            / "import_109_hhmm.csv"
+        )
+        lines = sample.read_text(encoding="utf-8").splitlines()
+        bad_csv = "\n".join([lines[0], lines[1], "bad;row"]) + "\n"
+        tmp_path = None
+        try:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False, encoding="utf-8") as tmp:
+                tmp.write(bad_csv)
+                tmp_path = tmp.name
+            result = logbook.import_from_csv(tmp_path, delimiter=";", time_in_min=False)
+            self.assertFalse(result["success"])
+            self.assertEqual(DGACAvionLog.objects.filter(lbook=logbook).count(), 0)
+        finally:
+            if tmp_path:
+                Path(tmp_path).unlink(missing_ok=True)
+
     def test_rename_logbook_deleted(self):
         delete_lbook_form = DeleteLbookForm()
         logbook = self._create_logbook()
@@ -368,3 +407,34 @@ class LogBookTestCase(TestCase):
         delete_lbook_form.delete(logbook_copy, UserProfile.objects.get(user_id=logbook.ownr_id))
         self.assertEqual(logbook_copy.deleted, True)
         self.assertEqual(logbook_copy.name, "Deleted_Avion DGAC(1)")
+
+
+class ReportPageTests(TestCase):
+    def test_report_page_loads_saved_reports(self):
+        user = User.objects.create_user("pilot", "pilot@example.com", "secret")
+        UserProfile.objects.create(user=user, dob="1990-01-01")
+        logbook = DGACAvionLogBook(ownr=user, name="reports", cat="plane_dgac", update=timezone.now())
+        logbook.reports = {"mono_ncdb": 90, "nbrto": 4}
+        logbook.save()
+
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT reports FROM logbooks_logbookbase WHERE id = %s", [logbook.pk])
+            raw = cursor.fetchone()[0]
+        self.assertIsInstance(raw, str)
+        self.assertIn("mono_ncdb", raw)
+
+        reloaded = DGACAvionLogBook.objects.get(pk=logbook.pk)
+        self.assertEqual(reloaded.reports["mono_ncdb"], 90)
+        self.assertEqual(reloaded.reports["nbrto"], 4)
+
+        client = Client()
+        client.login(username="pilot", password="secret")
+        response = client.get(reverse("logbooks:report", args=[logbook.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f"/logbooks/{logbook.pk}/report/")
+        self.assertContains(response, 'name="mono_ncdb_0"')
+        self.assertContains(response, 'value="1"')
+        self.assertContains(response, 'name="mono_ncdb_1"')
+        self.assertContains(response, 'value="30"')
+        self.assertContains(response, 'name="nbrto"')
+        self.assertContains(response, 'value="4"')
