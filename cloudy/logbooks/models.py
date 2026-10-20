@@ -264,6 +264,10 @@ class LogBookBase(StatsModelBase):  # TODO
     # Selection {{{
     @classmethod
     def _for_user(cls, user):
+        # Accept a user, a user pk, or an anonymous request user.
+        # AnonymousUser is not a row id; querying with it raises TypeError on Django 6.
+        if getattr(user, "is_authenticated", True) is False:
+            return cls.objects.none()
         return (
             LogBookBase.objects.filter(ownr=user)
             .annotate(last_entry=models.Max("logbase__cdate"))
@@ -361,7 +365,7 @@ class LogBookBase(StatsModelBase):  # TODO
             {'success': False, 'message': 'error'}
 
         Csv file should have:
-        - Encoding: UTF-8
+        - Encoding: UTF-8, or Windows-1252 (ANSI) as exported by Aerogest and Excel
         - Text separator: "
         """
 
@@ -432,9 +436,6 @@ class LogBookBase(StatsModelBase):  # TODO
         response = {"success": True}
         rules = self.csv_rules()
 
-        # Prepare the reader object to read the uploaded CSV file.
-        reader = UnicodeReader(pathlib.Path(csv_path).open(), delimiter=delimiter, quotechar='"')
-
         # We count line numbers to provide precise bug reports.
         line_num = 0
 
@@ -444,6 +445,10 @@ class LogBookBase(StatsModelBase):  # TODO
             empty_lines_tpl.append("")
 
         try:
+            # Binary mode so Windows-1252 exports are not decoded as UTF-8 up front.
+            with pathlib.Path(csv_path).open("rb") as raw:
+                reader = UnicodeReader(raw, delimiter=delimiter, quotechar='"')
+
             # We parse each line of the file.
             for row in reader:
                 line_num += 1

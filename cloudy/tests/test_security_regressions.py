@@ -1,12 +1,14 @@
 import json
 
 import pytest
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AnonymousUser, User
 from django.test import Client
 from django.urls import reverse
 
 from cloudy.accounts.models import UserProfile
+from cloudy.aircrafts.models import Aircraft
 from cloudy.DGAC_avion_logbook.models import DGACAvionLogBook
+from cloudy.logbooks.models import LogBookBase
 
 
 @pytest.fixture
@@ -23,6 +25,72 @@ def other_user(db):
     user = User.objects.create_user("other", "other@example.com", "secret")
     UserProfile.objects.create(user=user, dob="1990-01-01")
     return user
+
+
+@pytest.mark.django_db
+def test_existing_for_user_ignores_anonymous_user(db):
+    assert LogBookBase.existing_for_user(AnonymousUser()) == []
+
+
+@pytest.mark.django_db
+def test_existing_for_user_accepts_user_pk(owner_with_logbook):
+    user, logbook = owner_with_logbook
+    books = LogBookBase.existing_for_user(user.pk)
+    assert [book.pk for book in books] == [logbook.pk]
+
+
+@pytest.mark.django_db
+def test_add_log_autocomplete_requires_login(owner_with_logbook):
+    _, logbook = owner_with_logbook
+    response = Client().get(
+        reverse("logbooks:add_log_autocomplete", args=[logbook.pk]),
+        {"term": "974"},
+        HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+    )
+    assert response.status_code == 302
+    assert "/accounts/login/" in response.url
+
+
+@pytest.mark.django_db
+def test_airport_autocomplete_requires_login(owner_with_logbook):
+    _, logbook = owner_with_logbook
+    response = Client().get(
+        reverse("logbooks:airport_autocomplete", args=[logbook.pk]),
+        {"term": "LFPG"},
+        HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+    )
+    assert response.status_code == 302
+    assert "/accounts/login/" in response.url
+
+
+@pytest.mark.django_db
+def test_add_log_autocomplete_returns_matching_aircraft(owner_with_logbook):
+    _, logbook = owner_with_logbook
+    Aircraft.objects.create(logbook=logbook, imma="F-974", type="C172", airport="LFPG")
+    client = Client()
+    client.login(username="owner", password="secret")
+    response = client.get(
+        reverse("logbooks:add_log_autocomplete", args=[logbook.pk]),
+        {"term": "974"},
+        HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+    )
+    assert response.status_code == 200
+    assert json.loads(response.content) == [{"value": "F-974", "type": "C172", "airport": "LFPG"}]
+
+
+@pytest.mark.django_db
+def test_add_log_autocomplete_hides_other_users_aircraft(owner_with_logbook, other_user):
+    _, logbook = owner_with_logbook
+    Aircraft.objects.create(logbook=logbook, imma="F-974", type="C172", airport="LFPG")
+    client = Client()
+    client.login(username="other", password="secret")
+    response = client.get(
+        reverse("logbooks:add_log_autocomplete", args=[logbook.pk]),
+        {"term": "974"},
+        HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+    )
+    assert response.status_code == 200
+    assert json.loads(response.content) == {"success": False, "msg": "Ce carnet n'existe pas"}
 
 
 @pytest.mark.django_db

@@ -2,13 +2,30 @@ import csv
 import io
 
 
+def decode_csv_bytes(data):
+    """Return CSV text from UTF-8 or Windows ANSI (cp1252) bytes.
+
+    Aerogest and French Excel export CSV in cp1252. In that encoding é is the
+    single byte 0xE9, which is not valid UTF-8.
+    """
+    for encoding in ("utf-8-sig", "cp1252"):
+        try:
+            return data.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+    return data.decode("latin-1")
+
+
 class UnicodeReader:
     """CSV reader yielding Unicode strings from an encoded stream."""
 
     def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
         data = f.read()
         if isinstance(data, bytes):
-            data = data.decode(encoding)
+            if encoding in ("utf-8", "utf-8-sig"):
+                data = decode_csv_bytes(data)
+            else:
+                data = data.decode(encoding)
         self.reader = csv.reader(io.StringIO(data), dialect=dialect, **kwds)
 
     def __iter__(self):

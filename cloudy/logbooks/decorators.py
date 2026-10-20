@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 
@@ -16,6 +17,10 @@ def fetch_logbook(f):
     """
 
     def wrap(request, *args, **kwargs):
+        # AnonymousUser has no numeric id. Django 6 rejects it as a foreign key.
+        if not request.user.is_authenticated:
+            return redirect_to_login(request.get_full_path())
+
         # Grab the id of the logbook.
         logbook_id = kwargs.get("logbook_id", None)
 
@@ -140,6 +145,10 @@ def fetch_logbook(f):
     """
 
     def wrap(request, *args, **kwargs):
+        # AnonymousUser has no numeric id. Django 6 rejects it as a foreign key.
+        if not request.user.is_authenticated:
+            return redirect_to_login(request.get_full_path())
+
         # Grab the id of the logbook.
         logbook_id = kwargs.get("logbook_id", None)
 

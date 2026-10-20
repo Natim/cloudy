@@ -54,6 +54,7 @@ def delete(request, logbook_id, aircraft_id):
     return HttpResponseRedirect(reverse("logbooks:aircrafts_index", args=(request.logbook.id,)))
 
 
+@login_required
 @fetch_logbook
 def add_log_autocomplete(request, logbook_id):
     term = request.GET["term"]
@@ -66,6 +67,7 @@ def add_log_autocomplete(request, logbook_id):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
+@login_required
 @fetch_logbook
 def airport_autocomplete(request, logbook_id):
     term = request.GET["term"]

@@ -1,5 +1,8 @@
+import csv
+import io
 import re
 import tempfile
+import unittest
 from datetime import datetime
 from pathlib import Path
 
@@ -15,8 +18,26 @@ from django.utils import timezone
 from cloudy.accounts.models import UserProfile
 from cloudy.core.utils import contains_html, patch_settings
 from cloudy.DGAC_avion_logbook.models import DGACAvionLog, DGACAvionLogBook
+from cloudy.logbooks.csv_import import decode_csv_bytes, UnicodeReader
 from cloudy.logbooks.forms import DeleteLbookForm
 from cloudy.logbooks.models import LogBase, LogBookBase
+
+
+class CsvEncodingTests(unittest.TestCase):
+    def test_windows_1252_accent_is_decoded(self):
+        raw = "Aérodrome départ".encode("cp1252")
+        self.assertIn(b"\xe9", raw)
+        self.assertEqual(decode_csv_bytes(raw), "Aérodrome départ")
+
+    def test_utf8_with_bom_is_decoded(self):
+        raw = "Aérodrome".encode("utf-8-sig")
+        self.assertEqual(decode_csv_bytes(raw), "Aérodrome")
+
+    def test_reader_decodes_windows_1252_stream(self):
+        raw = "Date;Aérodrome\n13/07/2003;Orléans\n".encode("cp1252")
+        rows = list(UnicodeReader(io.BytesIO(raw), delimiter=";"))
+        self.assertEqual(rows[0][1], "Aérodrome")
+        self.assertEqual(rows[1][1], "Orléans")
 
 
 class LogBookTestCase(TestCase):
@@ -390,6 +411,35 @@ class LogBookTestCase(TestCase):
             result = logbook.import_from_csv(tmp_path, delimiter=";", time_in_min=False)
             self.assertFalse(result["success"])
             self.assertEqual(DGACAvionLog.objects.filter(lbook=logbook).count(), 0)
+        finally:
+            if tmp_path:
+                Path(tmp_path).unlink(missing_ok=True)
+
+    def test_csv_import_accepts_windows_1252(self):
+        logbook = self._create_logbook()._cast()
+        sample = (
+            Path(__file__).resolve().parents[1]
+            / "imports"
+            / "fixtures"
+            / "csvs"
+            / "AVION"
+            / "import_109_hhmm.csv"
+        )
+        with sample.open(encoding="utf-8") as sample_file:
+            rows = list(csv.reader(sample_file, delimiter=";"))
+        rows[1][24] = "Orléans"
+        text = "\n".join(";".join(row) for row in rows) + "\n"
+        raw = text.encode("cp1252")
+        self.assertIn(b"\xe9", raw)
+        tmp_path = None
+        try:
+            with tempfile.NamedTemporaryFile(mode="wb", suffix=".csv", delete=False) as tmp:
+                tmp.write(raw)
+                tmp_path = tmp.name
+            result = logbook.import_from_csv(tmp_path, delimiter=";", time_in_min=False)
+            self.assertTrue(result["success"], result.get("message"))
+            imported = DGACAvionLog.objects.get(lbook=logbook, aeronef_imma="C-FCFM")
+            self.assertEqual(imported.airpdep, "Orléans")
         finally:
             if tmp_path:
                 Path(tmp_path).unlink(missing_ok=True)
