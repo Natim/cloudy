@@ -117,17 +117,27 @@ def traversal(original_object, path):
     return base
 
 
+# Preset ranges use yyyy/MM/dd. The custom picker is an HTML date input (yyyy-MM-dd).
+# French day-first dates are accepted last so they do not steal year-first values.
+_RANGE_DATE_FORMATS = ("%Y/%m/%d", "%Y-%m-%d", "%d/%m/%Y")
+
+
+def _parse_range_date(value):
+    if value == "none":
+        return None
+    for date_format in _RANGE_DATE_FORMATS:
+        try:
+            return datetime.strptime(value, date_format)
+        except ValueError:
+            continue
+    return parse_dateutil(value, dayfirst=True)
+
+
 def convert_str_to_date(begin_date, end_date):
-    if isinstance(begin_date.__class__, str):
-        if begin_date == "none":
-            begin_date = None
-        else:
-            begin_date = parse_dateutil(begin_date, dayfirst=True)
-    if isinstance(end_date.__class__, str):
-        if end_date == "none":
-            end_date = None
-        else:
-            end_date = parse_dateutil(end_date, dayfirst=True)
+    if isinstance(begin_date, str):
+        begin_date = _parse_range_date(begin_date)
+    if isinstance(end_date, str):
+        end_date = _parse_range_date(end_date)
 
     return begin_date, end_date
 

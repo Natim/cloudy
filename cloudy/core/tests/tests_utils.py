@@ -1,6 +1,21 @@
+from datetime import datetime
+
 import pytest
 
 from cloudy.core import utils
+
+
+def test_convert_str_to_date_parses_slash_and_iso_dates():
+    begin, end = utils.convert_str_to_date("2025/10/20", "2026-01-02")
+    assert begin == datetime(2025, 10, 20)
+    assert end == datetime(2026, 1, 2)
+    assert utils.convert_str_to_date("20/10/2025", None)[0] == datetime(2025, 10, 20)
+
+
+def test_convert_str_to_date_keeps_datetimes_and_none():
+    begin = datetime(2024, 3, 1, 12, 0)
+    assert utils.convert_str_to_date(begin, None) == (begin, None)
+    assert utils.convert_str_to_date("none", "none") == (None, None)
 
 
 def test_get_valid_name():

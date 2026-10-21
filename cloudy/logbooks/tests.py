@@ -278,6 +278,14 @@ class LogBookTestCase(TestCase):
         self.assertEqual(log1_cdate, new_log1_cdate)
         self.assertEqual(log1_date, new_log1_date)
 
+    def test_totals_accepts_slash_begin_date(self):
+        logbook = self._create_logbook()
+        resp = self.c.get(
+            reverse("logbooks:totals", kwargs={"logbook_id": logbook.pk}),
+            {"select": "1year", "begin_date": "2025/10/20"},
+        )
+        self.assertEqual(resp.status_code, 200)
+
     def test_report_totals_no_cache(self):
         # Create a log book
         patch_settings(CACHING=False)

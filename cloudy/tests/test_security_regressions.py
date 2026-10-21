@@ -64,6 +64,20 @@ def test_airport_autocomplete_requires_login(owner_with_logbook):
 
 
 @pytest.mark.django_db
+def test_airport_autocomplete_is_not_captured_as_aircraft_id(owner_with_logbook):
+    _, logbook = owner_with_logbook
+    client = Client()
+    client.login(username="owner", password="secret")
+    response = client.get(
+        reverse("logbooks:airport_autocomplete", args=[logbook.pk]),
+        {"term": "cambaie"},
+        HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+    )
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+@pytest.mark.django_db
 def test_add_log_autocomplete_returns_matching_aircraft(owner_with_logbook):
     _, logbook = owner_with_logbook
     Aircraft.objects.create(logbook=logbook, imma="F-974", type="C172", airport="LFPG")

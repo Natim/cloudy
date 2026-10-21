@@ -63,12 +63,12 @@ urlpatterns += [
         {"aircraft_id": None},
         name="aircrafts_form",
     ),
-    path("<logbook_id>/aircrafts/form/<aircraft_id>/", aircrafts_views.form, name="aircrafts_form"),
     path(
         "<logbook_id>/aircrafts/form/airport_autocomplete/",
         aircrafts_views.airport_autocomplete,
         name="airport_autocomplete",
     ),
+    path("<logbook_id>/aircrafts/form/<int:aircraft_id>/", aircrafts_views.form, name="aircrafts_form"),
     path(
         "<logbook_id>/aircrafts/delete/<aircraft_id>/",
         aircrafts_views.delete,
