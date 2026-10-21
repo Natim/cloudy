@@ -3983,6 +3983,37 @@ a#mmiles {
     margin: 12px 0px 0px 5px;
 }
 
+#add-log-popup .body form .fieldwrapper.count-takeoffs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    grid-auto-flow: column;
+    column-gap: 8px;
+    row-gap: 4px;
+}
+
+#add-log-popup .body form .fieldwrapper.count-takeoffs .tol-pair {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    min-width: 0;
+}
+
+#add-log-popup .body form .fieldwrapper.count-takeoffs .tol-pair label {
+    float: none;
+    flex: 0 0 100px;
+    width: 100px;
+    margin: 4px 8px 0 0;
+}
+
+#add-log-popup .body form .fieldwrapper.count-takeoffs .tol-pair .input-small {
+    float: none;
+}
+
+#add-log-popup .body form .fieldwrapper.count-takeoffs .tol-pair .errorlist {
+    flex-basis: 100%;
+}
+
 /* line 493, ../src/logbook_popups.scss */
 #add-log-popup ul.tabs {
     margin: 10px 0px 0px 0px !important;

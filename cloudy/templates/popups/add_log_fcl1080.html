@@ -115,23 +115,27 @@
 
         <div class="box-form">
           <h3>Count Takeoffs/Landings</h3>
-          <div class="fieldwrapper">
-            <label for="id_{{form.take_off_day.name}}">{{ form.take_off_day.label|capfirst }}</label>
-            {{ form.take_off_day }}
-            {{ form.take_off_day.errors }}
-
-            <label for="id_{{form.take_off_night.name}}">{{ form.take_off_night.label|capfirst }}</label>
-            {{ form.take_off_night }}
-            {{ form.take_off_night.errors }}
-          </div>
-          <div class="fieldwrapper">
-            <label for="id_{{form.landing_day.name}}">{{ form.landing_day.label|capfirst }}</label>
-            {{ form.landing_day }}
-            {{ form.landing_day.errors }}
-
-            <label for="id_{{form.landing_night.name}}">{{ form.landing_night.label|capfirst }}</label>
-            {{ form.landing_night }}
-            {{ form.landing_night.errors }}
+          <div class="fieldwrapper count-takeoffs">
+            <div class="tol-pair">
+              <label for="id_{{form.take_off_day.name}}">{{ form.take_off_day.label|capfirst }}</label>
+              {{ form.take_off_day }}
+              {{ form.take_off_day.errors }}
+            </div>
+            <div class="tol-pair">
+              <label for="id_{{form.landing_day.name}}">{{ form.landing_day.label|capfirst }}</label>
+              {{ form.landing_day }}
+              {{ form.landing_day.errors }}
+            </div>
+            <div class="tol-pair">
+              <label for="id_{{form.take_off_night.name}}">{{ form.take_off_night.label|capfirst }}</label>
+              {{ form.take_off_night }}
+              {{ form.take_off_night.errors }}
+            </div>
+            <div class="tol-pair">
+              <label for="id_{{form.landing_night.name}}">{{ form.landing_night.label|capfirst }}</label>
+              {{ form.landing_night }}
+              {{ form.landing_night.errors }}
+            </div>
           </div>
           <div class="spacer"></div>
         </div>
