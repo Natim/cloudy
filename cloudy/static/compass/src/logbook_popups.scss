@@ -452,6 +452,21 @@
           float: none;
           width: 50px;
         }
+        .radio-inline {
+          display: inline-block;
+          white-space: nowrap;
+          vertical-align: middle;
+          margin: 6px 16px 0 0;
+
+          .label-radio {
+            float: none;
+            width: auto;
+            margin: 0;
+            text-align: left;
+            font-weight: normal;
+            vertical-align: middle;
+          }
+        }
         label {
           font-weight: bold;
           text-align:right;

@@ -33,3 +33,4 @@ class HorizontalRadioSelect(forms.RadioSelect):
     """
 
     template_name = "core/widgets/horizontal_radio.html"
+    option_template_name = "core/widgets/horizontal_radio_option.html"

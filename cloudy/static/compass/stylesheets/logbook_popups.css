@@ -3910,6 +3910,22 @@ a#mmiles {
     width: 50px;
 }
 
+#add-log-popup .body form .fieldwrapper .radio-inline {
+    display: inline-block;
+    white-space: nowrap;
+    vertical-align: middle;
+    margin: 6px 16px 0 0;
+}
+
+#add-log-popup .body form .fieldwrapper .radio-inline .label-radio {
+    float: none;
+    width: auto;
+    margin: 0;
+    text-align: left;
+    font-weight: normal;
+    vertical-align: middle;
+}
+
 /* line 455, ../src/logbook_popups.scss */
 #add-log-popup .body form .fieldwrapper label {
     font-weight: bold;

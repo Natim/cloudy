@@ -56,20 +56,20 @@
           <h3>Aircraft</h3>
 
           <div class="fieldwrapper">
-            <label for="id_{{form.aircraft_type.name}}">{{ form.aircraft_type.label|capfirst }}<span
-                class='required'>*</span></label>
-            <div class="ui-widget">
-              {{ form.aircraft_type }}
-            </div>
-            {{ form.aircraft_type.errors }}
-          </div>
-          <div class="fieldwrapper">
             <label for="id_{{form.aircraft_imma.name}}">{{ form.aircraft_imma.label|capfirst }}<span
                 class='required'>*</span></label>
             <div class="ui-widget">
               {{ form.aircraft_imma }}
             </div>
             {{ form.aircraft_imma.errors }}
+          </div>
+          <div class="fieldwrapper">
+            <label for="id_{{form.aircraft_type.name}}">{{ form.aircraft_type.label|capfirst }}<span
+                class='required'>*</span></label>
+            <div class="ui-widget">
+              {{ form.aircraft_type }}
+            </div>
+            {{ form.aircraft_type.errors }}
           </div>
           <div class="spacer"></div>
         </div>

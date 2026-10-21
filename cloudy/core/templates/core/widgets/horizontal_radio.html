@@ -3,7 +3,10 @@ Radio buttons rendered inline, each followed by its label, replacing the old
 HorizRadioRenderer. Lives in an app-level templates directory because the default
 form renderer (django.forms.renderers.DjangoTemplates) searches app template dirs
 but not the project-wide TEMPLATES DIRS.
+
+The option template already emits the <input> and its label. Do not add a second
+label here: that text was stacking over the radios in the FCL.1080 flight form.
 {% endcomment %}
 {% spaceless %}
-{% for group, options, index in widget.optgroups %}{% for option in options %}<span class="radio-inline">{% include option.template_name with widget=option %}<label for="{{ option.attrs.id }}" class="label-radio">{{ option.label }}</label></span>{% endfor %}{% endfor %}
+{% for group, options, index in widget.optgroups %}{% for option in options %}<span class="radio-inline">{% include option.template_name with widget=option %}</span>{% endfor %}{% endfor %}
 {% endspaceless %}
