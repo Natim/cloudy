@@ -1,7 +1,5 @@
 """Django view bridging WSGI requests to the MCP Streamable HTTP ASGI app."""
 
-from __future__ import annotations
-
 from asgiref.sync import async_to_sync
 from django.http import HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt

@@ -1,19 +1,20 @@
-"""MCP tools for pilot-scoped logbook statistics."""
+"""MCP tools for pilot-scoped logbook data and statistics."""
 
-from __future__ import annotations
-
+from datetime import datetime
 from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
-from cloudy.logbooks.models import LogBookBase
+from cloudy.aircrafts.models import Aircraft
+from cloudy.logbooks.models import LogBase, LogBookBase
 from cloudy.stats import service
 from cloudy.stats.service import LogbookAccessError
 
 from .auth import get_api_user
 from .logbooks_access import logbook_to_dict
+from .serialization import aircraft_to_dict, log_to_api_dict
 
-mcp = MCPServer("cloudy-logbook-stats")
+mcp = MCPServer("cloudy-logbook")
 
 
 def _user():
@@ -28,6 +29,53 @@ def list_logbooks() -> list[dict[str, Any]]:
     """List logbooks owned by the authenticated pilot."""
     user = _user()
     return [logbook_to_dict(b) for b in LogBookBase.active_for_user(user.pk)]
+
+
+@mcp.tool()
+def get_logbook(logbook_id: int) -> dict[str, Any]:
+    """Return one logbook by id (must belong to the authenticated pilot)."""
+    user = _user()
+    logbook = service.logbook_for_user(user, logbook_id)
+    return logbook_to_dict(logbook)
+
+
+@mcp.tool()
+def list_aircraft(logbook_id: int) -> list[dict[str, Any]]:
+    """List aircraft registered on a logbook."""
+    user = _user()
+    logbook = service.logbook_for_user(user, logbook_id)
+    return [aircraft_to_dict(a) for a in Aircraft.objects.filter(logbook=logbook)]
+
+
+@mcp.tool()
+def list_logs(
+    logbook_id: int,
+    date_from: str = "",
+    date_to: str = "",
+    limit: int = 50,
+    offset: int = 0,
+) -> list[dict[str, Any]]:
+    """List logbook entries (newest first), with optional ISO date filters."""
+    user = _user()
+    logbook = service.logbook_for_user(user, logbook_id)
+    start = datetime.fromisoformat(date_from) if date_from else None
+    end = datetime.fromisoformat(date_to) if date_to else None
+    limit = max(1, min(limit, 200))
+    offset = max(0, offset)
+    qs = logbook.logs_qs(time_slice=(start, end)).order_by("-date")
+    page = qs[offset : offset + limit]
+    return [log_to_api_dict(row._cast().to_json(serialize=False)) for row in page]
+
+
+@mcp.tool()
+def get_log(logbook_id: int, log_id: int) -> dict[str, Any]:
+    """Return a single logbook entry by id."""
+    user = _user()
+    logbook = service.logbook_for_user(user, logbook_id)
+    log = LogBase.get_by_id(log_id)
+    if log is None or log.lbook_id != logbook.id or log.deleted:
+        raise LogbookAccessError("Log not found")
+    return log_to_api_dict(log._cast().to_json(serialize=False))
 
 
 @mcp.tool()

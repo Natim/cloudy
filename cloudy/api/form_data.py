@@ -1,7 +1,5 @@
 """Map API JSON (model json_rules shape) to Django log forms."""
 
-from __future__ import annotations
-
 from datetime import datetime
 from typing import Any
 
@@ -10,6 +8,8 @@ from django.http import QueryDict
 
 from cloudy.logbooks.models import LogBase, LogBookBase
 from cloudy.time_format.formatters import HhmmFormatter, TenthFormatter
+
+from .serialization import normalize_log_body
 
 READONLY_LOG_FIELDS = frozenset({"id", "lbook", "cdate", "update", "deleted", "files", "visbl"})
 
@@ -128,6 +128,7 @@ def body_to_form_data(logbook: LogBookBase, body: dict[str, Any], log: LogBase |
 
 
 def save_log_from_api(user, logbook: LogBookBase, body: dict[str, Any], log: LogBase | None = None):
+    body = normalize_log_body(body, logbook.cat)
     form_class = logbook._log_form_model()
     post = body_to_form_data(logbook, body, log=log)
     form = form_class(logbook, post, log=log)

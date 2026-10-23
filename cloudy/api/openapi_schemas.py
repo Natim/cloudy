@@ -1,10 +1,10 @@
 """Build OpenAPI component schemas from log json_rules()."""
 
-from __future__ import annotations
-
 from typing import Any
 
 from cloudy.logbooks import settings as book_settings
+
+from .serialization import MODEL_TO_API
 
 _JSON_TYPE_MAP = {
     "string": {"type": "string"},
@@ -37,13 +37,18 @@ def log_schema_for_cat(cat: str, *, write: bool = False) -> dict[str, Any]:
             "visbl",
         }:
             continue
+        api_name = MODEL_TO_API.get(name, name)
         prop = dict(_JSON_TYPE_MAP.get(rtype, {"type": "string"}))
-        properties[name] = prop
+        properties[api_name] = prop
         if write and name in {"date", "optional_filter"}:
-            required.append(name)
+            required.append(api_name if name == "date" else name)
+    if write and "flight_date" in properties:
+        required = [k for k in required if k != "date"]
+        if "flight_date" not in required:
+            required.append("flight_date")
     schema: dict[str, Any] = {"type": "object", "properties": properties}
     if required:
-        schema["required"] = required
+        schema["required"] = sorted(set(required))
     return schema
 
 
@@ -57,12 +62,12 @@ def enrich_openapi_schema(schema: dict[str, Any]) -> dict[str, Any]:
         "properties": {
             "id": {"type": "integer"},
             "name": {"type": "string"},
-            "cat": {"type": "string"},
+            "category": {"type": "string"},
             "time_format": {"type": "integer"},
             "height_format": {"type": "integer"},
-            "cdate": {"type": "string", "format": "date-time"},
-            "update": {"type": "string", "format": "date-time"},
-            "visbl": {"type": "boolean"},
+            "created_at": {"type": "string", "format": "date-time"},
+            "updated_at": {"type": "string", "format": "date-time"},
+            "visible": {"type": "boolean"},
             "deleted": {"type": "boolean"},
         },
     }

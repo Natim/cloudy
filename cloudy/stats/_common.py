@@ -1,7 +1,5 @@
 """Helpers shared by stats views and service layer."""
 
-from __future__ import annotations
-
 import calendar
 from datetime import datetime, timedelta
 

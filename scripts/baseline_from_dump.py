@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """Extract per-table INSERT counts from a pg_dump SQL file (baseline for verification)."""
 
-from __future__ import annotations
-
 import gzip
 import re
 import sys
