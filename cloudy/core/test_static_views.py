@@ -76,6 +76,7 @@ class StaticViewsTestCase(TestCase):
         body = resp.content.decode()
         self.assertIn("Fly Green Aviation", body)
         self.assertIn("mûrissement", body)
+        self.assertIn("parcourez l’Europe à deux", body)
         self.assertIn("https://www.fly-green-aviation.com/", body)
 
     def test_air_avion(self):
