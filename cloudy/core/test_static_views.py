@@ -69,6 +69,16 @@ class StaticViewsTestCase(TestCase):
         resp = self.c.get(url)
         self.assertEqual(resp.status_code, 200)
 
+    def test_fly_green_aviation(self):
+        url = reverse("fly_green_aviation")
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 200)
+        body = resp.content.decode()
+        self.assertIn("Fly Green Aviation", body)
+        self.assertIn("mûrissement", body)
+        self.assertIn("parcourez l’Europe à deux", body)
+        self.assertIn("https://www.fly-green-aviation.com/", body)
+
     def test_air_avion(self):
         url = reverse("landing", kwargs={"aeronef": "avion"})
         resp = self.c.get(url)

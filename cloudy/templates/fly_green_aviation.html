@@ -1,0 +1,67 @@
+{% extends "site_base_public.html" %}
+
+{% load static %}
+{% load compress %}
+{% load quotes_tags %}
+
+{% block title %}Fly Green Aviation{% endblock %}
+{% block body_id %}fly-green-aviation{% endblock %}
+
+{% block head %}
+<link href="{% static 'compass/stylesheets/features.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<script type="text/javascript" src="{% static 'js/cloudy_home.js' %}"></script>
+{% endblock %}
+
+{% block main %}
+<div id="main">
+  <div id="features-top">
+    <div class="buttons">
+      <a id="signup-button" href="# TODO {# url 'register' #}"><span class="txt"></span></a>
+    </div>
+    <div class="buttons"></div>
+    <div id="paper-plane"></div>
+  </div>
+
+  <div id="features-third">
+    <div class="box-top"></div>
+    <div class="box-main">
+      <div class="content">
+        <h2>Cloudy, un service Fly Green Aviation</h2>
+        <p>
+          Cloudy est le carnet de vol en ligne simple et sécurisé que vous utilisez sur
+          <a href="/">www.cloudy.fr</a>. Ce service est réalisé par
+          <a href="https://www.fly-green-aviation.com/" rel="noopener noreferrer">Fly Green Aviation</a>,
+          une société basée à Rennes qui partage la même passion du vol et du pilotage.
+        </p>
+
+        <h2>Fly Green Aviation</h2>
+        <p>
+          Fly Green Aviation propose une aviation légère plus sobre et accessible au départ de Rennes
+          Saint-Jacques. L’équipe met à disposition des avions récents et économes en carburant, notamment le
+          Dynamic WT9 LSA et le Lightwing AC4, notamment pour :
+        </p>
+        <ul style="font-size: 14px; color: #454545; padding-left: 25px;">
+          <li>
+            <strong>Le mûrissement</strong> : une fois lâché avec instructeur, louer l’appareil à l’heure pour
+            consolider votre expérience, entretenir vos compétences et partir en navigation.
+          </li>
+          <li>
+            <strong>La formation des pilotes</strong> : vols d’initiation, préparation au brevet ULM ou à la licence
+            de pilote privé, avec un instructeur à vos côtés.
+          </li>
+          <li>
+            <strong>Le voyage</strong> : louez l’avion pour une semaine ou quinze jours et parcourez l’Europe à deux,
+            à bord d’un biplace rapide et économe.
+          </li>
+        </ul>
+        <p>
+          Pour découvrir les aéronefs, la formation, une location ou un séjour vol, rendez-vous sur le site de
+          <a href="https://www.fly-green-aviation.com/" rel="noopener noreferrer">Fly Green Aviation</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="box-bottom"></div>
+</div>
+{% endblock %}
