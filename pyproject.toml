@@ -15,10 +15,12 @@ dependencies = [
     "django-analytical",
     "django-compressor",
     "django-constance[redis]",
+    "django-ninja",
     "django-registration",
     "fdemmer-easy-thumbnails",
     "gunicorn",
     "hiredis",
+    "mcp",
     "pillow",
     "psycopg[binary]",
     "python-dateutil",
@@ -83,7 +85,7 @@ ignore = [
     "UP032",
     "UP047",
 ]
-select = ["F", "I", "E4", "E7", "E9", "W6"]
+select = ["F", "I", "E4", "E7", "E9", "W6", "UP010", "TID251"]
 
 [tool.ruff.lint.per-file-ignores]
 "**/migrations/*" = ["E501", "RUF012"]
@@ -94,6 +96,9 @@ known-first-party = ["cloudy"]
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "parents"
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"__future__.annotations" = { msg = "Python 3.14 evaluates annotations lazily (PEP 649); do not import annotations from __future__." }
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "cloudy.settings"
@@ -109,4 +114,5 @@ testpaths = [
     "cloudy/alerts",
     "cloudy/aircrafts",
     "cloudy/accounts",
+    "cloudy/api",
 ]

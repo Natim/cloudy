@@ -4,8 +4,6 @@ Convert DGAC Avion log entries to FCL 1.080 field values.
 Used when duplicating a plane_dgac logbook into plane_fcl1080.
 """
 
-from __future__ import annotations
-
 import re
 from typing import Any
 
