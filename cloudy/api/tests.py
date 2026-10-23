@@ -5,10 +5,15 @@ from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 
-from cloudy.api.auth import set_api_user
+from cloudy.api.auth import issue_access_token, set_api_user
 from cloudy.api.mcp_server import get_totals
 from cloudy.DGAC_avion_logbook.models import DGACAvionLogBook
 from cloudy.stats.service import get_named_totals, LogbookAccessError
+
+
+def bearer_headers(user: User) -> dict[str, str]:
+    token, _expires = issue_access_token(user)
+    return {"HTTP_AUTHORIZATION": f"Bearer {token}"}
 
 
 class ApiAuthTests(TestCase):
@@ -16,6 +21,7 @@ class ApiAuthTests(TestCase):
 
     def setUp(self):
         self.client = Client()
+        self.pilot = User.objects.get(email="pilot@example.com")
 
     def test_token_and_bearer(self):
         resp = self.client.post(
@@ -24,13 +30,22 @@ class ApiAuthTests(TestCase):
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, 200)
-        api_key = resp.json()["api_key"]
-        self.assertEqual(api_key, "TEST_API_KEY")
+        body = resp.json()
+        self.assertEqual(body["user_id"], self.pilot.pk)
+        self.assertEqual(body["token_type"], "bearer")
+        self.assertIn("access_token", body)
+        self.assertGreater(body["expires_in"], 0)
 
         bad = self.client.get("/api/v1/logbooks", HTTP_AUTHORIZATION="Bearer invalid")
         self.assertEqual(bad.status_code, 401)
 
-        ok = self.client.get("/api/v1/logbooks", HTTP_AUTHORIZATION=f"Bearer {api_key}")
+        legacy = self.client.get("/api/v1/logbooks", HTTP_AUTHORIZATION="Bearer TEST_API_KEY")
+        self.assertEqual(legacy.status_code, 401)
+
+        ok = self.client.get(
+            "/api/v1/logbooks",
+            HTTP_AUTHORIZATION=f"Bearer {body['access_token']}",
+        )
         self.assertEqual(ok.status_code, 200)
 
 
@@ -39,8 +54,8 @@ class ApiLogbookTests(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.headers = {"HTTP_AUTHORIZATION": "Bearer TEST_API_KEY"}
         self.user = User.objects.get(email="pilot@example.com")
+        self.headers = bearer_headers(self.user)
 
     def _create_book(self, cat="plane_dgac"):
         resp = self.client.post(
@@ -114,7 +129,8 @@ class ApiLogbookTests(TestCase):
         self.assertEqual(resp.status_code, 201, resp.content)
 
     def test_aircraft_eco_limit(self):
-        simple_headers = {"HTTP_AUTHORIZATION": "Bearer TEST_API_KEY_BIS"}
+        simple = User.objects.get(email="simple@example.com")
+        simple_headers = bearer_headers(simple)
         book = self.client.post(
             "/api/v1/logbooks",
             data=json.dumps({"cat": "plane_dgac"}),

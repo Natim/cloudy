@@ -7,7 +7,10 @@ class TokenIn(Schema):
 
 
 class TokenOut(Schema):
-    api_key: str
+    access_token: str
+    token_type: str = "bearer"
+    expires_in: int
+    user_id: int
 
 
 class LogbookCreateIn(Schema):

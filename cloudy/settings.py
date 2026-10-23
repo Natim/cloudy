@@ -43,6 +43,9 @@ ALLOWED_HOSTS = env(
     "DJANGO_ALLOWED_HOSTS", "www.cloudy.fr,cloudy.fr,api.cloudy.fr,localhost,127.0.0.1"
 ).split(",")
 
+# Mobile API / MCP JWT (HS256, signed with SECRET_KEY).
+API_JWT_EXPIRY_SECONDS = int(env("API_JWT_EXPIRY_SECONDS", str(60 * 60 * 24 * 30)))
+
 ADMINS = ["contact@cloudy.fr"]
 MANAGERS = ["contact@cloudy.fr"]
 UNKNOWN_AIRPORTS_CONTACTS = ["contact@cloudy.fr"]

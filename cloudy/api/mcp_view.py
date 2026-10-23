@@ -48,7 +48,7 @@ def _build_scope(request, path: str) -> dict:
 def mcp_endpoint(request):
     user = authenticate_bearer(request)
     if user is None:
-        return HttpResponseForbidden("Invalid or missing API key")
+        return HttpResponseForbidden("Invalid or missing bearer token")
     set_api_user(user)
 
     body = request.body

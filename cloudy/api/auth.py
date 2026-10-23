@@ -1,16 +1,18 @@
 from __future__ import annotations
 
 import contextvars
+from datetime import datetime, timedelta, UTC
 
-from django.contrib.auth import authenticate
+import jwt
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpRequest
 from ninja.errors import HttpError
 from ninja.security import HttpBearer
 
-from cloudy.accounts.models import UserProfile
-
 _api_user: contextvars.ContextVar[User | None] = contextvars.ContextVar("api_user", default=None)
+
+JWT_ALGORITHM = "HS256"
 
 
 def set_api_user(user: User | None) -> None:
@@ -21,25 +23,50 @@ def get_api_user() -> User | None:
     return _api_user.get()
 
 
-def user_from_api_key(api_key: str) -> User | None:
-    if not api_key:
+def issue_access_token(user: User) -> tuple[str, int]:
+    expires_in = settings.API_JWT_EXPIRY_SECONDS
+    now = datetime.now(tz=UTC)
+    payload = {
+        "user_id": user.pk,
+        "iat": now,
+        "exp": now + timedelta(seconds=expires_in),
+    }
+    token = jwt.encode(payload, settings.SECRET_KEY, algorithm=JWT_ALGORITHM)
+    if isinstance(token, bytes):
+        token = token.decode()
+    return token, expires_in
+
+
+def user_from_access_token(token: str) -> User | None:
+    if not token:
         return None
-    profile = UserProfile.objects.filter(api_key=api_key).select_related("user").first()
-    if profile is None or not profile.user.is_active:
+    try:
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=[JWT_ALGORITHM],
+            options={"require": ["exp", "iat", "user_id"]},
+        )
+    except jwt.PyJWTError:
         return None
-    return profile.user
+    try:
+        user_id = int(payload["user_id"])
+    except KeyError, TypeError, ValueError:
+        return None
+    user = User.objects.filter(pk=user_id, is_active=True).first()
+    return user
 
 
 def authenticate_bearer(request: HttpRequest) -> User | None:
     auth = request.META.get("HTTP_AUTHORIZATION", "")
     if not auth.startswith("Bearer "):
         return None
-    return user_from_api_key(auth[7:].strip())
+    return user_from_access_token(auth[7:].strip())
 
 
-class ApiKeyBearer(HttpBearer):
+class JwtBearer(HttpBearer):
     def authenticate(self, request: HttpRequest, token: str) -> User | None:
-        user = user_from_api_key(token)
+        user = user_from_access_token(token)
         if user is None:
             return None
         set_api_user(user)
@@ -49,15 +76,5 @@ class ApiKeyBearer(HttpBearer):
 def require_user(request: HttpRequest) -> User:
     user = getattr(request, "auth", None)
     if user is None:
-        raise HttpError(401, "Invalid or missing API key")
+        raise HttpError(401, "Invalid or missing bearer token")
     return user
-
-
-def exchange_email_password(email: str, password: str) -> str:
-    user = authenticate(request=None, username=email, password=password)
-    if user is None:
-        raise HttpError(401, "Invalid credentials")
-    profile = user.userprofile
-    if not profile.api_key:
-        profile.generate_api_key()
-    return profile.api_key

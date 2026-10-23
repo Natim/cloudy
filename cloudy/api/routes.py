@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.http import HttpRequest
 from ninja import Body, File, Router, UploadedFile
@@ -15,19 +16,27 @@ from cloudy.logbooks import settings as book_settings
 from cloudy.logbooks.forms import EditLbookNameForm
 from cloudy.logbooks.models import LogBase, LogBookBase
 
-from .auth import ApiKeyBearer, exchange_email_password, require_user
+from .auth import issue_access_token, JwtBearer, require_user
 from .form_data import save_log_from_api
 from .logbooks_access import get_owned_logbook, logbook_to_dict
 from .schemas import AircraftIn, LogbookCreateIn, LogbookPatchIn, TokenIn, TokenOut
 
 router = Router()
-auth = ApiKeyBearer()
+auth = JwtBearer()
 
 
 @router.post("/auth/token", response=TokenOut, auth=None)
 def auth_token(request: HttpRequest, payload: TokenIn):
-    api_key = exchange_email_password(payload.email, payload.password)
-    return {"api_key": api_key}
+    user = authenticate(request=None, username=payload.email, password=payload.password)
+    if user is None:
+        raise HttpError(401, "Invalid credentials")
+    access_token, expires_in = issue_access_token(user)
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expires_in": expires_in,
+        "user_id": user.pk,
+    }
 
 
 @router.get("/logbooks", response=list[dict], auth=auth)
