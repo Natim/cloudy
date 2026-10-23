@@ -107,7 +107,7 @@ class FCL1080LogBook(LogBookBase):
     # Inherited {{{
     @classmethod
     def rows_per_page(cls):
-        return 18
+        return 12
 
     # }}}
     # Rules sets {{{

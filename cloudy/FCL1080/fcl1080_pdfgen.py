@@ -36,6 +36,7 @@ BLACK = (0, 0, 0)
 
 
 EMPTY_STR = ""
+ROWS_PER_PAGE = 12
 
 # Landscape mode
 PAGE_HEIGHT = defaultPageSize[1]
@@ -159,15 +160,15 @@ def gen_carnet_de_vol(http_response=None, title="", show_cuts=True, logs=[], rep
         for year, year_group in groupby(logs, lambda log: log.date.year):
             logs_for_year = list(year_group)
 
-            # add new page every 14 entries
-            for i in range(0, len(logs_for_year), 18):
+            # add new page every 12 entries
+            for i in range(0, len(logs_for_year), ROWS_PER_PAGE):
                 # if not first page we add a break
                 if page_count != 1:
                     elements.append(PageBreak())
                 # keep track of the totals from the previous page
                 bottom_totals = append_new_page(
                     year_str=year,
-                    logs=logs_for_year[i : i + 18],
+                    logs=logs_for_year[i : i + ROWS_PER_PAGE],
                     prev_totals=prev_totals,
                     show_cuts=show_cuts,
                     elements=elements,
@@ -248,7 +249,7 @@ def _format_sting(strg, max_length):
 
 def append_new_page(elements=[], prev_totals={}, logs=[], show_cuts=True, year_str="2010", page_count=1):
     """
-    Append a new page with 14 log entries and totals to the log book
+    Append a new page with 12 log entries and totals to the log book
     """
 
     # First calculate totals
@@ -271,8 +272,6 @@ def append_new_page(elements=[], prev_totals={}, logs=[], show_cuts=True, year_s
             ("BACKGROUND", (0, 5), (-1, 5), (0.9, 0.9, 0.9)),
             ("BACKGROUND", (0, 8), (-1, 8), (0.9, 0.9, 0.9)),
             ("BACKGROUND", (0, 11), (-1, 11), (0.9, 0.9, 0.9)),
-            ("BACKGROUND", (0, 14), (-1, 14), (0.9, 0.9, 0.9)),
-            ("BACKGROUND", (0, 17), (-1, 17), (0.9, 0.9, 0.9)),
             ("FONT", (0, 0), (0, -1), HAND_FONT, 6),
             ("LEFTPADDING", (0, 0), (-1, -1), 2),
             ("RIGHTPADDING", (0, 0), (-1, -1), 2),
@@ -292,7 +291,8 @@ def append_new_page(elements=[], prev_totals={}, logs=[], show_cuts=True, year_s
     )
     # build body data
     body_data = [
-        ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""] for _ in range(18)
+        ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
+        for _ in range(ROWS_PER_PAGE)
     ]
     for i, log in enumerate(logs):
         body_data[i][0] = time.strftime("%d/%m", log.date.timetuple())
@@ -367,7 +367,7 @@ def append_new_page(elements=[], prev_totals={}, logs=[], show_cuts=True, year_s
             0.8 * cm,
             0.8 * cm,
         ],
-        rowHeights=[0.53 * cm] * 18,
+        rowHeights=[0.53 * cm] * ROWS_PER_PAGE,
     )
     body_table.hAlign = "LEFT"
     elements.append(body_table)
@@ -437,14 +437,14 @@ def append_new_page(elements=[], prev_totals={}, logs=[], show_cuts=True, year_s
             ("BACKGROUND", (0, 5), (-1, 5), (0.9, 0.9, 0.9)),
             ("BACKGROUND", (0, 8), (-1, 8), (0.9, 0.9, 0.9)),
             ("BACKGROUND", (0, 11), (-1, 11), (0.9, 0.9, 0.9)),
-            ("BACKGROUND", (0, 14), (-1, 14), (0.9, 0.9, 0.9)),
-            ("BACKGROUND", (0, 17), (-1, 17), (0.9, 0.9, 0.9)),
             ("TEXTCOLOR", (0, 0), (-1, -1), DARK_GREY),
         ]
     )
 
     # build body data
-    body_data = [["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""] for _ in range(18)]
+    body_data = [
+        ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""] for _ in range(ROWS_PER_PAGE)
+    ]
     for i, log in enumerate(logs):
         # OP CONDITION NIGHT TIME
         if log.op_time_night:
@@ -533,7 +533,7 @@ def append_new_page(elements=[], prev_totals={}, logs=[], show_cuts=True, year_s
             0.8 * cm,
             6.65 * cm,
         ],
-        rowHeights=[0.50 * cm] * 18,
+        rowHeights=[0.50 * cm] * ROWS_PER_PAGE,
     )
 
     body_table.hAlign = "LEFT"
