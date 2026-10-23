@@ -86,6 +86,7 @@ INSTALLED_APPS = [
     "cloudy.FCL1080",
     "cloudy.FFPLUM_ulm_logbook",
     "cloudy.FFP_logbook",
+    "cloudy.api",
 ]
 
 ACCOUNT_ACTIVATION_DAYS = 7

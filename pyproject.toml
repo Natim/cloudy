@@ -15,10 +15,12 @@ dependencies = [
     "django-analytical",
     "django-compressor",
     "django-constance[redis]",
+    "django-ninja>=1.7.1",
     "django-registration",
     "fdemmer-easy-thumbnails",
     "gunicorn",
     "hiredis",
+    "mcp>=2.3.0",
     "pillow",
     "psycopg[binary]",
     "python-dateutil",
@@ -109,4 +111,5 @@ testpaths = [
     "cloudy/alerts",
     "cloudy/aircrafts",
     "cloudy/accounts",
+    "cloudy/api",
 ]
