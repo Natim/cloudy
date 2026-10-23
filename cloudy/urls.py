@@ -24,6 +24,11 @@ urlpatterns = [
     path("data/cgvu/", TemplateView.as_view(template_name="popups/data_cgvu.html"), name="cgvu"),
     path("gcu/", TemplateView.as_view(template_name="gcu.html"), name="gcu"),
     path("contactus/", TemplateView.as_view(template_name="contactus.html"), name="contactus"),
+    path(
+        "fly-green-aviation/",
+        TemplateView.as_view(template_name="fly_green_aviation.html"),
+        name="fly_green_aviation",
+    ),
     path("features/", TemplateView.as_view(template_name="features.html"), name="features"),
     path("support/", TemplateView.as_view(template_name="support.html"), name="support"),
     path(
