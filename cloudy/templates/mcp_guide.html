@@ -1,0 +1,274 @@
+{% extends "site_base_public.html" %}
+
+{% load static %}
+
+{% block title %}Vos carnets dans Claude et ChatGPT{% endblock %}
+{% block body_id %}mcp-guide{% endblock %}
+
+{% block head %}
+<link href="{% static 'compass/stylesheets/features.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<style type="text/css">
+  #mcp-guide-page {
+    color: #454545;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 820px;
+  }
+
+  #mcp-guide-page h2 {
+    margin-top: 28px;
+  }
+
+  #mcp-guide-page h3 {
+    color: #073150;
+    font-size: 16px;
+    margin: 18px 0 6px;
+  }
+
+  #mcp-guide-page p,
+  #mcp-guide-page li {
+    font-size: 14px;
+  }
+
+  #mcp-guide-page a {
+    color: #9a1c20;
+  }
+
+  #mcp-guide-page ol,
+  #mcp-guide-page ul {
+    margin: 8px 0 12px 22px;
+  }
+
+  #mcp-guide-page li {
+    margin-bottom: 6px;
+  }
+
+  #mcp-guide-page code {
+    font-family: monospace;
+    background: #f4f7fa;
+    padding: 1px 4px;
+  }
+
+  #mcp-guide-page pre {
+    background: #f4f7fa;
+    border: 1px solid #e2e8ee;
+    padding: 12px 14px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  #mcp-guide-page .example {
+    margin: 0 0 10px;
+    padding-left: 12px;
+    border-left: 3px solid #073150;
+  }
+
+  #mcp-guide-page .tool dt {
+    font-family: monospace;
+    color: #073150;
+    margin-top: 10px;
+  }
+
+  #mcp-guide-page .tool dd {
+    margin: 0 0 0 0;
+  }
+</style>
+{% endblock %}
+
+{% block main %}
+<div id="main">
+  <div id="features-top">
+    <div class="buttons">
+      <a id="signup-button" href="{% url 'register' %}"><span class="txt"></span></a>
+    </div>
+    <div class="buttons"></div>
+    <div id="paper-plane"></div>
+  </div>
+
+  <div id="features-third">
+    <div class="box-top"></div>
+    <div class="box-main">
+      <div class="content" id="mcp-guide-page">
+        <h2>Vos carnets de vol, dans Claude et ChatGPT</h2>
+        <p>
+          Cloudy expose un serveur MCP (Model Context Protocol). Une fois connecté avec votre compte,
+          Claude ou ChatGPT peut lister vos carnets et en lire les statistiques : totaux, évolution
+          dans le temps, valeurs les plus fréquentes et aérodromes.
+        </p>
+        <p>
+          L'adresse du serveur est
+          <code>{{ request.scheme }}://{{ request.get_host }}/mcp</code>.
+          L'accès se fait avec un jeton personnel, envoyé dans l'en-tête
+          <code>Authorization</code>. Le mot de passe du compte Cloudy ne se colle pas dans l'assistant.
+        </p>
+
+        <h2>Ce que vous pouvez demander</h2>
+        <p>Quelques questions, une fois le connecteur activé dans la conversation :</p>
+        <p class="example">« Quels carnets sont sur mon compte, et combien d'heures totalisent-ils cette année ? »</p>
+        <p class="example">« Quels sont mes aérodromes les plus fréquentés depuis janvier ? »</p>
+        <p class="example">« Montre l'évolution de mes atterrissages sur les douze derniers mois. »</p>
+        <p>
+          L'assistant commence par lister les carnets, puis demande les noms de totaux disponibles
+          avant de calculer. Les dates acceptées sont au format <code>AAAA-MM-JJ</code> ou <code>JJ/MM/AAAA</code>.
+        </p>
+
+        <h2>1. Obtenir un jeton</h2>
+        <p>
+          Le jeton s'obtient avec l'e-mail et le mot de passe du compte Cloudy. Il reste valable
+          30 jours (la réponse indique la durée exacte dans <code>expires_in</code>, en secondes).
+          Renouvelez-le de la même façon quand il expire.
+        </p>
+        <pre>curl -s -X POST {{ request.scheme }}://{{ request.get_host }}/api/v1/auth/token \
+  -H "Content-Type: application/json" \
+  -d '{"email":"vous@exemple.fr","password":"votre-mot-de-passe"}'</pre>
+        <p>La réponse contient le jeton à recopier :</p>
+        <pre>{
+  "access_token": "eyJ…",
+  "token_type": "bearer",
+  "expires_in": 2592000,
+  "user_id": 123
+}</pre>
+        <p>
+          Dans Claude ou ChatGPT, la valeur d'en-tête est le mot <code>Bearer</code>, une espace,
+          puis <code>access_token</code>. Exemple : <code>Bearer eyJ…</code>.
+          Gardez ce jeton pour vous : il donne accès en lecture aux carnets du compte.
+        </p>
+
+        <h2>2. Connecter Claude</h2>
+        <p>
+          Les connecteurs distants sont disponibles sur claude.ai, Claude Desktop et Cowork
+          (forfaits Free, Pro, Max, Team et Enterprise ; un seul connecteur personnalisé en Free).
+          Claude appelle Cloudy depuis les serveurs d'Anthropic : le serveur doit être joignable
+          sur Internet, ce qui est le cas de Cloudy.
+        </p>
+        <h3>Compte Pro ou Max</h3>
+        <ol>
+          <li>Ouvrez <strong>Personnaliser → Connecteurs</strong> (Customize → Connectors).</li>
+          <li>Cliquez <strong>+ Ajouter</strong>, puis <strong>Ajouter un connecteur personnalisé</strong>.</li>
+          <li>Nom : <code>Cloudy</code>. Adresse : <code>{{ request.scheme }}://{{ request.get_host }}/mcp</code>. Continuez.</li>
+          <li>Authentification : <strong>Aucune connexion</strong> (No sign-in).</li>
+          <li>
+            En-têtes de requête (Request headers) : nom <code>authorization</code>,
+            valeur <code>Bearer</code> suivi de votre jeton. Marquez l'en-tête comme requis.
+          </li>
+          <li>Validez avec <strong>Ajouter</strong>.</li>
+        </ol>
+        <h3>Forfait Team ou Enterprise</h3>
+        <p>
+          Un propriétaire de l'organisation ajoute d'abord le connecteur dans
+          <strong>Paramètres de l'organisation → Connecteurs → Ajouter → Personnalisé → Web</strong>,
+          avec les mêmes nom, adresse et en-tête. Chaque membre le retrouve ensuite dans
+          Personnaliser → Connecteurs et clique sur <strong>Connecter</strong>.
+          Le jeton est commun à toutes les personnes qui utilisent ce connecteur : choisissez un
+          compte Cloudy dont les carnets peuvent être lus par ce groupe, ou un compte Claude personnel.
+        </p>
+        <p>
+          La saisie d'en-têtes est encore en bêta chez Anthropic. Si la section n'apparaît pas,
+          utilisez la configuration locale de Claude Desktop ci-dessous.
+        </p>
+        <h3>Dans une conversation</h3>
+        <p>
+          Cliquez sur <strong>+</strong> en bas à gauche du message, puis <strong>Connecteurs</strong>,
+          et activez Cloudy. Vous pouvez ensuite poser une question sur vos vols.
+          Pour retirer l'accès, supprimez le connecteur dans les mêmes réglages : le jeton n'est plus envoyé.
+        </p>
+        <h3>Claude Desktop, en local</h3>
+        <p>
+          Cette configuration envoie le jeton depuis votre ordinateur. Fichier selon le système :
+          <code>~/Library/Application Support/Claude/claude_desktop_config.json</code> (macOS),
+          <code>%APPDATA%\Claude\claude_desktop_config.json</code> (Windows),
+          <code>~/.config/Claude/claude_desktop_config.json</code> (Linux).
+          Node.js doit être installé. Redémarrez Claude Desktop après l'enregistrement.
+        </p>
+        <pre>{
+  "mcpServers": {
+    "cloudy": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "{{ request.scheme }}://{{ request.get_host }}/mcp",
+        "--header",
+        "Authorization: Bearer VOTRE_JETON"
+      ]
+    }
+  }
+}</pre>
+
+        <h2>3. Connecter ChatGPT</h2>
+        <p>
+          La connexion se fait sur ChatGPT web. La création d'un serveur MCP personnalisé est ouverte
+          aux espaces Business, Enterprise et Edu (administrateurs, et membres autorisés en Enterprise).
+          Les comptes Pro peuvent brancher un serveur MCP pour des actions de lecture, ce qui correspond
+          aux outils Cloudy.
+        </p>
+        <ol>
+          <li>Ouvrez <strong>Plugins</strong>.</li>
+          <li>Cliquez sur <strong>+</strong>, puis <strong>Ajouter un serveur MCP personnalisé</strong>.</li>
+          <li>
+            Nom : <code>Cloudy</code>. Description libre, par exemple
+            « Statistiques de mes carnets de vol Cloudy ».
+          </li>
+          <li>
+            Adresse du serveur : <code>{{ request.scheme }}://{{ request.get_host }}/mcp</code>.
+          </li>
+          <li>
+            Authentification : si un champ d'en-tête ou de clé API est proposé, nom
+            <code>authorization</code>, valeur <code>Bearer</code> suivi de votre jeton.
+          </li>
+          <li>Cochez l'avertissement, puis <strong>Créer comme plugin</strong>.</li>
+          <li>
+            Installez le plugin. Dans une nouvelle conversation, tapez <code>@</code> et choisissez Cloudy.
+          </li>
+        </ol>
+        <p>
+          Sur les écrans plus anciens, le même ajout passe par le mode développeur, puis
+          <strong>Applications → Créer</strong>, avec la même adresse.
+          ChatGPT propose aujourd'hui OAuth, ou une connexion sans authentification.
+          Cloudy attend le jeton Bearer décrit plus haut : sans champ pour cet en-tête,
+          la connexion est refusée. Le mot de passe du compte ne remplace pas le jeton.
+        </p>
+
+        <h2>Les outils</h2>
+        <p>
+          Six outils, tous en lecture. Ils ne créent, ne modifient et ne suppriment aucun vol.
+          Chaque appel ne voit que les carnets du compte auquel appartient le jeton.
+        </p>
+        <dl class="tool">
+          <dt>list_logbooks</dt>
+          <dd>Liste les carnets actifs du pilote : identifiant, nom, catégorie.</dd>
+          <dt>describe_totals</dt>
+          <dd>Donne les noms de totaux disponibles pour un carnet (heures, atterrissages, etc.).</dd>
+          <dt>get_totals</dt>
+          <dd>Calcule un ou plusieurs de ces totaux, sur une période et avec des filtres éventuels.</dd>
+          <dt>time_series</dt>
+          <dd>Découpe un total dans le temps, comme les graphiques du site.</dd>
+          <dt>top_values</dt>
+          <dd>Classe les valeurs les plus fréquentes d'un total regroupé (appareil, fonction, etc.).</dd>
+          <dt>airports</dt>
+          <dd>Compte les passages par aérodrome et renvoie les coordonnées pour une carte.</dd>
+        </dl>
+
+        <h2>Ce que l'assistant voit</h2>
+        <p>
+          Le jeton voyage dans l'en-tête <code>Authorization</code>, jamais dans le texte de la question.
+          Claude et ChatGPT reçoivent ensuite les réponses des outils : totaux, séries et aérodromes
+          de vos carnets. Ils ne reçoivent pas le mot de passe du compte.
+        </p>
+        <p>
+          Pour couper l'accès, retirez le connecteur dans Claude ou le plugin dans ChatGPT.
+          Le jeton déjà émis reste valable jusqu'à son expiration : évitez de le laisser dans un
+          fichier de configuration partagé.
+        </p>
+        <p>
+          Une question sur la connexion ? Écrivez à
+          <a href="mailto:support@cloudy.fr">support@cloudy.fr</a>.
+        </p>
+      </div>
+    </div>
+    <div class="box-bottom"></div>
+  </div>
+</div>
+{% endblock %}

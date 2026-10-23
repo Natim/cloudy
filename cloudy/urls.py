@@ -31,6 +31,7 @@ urlpatterns = [
     ),
     path("features/", TemplateView.as_view(template_name="features.html"), name="features"),
     path("support/", TemplateView.as_view(template_name="support.html"), name="support"),
+    path("connecteurs/", TemplateView.as_view(template_name="mcp_guide.html"), name="mcp_guide"),
     path(
         "pricing/",
         TemplateView.as_view(
