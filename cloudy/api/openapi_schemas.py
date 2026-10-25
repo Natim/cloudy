@@ -52,6 +52,40 @@ def log_schema_for_cat(cat: str, *, write: bool = False) -> dict[str, Any]:
     return schema
 
 
+def _log_read_one_of() -> dict[str, Any]:
+    return {"oneOf": [{"$ref": f"#/components/schemas/LogRead_{cat}"} for cat in book_settings.MAP]}
+
+
+def _log_write_one_of() -> dict[str, Any]:
+    return {"oneOf": [{"$ref": f"#/components/schemas/LogWrite_{cat}"} for cat in book_settings.MAP]}
+
+
+def _patch_log_paths(schema: dict[str, Any]) -> None:
+    paths = schema.get("paths", {})
+    for path_key, methods in paths.items():
+        if path_key.endswith("/logs/{log_id}"):
+            for verb in ("get", "put", "patch"):
+                if verb not in methods:
+                    continue
+                if verb in {"put", "patch"}:
+                    content = methods[verb].setdefault("requestBody", {}).setdefault("content", {})
+                    content.setdefault("application/json", {})["schema"] = _log_write_one_of()
+                methods[verb]["responses"]["200"]["content"]["application/json"]["schema"] = (
+                    _log_read_one_of()
+                )
+            continue
+        if not path_key.endswith("/logs"):
+            continue
+        if "get" in methods:
+            methods["get"]["responses"]["200"]["content"]["application/json"]["schema"] = {
+                "$ref": "#/components/schemas/LogListOut"
+            }
+        if "post" in methods:
+            content = methods["post"].setdefault("requestBody", {}).setdefault("content", {})
+            content.setdefault("application/json", {})["schema"] = _log_write_one_of()
+            methods["post"]["responses"]["201"]["content"]["application/json"]["schema"] = _log_read_one_of()
+
+
 def enrich_openapi_schema(schema: dict[str, Any]) -> dict[str, Any]:
     components = schema.setdefault("components", {}).setdefault("schemas", {})
     for cat in book_settings.MAP:
@@ -71,4 +105,13 @@ def enrich_openapi_schema(schema: dict[str, Any]) -> dict[str, Any]:
             "deleted": {"type": "boolean"},
         },
     }
+    components["LogListOut"] = {
+        "type": "object",
+        "properties": {
+            "items": {"type": "array", "items": _log_read_one_of()},
+            "next_page_token": {"type": "string", "nullable": True},
+        },
+        "required": ["items", "next_page_token"],
+    }
+    _patch_log_paths(schema)
     return schema

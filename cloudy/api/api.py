@@ -1,5 +1,6 @@
 from ninja import NinjaAPI
 
+from .errors import api_error_response, ApiHttpError
 from .openapi_schemas import enrich_openapi_schema
 from .routes import router
 
@@ -11,6 +12,7 @@ api = NinjaAPI(
 )
 
 api.add_router("", router)
+api.add_exception_handler(ApiHttpError, api_error_response)
 
 _original_get_openapi_schema = api.get_openapi_schema
 

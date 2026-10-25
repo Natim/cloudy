@@ -1,17 +1,17 @@
 """Map API JSON (model json_rules shape) to Django log forms."""
 
-from datetime import datetime
 from typing import Any
 
-from dateutil.parser import isoparse
 from django.http import QueryDict
+from django.utils import timezone
 
 from cloudy.logbooks.models import LogBase, LogBookBase
 from cloudy.time_format.formatters import HhmmFormatter, TenthFormatter
 
-from .serialization import normalize_log_body
-
-READONLY_LOG_FIELDS = frozenset({"id", "lbook", "cdate", "update", "deleted", "files", "visbl"})
+from .constants import READONLY_LOG_FIELDS
+from .errors import invalid_payload
+from .serialization import MODEL_TO_API
+from .validation import validate_and_prepare_log_body
 
 # API aliases for form-only field names on DGAC avion.
 _DGAC_FIELD_ALIASES = {
@@ -27,26 +27,6 @@ _DGAC_FIELD_ALIASES = {
 }
 
 
-def _coerce_body_value(rtype: str, value: Any) -> Any:
-    if value is None:
-        return ""
-    if rtype == "date":
-        if isinstance(value, datetime):
-            return value
-        if isinstance(value, str):
-            return isoparse(value)
-    if rtype == "integer":
-        return int(value)
-    if rtype == "bool":
-        return bool(value)
-    if rtype == "list":
-        if isinstance(value, list):
-            return value
-        if isinstance(value, str):
-            return value.split(";") if value else []
-    return value
-
-
 def _apply_body_to_log(log: LogBase, body: dict[str, Any]) -> None:
     for rule in log.json_rules():
         name, rtype = rule[0], rule[1]
@@ -54,12 +34,19 @@ def _apply_body_to_log(log: LogBase, body: dict[str, Any]) -> None:
             continue
         if name not in body:
             continue
-        setattr(log, name, _coerce_body_value(rtype, body[name]))
+        value = body[name]
+        if rtype == "list":
+            if isinstance(value, list):
+                setattr(log, name, ";".join(value))
+            else:
+                setattr(log, name, value or "")
+            continue
+        setattr(log, name, value)
 
 
 def _unsaved_log(logbook: LogBookBase) -> LogBase:
     log_model = logbook._log_model()
-    now = datetime.now()
+    now = timezone.now()
     return log_model(
         lbook=logbook,
         cdate=now,
@@ -74,7 +61,7 @@ def _unsaved_log(logbook: LogBookBase) -> LogBase:
 
 
 def body_to_form_data(logbook: LogBookBase, body: dict[str, Any], log: LogBase | None = None) -> QueryDict:
-    """Build POST data for the logbook's form from an API payload."""
+    """Build POST data for the logbook's form from an API payload (model field names)."""
     instance = log if log is not None else _unsaved_log(logbook)
     _apply_body_to_log(instance, body)
 
@@ -86,9 +73,9 @@ def body_to_form_data(logbook: LogBookBase, body: dict[str, Any], log: LogBase |
         name, rtype = rule[0], rule[1]
         if name in READONLY_LOG_FIELDS or name not in body:
             continue
-        value = _coerce_body_value(rtype, body[name])
+        value = body[name]
         form_name = _DGAC_FIELD_ALIASES.get(name, name)
-        if rtype == "date" and isinstance(value, datetime):
+        if rtype == "date" and hasattr(value, "strftime"):
             data[form_name] = value.strftime("%d/%m/%Y")
         elif form_name in {"departure_time", "arrival_time"} and isinstance(value, str) and ":" in value:
             hours, mins = value.split(":", 1)
@@ -120,20 +107,39 @@ def body_to_form_data(logbook: LogBookBase, body: dict[str, Any], log: LogBase |
             else:
                 qd[key] = TenthFormatter.output(minutes)
             continue
-        if isinstance(val, datetime):
+        if hasattr(val, "strftime"):
             qd[key] = val.strftime("%d/%m/%Y")
         else:
             qd[key] = str(val)
     return qd
 
 
-def save_log_from_api(user, logbook: LogBookBase, body: dict[str, Any], log: LogBase | None = None):
-    body = normalize_log_body(body, logbook.cat)
+def form_errors_to_api(form_errors) -> dict:
+    form_to_model = {v: k for k, v in _DGAC_FIELD_ALIASES.items()}
+    out: dict = {}
+    for field, entries in form_errors.get_json_data().items():
+        model_name = form_to_model.get(field, field)
+        api_name = MODEL_TO_API.get(model_name, field)
+        out[api_name] = entries
+    return out
+
+
+def save_log_from_api(
+    user,
+    logbook: LogBookBase,
+    body: dict[str, Any],
+    log: LogBase | None = None,
+    *,
+    partial: bool = False,
+):
+    prepared = validate_and_prepare_log_body(logbook, body, partial=partial, log=log)
+    if partial and not prepared:
+        raise invalid_payload("Empty patch body")
     form_class = logbook._log_form_model()
-    post = body_to_form_data(logbook, body, log=log)
+    post = body_to_form_data(logbook, prepared, log=log)
     form = form_class(logbook, post, log=log)
     if not form.is_valid():
-        raise ValueError(form.errors.as_json())
+        raise invalid_payload("Invalid log", errors=form_errors_to_api(form.errors))
     saved = form.save(user, logbook, {}, log)
     saved.save()
     return LogBase.get_by_id(saved.pk)

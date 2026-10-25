@@ -1,4 +1,5 @@
 import contextvars
+import uuid
 from datetime import datetime, timedelta, UTC
 
 import jwt
@@ -11,6 +12,8 @@ from ninja.security import HttpBearer
 _api_user: contextvars.ContextVar[User | None] = contextvars.ContextVar("api_user", default=None)
 
 JWT_ALGORITHM = "HS256"
+JWT_ISSUER = "cloudy"
+JWT_AUDIENCE = "cloudy-api"
 
 
 def set_api_user(user: User | None) -> None:
@@ -25,9 +28,12 @@ def issue_access_token(user: User) -> tuple[str, int]:
     expires_in = settings.API_JWT_EXPIRY_SECONDS
     now = datetime.now(tz=UTC)
     payload = {
-        "user_id": user.pk,
+        "sub": str(user.pk),
+        "iss": JWT_ISSUER,
+        "aud": JWT_AUDIENCE,
         "iat": now,
         "exp": now + timedelta(seconds=expires_in),
+        "jti": str(uuid.uuid4()),
     }
     token = jwt.encode(payload, settings.SECRET_KEY, algorithm=JWT_ALGORITHM)
     if isinstance(token, bytes):
@@ -43,12 +49,14 @@ def user_from_access_token(token: str) -> User | None:
             token,
             settings.SECRET_KEY,
             algorithms=[JWT_ALGORITHM],
-            options={"require": ["exp", "iat", "user_id"]},
+            audience=JWT_AUDIENCE,
+            issuer=JWT_ISSUER,
+            options={"require": ["exp", "iat", "sub", "jti", "aud", "iss"]},
         )
     except jwt.PyJWTError:
         return None
     try:
-        user_id = int(payload["user_id"])
+        user_id = int(payload["sub"])
     except KeyError, TypeError, ValueError:
         return None
     user = User.objects.filter(pk=user_id, is_active=True).first()

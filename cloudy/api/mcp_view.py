@@ -1,7 +1,7 @@
 """Django view bridging WSGI requests to the MCP Streamable HTTP ASGI app."""
 
 from asgiref.sync import async_to_sync
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
@@ -46,7 +46,7 @@ def _build_scope(request, path: str) -> dict:
 def mcp_endpoint(request):
     user = authenticate_bearer(request)
     if user is None:
-        return HttpResponseForbidden("Invalid or missing bearer token")
+        return HttpResponse("Invalid or missing bearer token", status=401)
     set_api_user(user)
 
     body = request.body
@@ -54,21 +54,25 @@ def mcp_endpoint(request):
     response_headers: list[tuple[bytes, bytes]] = []
     response_body = b""
 
-    async def receive():
-        return {"type": "http.request", "body": body, "more_body": False}
+    try:
 
-    async def send(message):
-        nonlocal response_status, response_headers, response_body
-        if message["type"] == "http.response.start":
-            response_status = message["status"]
-            response_headers = message.get("headers", [])
-        elif message["type"] == "http.response.body":
-            response_body += message.get("body", b"")
+        async def receive():
+            return {"type": "http.request", "body": body, "more_body": False}
 
-    scope = _build_scope(request, "/")
-    async_to_sync(_get_asgi_app())(scope, receive, send)
+        async def send(message):
+            nonlocal response_status, response_headers, response_body
+            if message["type"] == "http.response.start":
+                response_status = message["status"]
+                response_headers = message.get("headers", [])
+            elif message["type"] == "http.response.body":
+                response_body += message.get("body", b"")
 
-    django_response = HttpResponse(response_body, status=response_status)
-    for header, value in response_headers:
-        django_response[header.decode("latin-1")] = value.decode("latin-1")
-    return django_response
+        scope = _build_scope(request, "/")
+        async_to_sync(_get_asgi_app())(scope, receive, send)
+
+        django_response = HttpResponse(response_body, status=response_status)
+        for header, value in response_headers:
+            django_response[header.decode("latin-1")] = value.decode("latin-1")
+        return django_response
+    finally:
+        set_api_user(None)

@@ -1,11 +1,13 @@
 import json
 from datetime import datetime
 
+import jwt
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 
-from cloudy.api.auth import issue_access_token, set_api_user
+from cloudy.api.auth import issue_access_token, JWT_AUDIENCE, JWT_ISSUER, set_api_user, user_from_access_token
 from cloudy.api.mcp_server import get_logbook, get_totals, list_aircraft, list_logs
 from cloudy.DGAC_avion_logbook.models import DGACAvionLogBook
 from cloudy.stats.service import get_named_totals, LogbookAccessError
@@ -36,6 +38,17 @@ class ApiAuthTests(TestCase):
         self.assertIn("access_token", body)
         self.assertGreater(body["expires_in"], 0)
 
+        claims = jwt.decode(
+            body["access_token"],
+            settings.SECRET_KEY,
+            algorithms=["HS256"],
+            audience=JWT_AUDIENCE,
+            issuer=JWT_ISSUER,
+        )
+        for key in ("sub", "iss", "aud", "iat", "exp", "jti"):
+            self.assertIn(key, claims)
+        self.assertEqual(claims["sub"], str(self.pilot.pk))
+
         bad = self.client.get("/api/v1/logbooks", HTTP_AUTHORIZATION="Bearer invalid")
         self.assertEqual(bad.status_code, 401)
 
@@ -47,6 +60,19 @@ class ApiAuthTests(TestCase):
             HTTP_AUTHORIZATION=f"Bearer {body['access_token']}",
         )
         self.assertEqual(ok.status_code, 200)
+
+    def test_token_rejects_missing_claims(self):
+        token, _ = issue_access_token(self.pilot)
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=["HS256"],
+            audience=JWT_AUDIENCE,
+            issuer=JWT_ISSUER,
+        )
+        del payload["jti"]
+        bad = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+        self.assertIsNone(user_from_access_token(bad))
 
 
 class ApiLogbookTests(TestCase):
@@ -67,8 +93,7 @@ class ApiLogbookTests(TestCase):
         self.assertEqual(resp.status_code, 201, resp.content)
         return resp.json()
 
-    def test_dgac_avion_log_crud(self):
-        book = self._create_book("plane_dgac")
+    def _dgac_payload(self, **overrides):
         payload = {
             "flight_date": "2011-07-04T12:00:00",
             "optional_filter": "",
@@ -80,6 +105,12 @@ class ApiLogbookTests(TestCase):
             "departure_airport": "",
             "arrival_airport": "",
         }
+        payload.update(overrides)
+        return payload
+
+    def test_dgac_avion_log_crud(self):
+        book = self._create_book("plane_dgac")
+        payload = self._dgac_payload()
         created = self.client.post(
             f"/api/v1/logbooks/{book['id']}/logs",
             data=json.dumps(payload),
@@ -87,16 +118,29 @@ class ApiLogbookTests(TestCase):
             **self.headers,
         )
         self.assertEqual(created.status_code, 201, created.content)
+        self.assertIn("Location", created)
         log_id = created.json()["id"]
 
-        updated = self.client.put(
+        patched = self.client.patch(
             f"/api/v1/logbooks/{book['id']}/logs/{log_id}",
-            data=json.dumps({**payload, "flight_nature": "N2"}),
+            data=json.dumps({"flight_nature": "N2", "comments": "keep-me"}),
             content_type="application/json",
             **self.headers,
         )
-        self.assertEqual(updated.status_code, 200)
-        self.assertEqual(updated.json()["flight_nature"], "N2")
+        self.assertEqual(patched.status_code, 200)
+        self.assertEqual(patched.json()["flight_nature"], "N2")
+        self.assertEqual(patched.json()["aircraft_type"], "T1")
+        self.assertEqual(patched.json()["comments"], "keep-me")
+
+        replaced = self.client.put(
+            f"/api/v1/logbooks/{book['id']}/logs/{log_id}",
+            data=json.dumps(self._dgac_payload(flight_nature="N3")),
+            content_type="application/json",
+            **self.headers,
+        )
+        self.assertEqual(replaced.status_code, 200)
+        self.assertEqual(replaced.json()["flight_nature"], "N3")
+        self.assertEqual(replaced.json()["comments"], "")
 
         deleted = self.client.delete(
             f"/api/v1/logbooks/{book['id']}/logs/{log_id}",
@@ -118,7 +162,7 @@ class ApiLogbookTests(TestCase):
             "single_pilot_se": 1,
             "single_pilot_me": 0,
             "total_time_flight": 60,
-            "name_pic": "Ada Pilot",
+            "pilot_in_command_name": "Ada Pilot",
         }
         resp = self.client.post(
             f"/api/v1/logbooks/{book['id']}/logs",
@@ -156,24 +200,26 @@ class ApiLogbookTests(TestCase):
 
     def test_reports_put(self):
         book = self._create_book("plane_dgac")
-        reports = {"nbrto": 3, "nbrla": 3, "ifr": 0, "simu": 0}
-        for key in (
-            "mbr_equipage_jour",
-            "mbr_equipage_nuit",
-            "mono_jdbl",
-            "mono_jcdb",
-            "mono_ndbl",
-            "mono_ncdb",
-            "mul_jdbl",
-            "mul_jcdb",
-            "mul_jcplt",
-            "mul_ndbl",
-            "mul_ncdb",
-            "mul_ncplt",
-            "vai_dbl",
-            "vai_plt",
-        ):
-            reports[key] = 0
+        reports = {
+            "takeoff_count": 3,
+            "landing_count": 3,
+            "ifr": 0,
+            "simulator_minutes": 0,
+            "crew_day_minutes": 0,
+            "crew_night_minutes": 0,
+            "single_engine_day_dual_minutes": 0,
+            "single_engine_day_captain_minutes": 0,
+            "single_engine_night_dual_minutes": 0,
+            "single_engine_night_captain_minutes": 0,
+            "multi_engine_day_dual_minutes": 0,
+            "multi_engine_day_captain_minutes": 0,
+            "multi_engine_day_co_pilot_minutes": 0,
+            "multi_engine_night_dual_minutes": 0,
+            "multi_engine_night_captain_minutes": 0,
+            "multi_engine_night_co_pilot_minutes": 0,
+            "instrument_day_dual_minutes": 0,
+            "instrument_pilot_minutes": 0,
+        }
         resp = self.client.put(
             f"/api/v1/logbooks/{book['id']}/reports",
             data=json.dumps(reports),
@@ -181,21 +227,13 @@ class ApiLogbookTests(TestCase):
             **self.headers,
         )
         self.assertEqual(resp.status_code, 200, resp.content)
+        self.assertEqual(resp.json()["takeoff_count"], 3)
 
     def test_photo_upload(self):
         book = self._create_book("plane_dgac")
-        payload = {
-            "flight_date": "2011-07-05T12:00:00",
-            "optional_filter": "",
-            "aircraft_type": "T1",
-            "aircraft_registration": "M1",
-            "function_on_board": "EP",
-            "flight_nature": "N1",
-            "crew_night_minutes": 1,
-        }
         log = self.client.post(
             f"/api/v1/logbooks/{book['id']}/logs",
-            data=json.dumps(payload),
+            data=json.dumps(self._dgac_payload(flight_date="2011-07-05T12:00:00")),
             content_type="application/json",
             **self.headers,
         )
@@ -206,8 +244,53 @@ class ApiLogbookTests(TestCase):
             data={"file": upload},
             **self.headers,
         )
-        self.assertEqual(resp.status_code, 200, resp.content)
-        self.assertIn("url", resp.json())
+        self.assertEqual(resp.status_code, 201, resp.content)
+        body = resp.json()
+        self.assertIn("url", body)
+        self.assertIn("id", body)
+
+    def test_log_list_page_token(self):
+        book = self._create_book("plane_dgac")
+        for day in (4, 5, 6):
+            self.client.post(
+                f"/api/v1/logbooks/{book['id']}/logs",
+                data=json.dumps(self._dgac_payload(flight_date=f"2011-07-0{day}T12:00:00")),
+                content_type="application/json",
+                **self.headers,
+            )
+        first = self.client.get(
+            f"/api/v1/logbooks/{book['id']}/logs?limit=2",
+            **self.headers,
+        )
+        self.assertEqual(first.status_code, 200)
+        page1 = first.json()
+        self.assertEqual(len(page1["items"]), 2)
+        self.assertIsNotNone(page1["next_page_token"])
+        second = self.client.get(
+            f"/api/v1/logbooks/{book['id']}/logs?limit=2&page_token={page1['next_page_token']}",
+            **self.headers,
+        )
+        self.assertEqual(second.status_code, 200)
+        self.assertEqual(len(second.json()["items"]), 1)
+
+    def test_plan_required_for_second_logbook(self):
+        simple = User.objects.get(email="simple@example.com")
+        headers = bearer_headers(simple)
+        first = self.client.post(
+            "/api/v1/logbooks",
+            data=json.dumps({"category": "plane_dgac"}),
+            content_type="application/json",
+            **headers,
+        )
+        self.assertEqual(first.status_code, 201)
+        second = self.client.post(
+            "/api/v1/logbooks",
+            data=json.dumps({"category": "plane_dgac", "name": "Second"}),
+            content_type="application/json",
+            **headers,
+        )
+        self.assertEqual(second.status_code, 403)
+        self.assertEqual(second.json()["code"], "plan_required")
 
 
 class McpStatsTests(TestCase):
@@ -236,7 +319,7 @@ class McpStatsTests(TestCase):
 
     def test_mcp_http_requires_key(self):
         resp = self.client.post("/mcp", data="{}", content_type="application/json")
-        self.assertEqual(resp.status_code, 403)
+        self.assertEqual(resp.status_code, 401)
 
     def test_mcp_logbook_aircraft_and_logs(self):
         set_api_user(self.pilot)

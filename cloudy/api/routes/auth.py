@@ -11,7 +11,7 @@ router = Router(tags=["auth"])
 
 @router.post("/auth/token", response=TokenOut, auth=None)
 def auth_token(request: HttpRequest, payload: TokenIn):
-    user = authenticate(request=None, username=payload.email, password=payload.password)
+    user = authenticate(request, username=payload.email, password=payload.password)
     if user is None:
         raise HttpError(401, "Invalid credentials")
     access_token, expires_in = issue_access_token(user)

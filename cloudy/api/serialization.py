@@ -105,6 +105,27 @@ def log_to_api_dict(raw: dict[str, Any]) -> dict[str, Any]:
     return _rename_keys(raw, MODEL_TO_API)
 
 
+def log_instance_to_api_dict(log) -> dict[str, Any]:
+    from django.conf import settings
+
+    raw = log.to_json(serialize=False)
+    raw["files"] = [
+        {"id": fobject.pk, "path": f"{settings.MEDIA_URL}{fobject.file.name}"}
+        for fobject in log.files.filter(deleted=False)
+    ]
+    return log_to_api_dict(raw)
+
+
+def normalize_report_body(body: dict[str, Any]) -> dict[str, Any]:
+    return {API_TO_MODEL.get(key, key): value for key, value in body.items()}
+
+
+def reports_to_api_dict(reports: dict[str, Any] | None) -> dict[str, Any]:
+    if not reports:
+        return {}
+    return {MODEL_TO_API.get(key, key): value for key, value in reports.items()}
+
+
 def normalize_log_body(body: dict[str, Any], category: str | None = None) -> dict[str, Any]:
     """Accept public API names (and legacy model names) on write."""
     out: dict[str, Any] = {}
