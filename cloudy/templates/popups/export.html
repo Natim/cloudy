@@ -35,6 +35,11 @@
       <form>
         Afficher les lignes de découpe sur le pdf: <input type="checkbox" name="lines" value="l"
           id="pdf-export-line-trigger" />
+        {% if logbook and logbook.cat == 'plane_fcl1080' %}
+        <br />
+        Inclure les images: <input type="checkbox" name="include_images" value="1"
+          id="pdf-export-images-trigger" />
+        {% endif %}
       </form>
     </div>
     {% endif %}
@@ -42,17 +47,23 @@
 </div>
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
-    $('#pdf-export-line-trigger').change(function () {
-      var checked = $(this).attr('checked');
-      var pdf_url = "{% if logbook %}{% url 'logbooks:export' logbook.id 'pdf' %}{% endif %}";
+    var pdf_url = "{% if logbook %}{% url 'logbooks:export' logbook.id 'pdf' %}{% endif %}";
 
-      if (checked === true) {
-        $("#pdf-export-link").attr('href', pdf_url + "?mode=show_cuts");
+    function updatePdfExportUrl() {
+      var params = [];
+      if ($('#pdf-export-line-trigger').is(':checked')) {
+        params.push('mode=show_cuts');
       }
-      else {
-        $("#pdf-export-link").attr('href', pdf_url);
+      if ($('#pdf-export-images-trigger').is(':checked')) {
+        params.push('include_images=1');
       }
-    });
+      var href = pdf_url;
+      if (params.length) {
+        href = pdf_url + '?' + params.join('&');
+      }
+      $("#pdf-export-link").attr('href', href);
+    }
 
+    $('#pdf-export-line-trigger, #pdf-export-images-trigger').change(updatePdfExportUrl);
   });
 </script>

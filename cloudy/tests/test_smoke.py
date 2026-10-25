@@ -381,7 +381,7 @@ def test_logbook_pdf_export_uses_content_type(user_with_profile, monkeypatch):
     logbook = DGACAvionLogBook(ownr=user_with_profile, name="export-test", cat="plane_dgac")
     logbook.save()
 
-    def fake_pdf(self, http_response, title, show_cuts=False):
+    def fake_pdf(self, http_response, title, show_cuts=False, include_images=False):
         http_response.write(b"%PDF-fake")
 
     monkeypatch.setattr(DGACAvionLogBook, "attach_pdf_to_http_response", fake_pdf)
@@ -465,6 +465,125 @@ def test_fcl1080_pdf_builds_with_one_log():
     buf = BytesIO()
     gen_carnet_de_vol(http_response=buf, title="test", show_cuts=False, logs=[log], reports={})
     assert buf.getvalue().startswith(b"%PDF")
+
+
+def _pdf_page_count(pdf_bytes):
+    return pdf_bytes.count(b"/Type /Page")
+
+
+def _fcl1080_sample_log(**overrides):
+    from datetime import datetime
+    from types import SimpleNamespace
+
+    fields = {
+        "date": datetime(2025, 1, 15),
+        "departure_place": "LFRN",
+        "departure_time": 480,
+        "arrival_place": "LFPG",
+        "arrival_time": 540,
+        "aircraft_type": "C172",
+        "aircraft_imma": "F-TEST",
+        "single_pilot_se": True,
+        "single_pilot_me": False,
+        "single_pilot_time": 60,
+        "multi_pilot_time": 0,
+        "total_time_flight": 60,
+        "name_pic": "SELF",
+        "take_off_day": 1,
+        "take_off_night": 0,
+        "landing_day": 1,
+        "landing_night": 0,
+        "synthetic_time": 0,
+        "synthetic_date": None,
+        "synthetic_type": "",
+        "obs": "",
+        "pilot_time_dual": 0,
+        "pilot_timpe_cop": 0,
+        "op_time_ifr": 0,
+        "op_time_night": 0,
+        "pilot_time_in_cmd": 60,
+        "pilot_time_inst": 0,
+    }
+    fields.update(overrides)
+    return SimpleNamespace(**fields)
+
+
+class _MockLogFiles:
+    def __init__(self, file_objects):
+        self._file_objects = file_objects
+
+    def all(self):
+        return self._file_objects
+
+
+class _MockAttachedFile:
+    def __init__(self, path, name=None, deleted=False):
+        import os
+        from types import SimpleNamespace
+
+        self.deleted = deleted
+        self.file = SimpleNamespace(
+            path=str(path),
+            name=name or os.path.basename(str(path)),
+        )
+
+
+def test_fcl1080_pdf_annex_adds_page_for_attached_image(tmp_path):
+    from io import BytesIO
+
+    from PIL import Image as PILImage
+
+    from cloudy.FCL1080.fcl1080_pdfgen import gen_carnet_de_vol
+
+    png_path = tmp_path / "cahier.png"
+    PILImage.new("RGB", (120, 90), color="blue").save(png_path)
+    attached = _MockAttachedFile(png_path)
+    log = _fcl1080_sample_log(files=_MockLogFiles([attached]))
+
+    buf_plain = BytesIO()
+    gen_carnet_de_vol(
+        http_response=buf_plain, title="test", show_cuts=False, logs=[log], reports={}, include_images=False
+    )
+    buf_annex = BytesIO()
+    gen_carnet_de_vol(
+        http_response=buf_annex, title="test", show_cuts=False, logs=[log], reports={}, include_images=True
+    )
+
+    assert buf_annex.getvalue().startswith(b"%PDF")
+    assert _pdf_page_count(buf_annex.getvalue()) == _pdf_page_count(buf_plain.getvalue()) + 1
+
+
+def test_fcl1080_pdf_annex_skips_logs_without_images(tmp_path):
+    from io import BytesIO
+
+    from cloudy.FCL1080.fcl1080_pdfgen import gen_carnet_de_vol
+
+    pdf_path = tmp_path / "scan.pdf"
+    pdf_path.write_bytes(b"%PDF-1.4")
+    attached = _MockAttachedFile(pdf_path, name="scan.pdf")
+    log_with_pdf = _fcl1080_sample_log(files=_MockLogFiles([attached]))
+    log_without_files = _fcl1080_sample_log()
+
+    for log in (log_with_pdf, log_without_files):
+        buf_plain = BytesIO()
+        gen_carnet_de_vol(
+            http_response=buf_plain,
+            title="test",
+            show_cuts=False,
+            logs=[log],
+            reports={},
+            include_images=False,
+        )
+        buf_annex = BytesIO()
+        gen_carnet_de_vol(
+            http_response=buf_annex,
+            title="test",
+            show_cuts=False,
+            logs=[log],
+            reports={},
+            include_images=True,
+        )
+        assert _pdf_page_count(buf_annex.getvalue()) == _pdf_page_count(buf_plain.getvalue())
 
 
 def test_logbook_pdfs_do_not_require_text_outlines(monkeypatch):

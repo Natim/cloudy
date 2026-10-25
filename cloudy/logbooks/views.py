@@ -657,6 +657,7 @@ def export(request, logbook_id, ex_type):
         if "mode" in request.GET:
             if request.GET["mode"] == "show_cuts":
                 show_cuts = True
+        include_images = request.GET.get("include_images") == "1"
 
         if request.user.userprofile.plan == 1:
             return redirect(reverse("payment:pcloudy") + "?pack=export_logbook")
@@ -665,7 +666,10 @@ def export(request, logbook_id, ex_type):
         # just want the data, we could call to_pdf()
         response = HttpResponse(content_type="application/pdf")
         logbook.attach_pdf_to_http_response(
-            http_response=response, title=str(slugify(logbook.name)), show_cuts=show_cuts
+            http_response=response,
+            title=str(slugify(logbook.name)),
+            show_cuts=show_cuts,
+            include_images=include_images,
         )
 
     # Export csv
