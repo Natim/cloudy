@@ -225,9 +225,16 @@ class FCL1080LogBook(LogBookBase):
     def can_fly(self):
         return True
 
-    def attach_pdf_to_http_response(self, http_response, title, show_cuts=True):
+    def attach_pdf_to_http_response(self, http_response, title, show_cuts=True, include_images=False):
         """
         Attaches the logbook pdf as the http response object (if passed)
         """
-        logs = list(self.logs_qs())
-        gen_carnet_de_vol(http_response, title, show_cuts, logs, self.reports)
+        from django.db.models import Prefetch
+
+        from cloudy.core.models import FileModel
+
+        qs = self.logs_qs()
+        if include_images:
+            qs = qs.prefetch_related(Prefetch("files", queryset=FileModel.objects.filter(deleted=False)))
+        logs = list(qs)
+        gen_carnet_de_vol(http_response, title, show_cuts, logs, self.reports, include_images=include_images)

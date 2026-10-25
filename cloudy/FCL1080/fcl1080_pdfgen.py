@@ -2,19 +2,23 @@
 PDF generation for a DGAC Plane logbook.
 """
 
+import math
+import os
 import time
 from itertools import groupby
 
+from PIL import Image as PILImage
 from reportlab.graphics.charts.textlabels import Label
 from reportlab.graphics.shapes import Drawing, Line
 from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.platypus import (
     Image,
     Indenter,
     PageBreak,
+    Paragraph,
     SimpleDocTemplate,
     Spacer,
     Table,
@@ -100,7 +104,12 @@ def _min_format(minutes):
     return minutes
 
 
-def gen_carnet_de_vol(http_response=None, title="", show_cuts=True, logs=[], reports={}):
+ANNEX_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif"}
+
+
+def gen_carnet_de_vol(
+    http_response=None, title="", show_cuts=True, logs=[], reports={}, include_images=False
+):
     """
     Generate the logbook pdf
     Logs contains all log entries for the book
@@ -182,9 +191,120 @@ def gen_carnet_de_vol(http_response=None, title="", show_cuts=True, logs=[], rep
         # no data
         append_new_page(show_cuts=show_cuts, elements=elements)
 
+    if include_images:
+        append_annex_pages(elements, logs)
+
     doc.pagesize = landscape(A4)
 
     doc.build(elements)
+
+
+def _image_paths_for_log(log):
+    paths = []
+    files = getattr(log, "files", None)
+    if files is None:
+        return paths
+    for file_obj in files.all():
+        if getattr(file_obj, "deleted", False):
+            continue
+        ext = os.path.splitext(file_obj.file.name)[1].lower()
+        if ext not in ANNEX_IMAGE_EXTENSIONS:
+            continue
+        try:
+            path = file_obj.file.path
+        except ValueError, NotImplementedError:
+            continue
+        if os.path.isfile(path):
+            paths.append(path)
+    return paths
+
+
+def _annex_grid_shape(image_count):
+    if image_count == 1:
+        return 1, 1
+    if image_count == 2:
+        return 2, 1
+    if image_count <= 4:
+        return 2, 2
+    cols = math.ceil(math.sqrt(image_count))
+    rows = math.ceil(image_count / cols)
+    return cols, rows
+
+
+def _flowable_image(path, max_width, max_height):
+    with PILImage.open(path) as img:
+        img_w, img_h = img.size
+    if img_w <= 0 or img_h <= 0:
+        return None
+    scale = min(max_width / img_w, max_height / img_h)
+    return Image(path, width=img_w * scale, height=img_h * scale)
+
+
+def append_annex_pages(elements, logs):
+    logs_with_images = []
+    for log in logs:
+        paths = _image_paths_for_log(log)
+        if paths:
+            logs_with_images.append((log, paths))
+    if not logs_with_images:
+        return
+
+    page_width, page_height = landscape(A4)
+    usable_width = page_width - 60
+    usable_height = page_height - 90
+    header_style = ParagraphStyle(
+        "AnnexHeader",
+        parent=styles["Normal"],
+        fontName=HAND_FONT,
+        fontSize=11,
+        leading=14,
+    )
+    title_style = ParagraphStyle(
+        "AnnexTitle",
+        parent=styles["Heading1"],
+        fontName=HAND_FONT,
+        fontSize=16,
+        leading=20,
+        spaceAfter=8,
+    )
+
+    elements.append(PageBreak())
+    for index, (log, paths) in enumerate(logs_with_images):
+        if index > 0:
+            elements.append(PageBreak())
+
+        if index == 0:
+            elements.append(Paragraph("Annexes", title_style))
+
+        date_str = log.date.strftime("%d/%m/%Y")
+        header = f"{date_str} - {log.aircraft_imma} - {log.aircraft_type}"
+        elements.append(Paragraph(header, header_style))
+        elements.append(Spacer(1, 0.4 * cm))
+
+        cols, rows = _annex_grid_shape(len(paths))
+        cell_width = usable_width / cols
+        cell_height = (usable_height - 0.5 * cm) / rows
+        padding = 6
+        grid = [["" for _ in range(cols)] for _ in range(rows)]
+        for index, path in enumerate(paths):
+            row, col = divmod(index, cols)
+            flowable = _flowable_image(path, cell_width - padding, cell_height - padding)
+            grid[row][col] = flowable if flowable is not None else ""
+
+        table = Table(
+            grid,
+            colWidths=[cell_width] * cols,
+            rowHeights=[cell_height] * rows,
+        )
+        table.setStyle(
+            TableStyle(
+                [
+                    ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                    ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ]
+            )
+        )
+        elements.append(table)
 
 
 def _calculate_page_totals(logs):
