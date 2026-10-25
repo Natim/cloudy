@@ -18,6 +18,35 @@ def bearer_headers(user: User) -> dict[str, str]:
     return {"HTTP_AUTHORIZATION": f"Bearer {token}"}
 
 
+class ApiCorsTests(TestCase):
+    fixtures = ["testing_data.json"]
+
+    def setUp(self):
+        self.client = Client()
+        self.pilot = User.objects.get(email="pilot@example.com")
+        self.headers = bearer_headers(self.pilot)
+
+    def test_cors_preflight_allows_pwa_origin(self):
+        resp = self.client.options(
+            "/api/v1/logbooks",
+            HTTP_ORIGIN="http://localhost:5173",
+            HTTP_ACCESS_CONTROL_REQUEST_METHOD="GET",
+            HTTP_ACCESS_CONTROL_REQUEST_HEADERS="authorization",
+        )
+        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(resp["Access-Control-Allow-Origin"], "http://localhost:5173")
+        self.assertIn("Authorization", resp["Access-Control-Allow-Headers"])
+
+    def test_cors_get_includes_allow_origin(self):
+        resp = self.client.get(
+            "/api/v1/logbooks",
+            HTTP_ORIGIN="https://natim.github.io",
+            **self.headers,
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp["Access-Control-Allow-Origin"], "https://natim.github.io")
+
+
 class ApiAuthTests(TestCase):
     fixtures = ["testing_data.json"]
 
@@ -147,6 +176,31 @@ class ApiLogbookTests(TestCase):
             **self.headers,
         )
         self.assertEqual(deleted.status_code, 204)
+
+    def test_glider_dgac_log_create(self):
+        book = self._create_book("glider_dgac")
+        payload = {
+            "flight_date": "2011-08-02T10:00:00",
+            "optional_filter": "",
+            "aircraft_type": "ASK21",
+            "aircraft_registration": "F-CABC",
+            "function_on_board": "Pilote",
+            "flight_nature": "L",
+            "lmode": "R",
+            "dual_minutes": 45,
+            "departure_airport": "LFXX",
+            "arrival_airport": "LFXX",
+        }
+        resp = self.client.post(
+            f"/api/v1/logbooks/{book['id']}/logs",
+            data=json.dumps(payload),
+            content_type="application/json",
+            **self.headers,
+        )
+        self.assertEqual(resp.status_code, 201, resp.content)
+        body = resp.json()
+        self.assertEqual(body["function_on_board"], "Pilote")
+        self.assertEqual(body["flight_nature"], "L")
 
     def test_fcl1080_log_create(self):
         book = self._create_book("plane_fcl1080")

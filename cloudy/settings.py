@@ -44,6 +44,15 @@ ALLOWED_HOSTS = env(
 # Mobile API / MCP JWT (HS256, signed with SECRET_KEY).
 API_JWT_EXPIRY_SECONDS = int(env("API_JWT_EXPIRY_SECONDS", str(60 * 60 * 24 * 30)))
 
+CORS_ALLOWED_ORIGINS = frozenset(
+    origin.strip()
+    for origin in env(
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:5173,https://natim.github.io",
+    ).split(",")
+    if origin.strip()
+)
+
 ADMINS = ["contact@cloudy.fr"]
 MANAGERS = ["contact@cloudy.fr"]
 UNKNOWN_AIRPORTS_CONTACTS = ["contact@cloudy.fr"]
@@ -103,6 +112,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "cloudy.api.middleware.ApiCorsMiddleware",
     "cloudy.api.middleware.ClearApiUserMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
