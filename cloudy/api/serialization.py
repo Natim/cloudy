@@ -101,8 +101,56 @@ def _rename_keys(data: dict[str, Any], mapping: dict[str, str]) -> dict[str, Any
     return out
 
 
+def _passengers_as_list(value: Any) -> list[str]:
+    """Passengers are stored as a ';'-separated string. Empty slots are omitted."""
+    if isinstance(value, list):
+        parts = value
+    elif isinstance(value, str) and value:
+        parts = value.split(";")
+    else:
+        return []
+    return [part for part in parts if isinstance(part, str) and part]
+
+
+_NULLABLE_COUNTS = (
+    "take_off_day",
+    "take_off_night",
+    "landing_day",
+    "landing_night",
+)
+
+_CLOCK_TIMES = (
+    "departure_time",
+    "arrival_time",
+)
+
+
+def _utc_clock_time(value: Any) -> str:
+    """Minutes from midnight UTC become a zero-padded HH:MM string."""
+    if isinstance(value, str):
+        if ":" in value or value == "":
+            return value
+        if value.isdigit():
+            value = int(value)
+        else:
+            return value
+    if isinstance(value, bool) or not isinstance(value, int):
+        return "" if value is None else str(value)
+    hours, minutes = divmod(value, 60)
+    return f"{hours:02d}:{minutes:02d}"
+
+
 def log_to_api_dict(raw: dict[str, Any]) -> dict[str, Any]:
-    return _rename_keys(raw, MODEL_TO_API)
+    data = _rename_keys(raw, MODEL_TO_API)
+    if "passengers" in data:
+        data["passengers"] = _passengers_as_list(data["passengers"])
+    for field in _NULLABLE_COUNTS:
+        if field in data and data[field] is None:
+            data[field] = 0
+    for field in _CLOCK_TIMES:
+        if field in data:
+            data[field] = _utc_clock_time(data[field])
+    return data
 
 
 def log_instance_to_api_dict(log) -> dict[str, Any]:

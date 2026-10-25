@@ -9,6 +9,7 @@ from django.test import Client, TestCase
 
 from cloudy.api.auth import issue_access_token, JWT_AUDIENCE, JWT_ISSUER, set_api_user, user_from_access_token
 from cloudy.api.mcp_server import get_logbook, get_totals, list_aircraft, list_logs
+from cloudy.api.serialization import log_to_api_dict
 from cloudy.DGAC_avion_logbook.models import DGACAvionLogBook
 from cloudy.stats.service import get_named_totals, LogbookAccessError
 
@@ -148,6 +149,7 @@ class ApiLogbookTests(TestCase):
         )
         self.assertEqual(created.status_code, 201, created.content)
         self.assertIn("Location", created)
+        self.assertEqual(created.json()["passengers"], [])
         log_id = created.json()["id"]
 
         patched = self.client.patch(
@@ -217,6 +219,7 @@ class ApiLogbookTests(TestCase):
             "single_pilot_me": 0,
             "total_time_flight": 60,
             "pilot_in_command_name": "Ada Pilot",
+            "passengers": ["Anasthasia Beaujot"],
         }
         resp = self.client.post(
             f"/api/v1/logbooks/{book['id']}/logs",
@@ -225,6 +228,9 @@ class ApiLogbookTests(TestCase):
             **self.headers,
         )
         self.assertEqual(resp.status_code, 201, resp.content)
+        self.assertEqual(resp.json()["passengers"], ["Anasthasia Beaujot"])
+        self.assertEqual(resp.json()["departure_time"], "08:00")
+        self.assertEqual(resp.json()["arrival_time"], "09:00")
 
     def test_aircraft_eco_limit(self):
         simple = User.objects.get(email="simple@example.com")
@@ -345,6 +351,60 @@ class ApiLogbookTests(TestCase):
         )
         self.assertEqual(second.status_code, 403)
         self.assertEqual(second.json()["code"], "plan_required")
+
+
+class PassengerSerializationTests(TestCase):
+    def test_semicolon_string_becomes_name_list(self):
+        data = log_to_api_dict({"staffob": "Anasthasia Beaujot;;", "id": 1})
+        self.assertEqual(data["passengers"], ["Anasthasia Beaujot"])
+        self.assertNotIn("staffob", data)
+
+    def test_empty_and_blank_slots_are_omitted(self):
+        self.assertEqual(log_to_api_dict({"staffob": ""})["passengers"], [])
+        self.assertEqual(log_to_api_dict({"staffob": ";;"})["passengers"], [])
+        self.assertEqual(log_to_api_dict({"staffob": None})["passengers"], [])
+
+    def test_existing_list_drops_empty_entries(self):
+        data = log_to_api_dict({"passengers": ["Ada", "", "Bob"]})
+        self.assertEqual(data["passengers"], ["Ada", "Bob"])
+
+    def test_null_takeoff_and_landing_counts_are_zero(self):
+        data = log_to_api_dict(
+            {
+                "take_off_day": None,
+                "take_off_night": None,
+                "landing_day": None,
+                "landing_night": None,
+            }
+        )
+        self.assertEqual(data["take_off_day"], 0)
+        self.assertEqual(data["take_off_night"], 0)
+        self.assertEqual(data["landing_day"], 0)
+        self.assertEqual(data["landing_night"], 0)
+
+    def test_minute_counts_become_utc_clock_times(self):
+        data = log_to_api_dict({"departure_time": 465, "arrival_time": 512})
+        self.assertEqual(data["departure_time"], "07:45")
+        self.assertEqual(data["arrival_time"], "08:32")
+
+    def test_clock_time_strings_are_kept(self):
+        data = log_to_api_dict({"departure_time": "08:00", "arrival_time": "09:00"})
+        self.assertEqual(data["departure_time"], "08:00")
+        self.assertEqual(data["arrival_time"], "09:00")
+
+    def test_present_takeoff_and_landing_counts_are_kept(self):
+        data = log_to_api_dict(
+            {
+                "take_off_day": 5,
+                "take_off_night": 0,
+                "landing_day": 5,
+                "landing_night": 1,
+            }
+        )
+        self.assertEqual(data["take_off_day"], 5)
+        self.assertEqual(data["take_off_night"], 0)
+        self.assertEqual(data["landing_day"], 5)
+        self.assertEqual(data["landing_night"], 1)
 
 
 class OpenApiSchemaTests(TestCase):
