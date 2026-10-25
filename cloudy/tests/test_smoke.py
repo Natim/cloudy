@@ -381,7 +381,7 @@ def test_logbook_pdf_export_uses_content_type(user_with_profile, monkeypatch):
     logbook = DGACAvionLogBook(ownr=user_with_profile, name="export-test", cat="plane_dgac")
     logbook.save()
 
-    def fake_pdf(self, http_response, title, show_cuts=False):
+    def fake_pdf(self, http_response, title, show_cuts=False, include_images=False):
         http_response.write(b"%PDF-fake")
 
     monkeypatch.setattr(DGACAvionLogBook, "attach_pdf_to_http_response", fake_pdf)
