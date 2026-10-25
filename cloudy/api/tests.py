@@ -347,6 +347,17 @@ class ApiLogbookTests(TestCase):
         self.assertEqual(second.json()["code"], "plan_required")
 
 
+class OpenApiSchemaTests(TestCase):
+    def test_openapi_json_includes_log_schemas(self):
+        resp = self.client.get("/api/v1/openapi.json")
+        self.assertEqual(resp.status_code, 200, resp.content)
+        schema = resp.json()
+        components = schema["components"]["schemas"]
+        self.assertIn("LogRead_glider_dgac", components)
+        self.assertIn("LogWrite_plane_dgac", components)
+        self.assertIn("LogListOut", components)
+
+
 class McpStatsTests(TestCase):
     fixtures = ["testing_data.json"]
 
