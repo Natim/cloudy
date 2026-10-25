@@ -60,6 +60,15 @@ def _log_write_one_of() -> dict[str, Any]:
     return {"oneOf": [{"$ref": f"#/components/schemas/LogWrite_{cat}"} for cat in book_settings.MAP]}
 
 
+def _response_json_schema(operation: dict[str, Any], status: int) -> dict[str, Any]:
+    """Ninja keys OpenAPI responses by int status until JSON encoding."""
+    responses = operation["responses"]
+    body = responses.get(status)
+    if body is None:
+        body = responses[str(status)]
+    return body["content"]["application/json"]
+
+
 def _patch_log_paths(schema: dict[str, Any]) -> None:
     paths = schema.get("paths", {})
     for path_key, methods in paths.items():
@@ -70,20 +79,16 @@ def _patch_log_paths(schema: dict[str, Any]) -> None:
                 if verb in {"put", "patch"}:
                     content = methods[verb].setdefault("requestBody", {}).setdefault("content", {})
                     content.setdefault("application/json", {})["schema"] = _log_write_one_of()
-                methods[verb]["responses"]["200"]["content"]["application/json"]["schema"] = (
-                    _log_read_one_of()
-                )
+                _response_json_schema(methods[verb], 200)["schema"] = _log_read_one_of()
             continue
         if not path_key.endswith("/logs"):
             continue
         if "get" in methods:
-            methods["get"]["responses"]["200"]["content"]["application/json"]["schema"] = {
-                "$ref": "#/components/schemas/LogListOut"
-            }
+            _response_json_schema(methods["get"], 200)["schema"] = {"$ref": "#/components/schemas/LogListOut"}
         if "post" in methods:
             content = methods["post"].setdefault("requestBody", {}).setdefault("content", {})
             content.setdefault("application/json", {})["schema"] = _log_write_one_of()
-            methods["post"]["responses"]["201"]["content"]["application/json"]["schema"] = _log_read_one_of()
+            _response_json_schema(methods["post"], 201)["schema"] = _log_read_one_of()
 
 
 def enrich_openapi_schema(schema: dict[str, Any]) -> dict[str, Any]:
