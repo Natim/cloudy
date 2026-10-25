@@ -236,6 +236,60 @@ class ApiLogbookTests(TestCase):
         self.assertEqual(resp.json()["departure_time"], "08:00")
         self.assertEqual(resp.json()["arrival_time"], "09:00")
 
+    def test_fcl1080_empty_synthetic_date(self):
+        book = self._create_book("plane_fcl1080")
+        payload = {
+            "flight_date": "2011-08-01T08:00:00",
+            "optional_filter": "",
+            "departure_place": "LFPG",
+            "arrival_place": "LFPO",
+            "departure_time": "08:00",
+            "arrival_time": "09:00",
+            "aircraft_type": "C172",
+            "aircraft_registration": "F-GABC",
+            "single_pilot_se": 1,
+            "single_pilot_me": 0,
+            "total_time_flight": 60,
+            "pilot_in_command_name": "Ada Pilot",
+            "synthetic_date": "",
+        }
+        created = self.client.post(
+            f"/api/v1/logbooks/{book['id']}/logs",
+            data=json.dumps(payload),
+            content_type="application/json",
+            **self.headers,
+        )
+        self.assertEqual(created.status_code, 201, created.content)
+        self.assertNotIn("synthetic_date", created.json())
+        log_id = created.json()["id"]
+
+        cleared = self.client.put(
+            f"/api/v1/logbooks/{book['id']}/logs/{log_id}",
+            data=json.dumps({**payload, "synthetic_date": None}),
+            content_type="application/json",
+            **self.headers,
+        )
+        self.assertEqual(cleared.status_code, 200, cleared.content)
+        self.assertNotIn("synthetic_date", cleared.json())
+
+        dated = self.client.put(
+            f"/api/v1/logbooks/{book['id']}/logs/{log_id}",
+            data=json.dumps({**payload, "synthetic_date": "2011-08-02T00:00:00"}),
+            content_type="application/json",
+            **self.headers,
+        )
+        self.assertEqual(dated.status_code, 200, dated.content)
+        self.assertIn("2011-08-02", dated.json()["synthetic_date"])
+
+        invalid = self.client.put(
+            f"/api/v1/logbooks/{book['id']}/logs/{log_id}",
+            data=json.dumps({**payload, "synthetic_date": "not-a-date"}),
+            content_type="application/json",
+            **self.headers,
+        )
+        self.assertEqual(invalid.status_code, 400)
+        self.assertEqual(invalid.json()["errors"]["synthetic_date"][0]["message"], "Invalid date-time.")
+
     def test_aircraft_eco_limit(self):
         simple = User.objects.get(email="simple@example.com")
         simple_headers = bearer_headers(simple)

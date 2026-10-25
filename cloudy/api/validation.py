@@ -11,6 +11,9 @@ from .constants import READONLY_LOG_FIELDS
 from .errors import invalid_payload
 from .serialization import MODEL_TO_API, normalize_log_body, normalize_report_body
 
+# Dates that may be omitted. An empty string or null is stored as None.
+_NULLABLE_DATES = frozenset({"synthetic_date"})
+
 
 def _empty_default(rtype: str) -> Any:
     if rtype == "integer":
@@ -22,7 +25,13 @@ def _empty_default(rtype: str) -> Any:
     return ""
 
 
-def _coerce_value(rtype: str, value: Any, field_api: str) -> Any:
+def _blank_date(value: Any) -> bool:
+    return value is None or (isinstance(value, str) and value.strip() == "")
+
+
+def _coerce_value(rtype: str, value: Any, field_api: str, *, nullable: bool = False) -> Any:
+    if rtype == "date" and nullable and _blank_date(value):
+        return None
     if value is None:
         if rtype in {"string", "list"}:
             return _empty_default(rtype)
@@ -106,14 +115,18 @@ def validate_and_prepare_log_body(
             if name not in normalized:
                 continue
             api_name = MODEL_TO_API.get(name, name)
-            prepared[name] = _coerce_value(rtype, normalized[name], api_name)
+            prepared[name] = _coerce_value(
+                rtype, normalized[name], api_name, nullable=name in _NULLABLE_DATES
+            )
         return prepared
 
     prepared = {}
     for name, rtype in _writable_rules(logbook):
         api_name = MODEL_TO_API.get(name, name)
         if name in normalized:
-            prepared[name] = _coerce_value(rtype, normalized[name], api_name)
+            prepared[name] = _coerce_value(
+                rtype, normalized[name], api_name, nullable=name in _NULLABLE_DATES
+            )
         else:
             prepared[name] = _empty_default(rtype)
 

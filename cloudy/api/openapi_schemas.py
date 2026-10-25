@@ -39,6 +39,8 @@ def log_schema_for_cat(cat: str, *, write: bool = False) -> dict[str, Any]:
             continue
         api_name = MODEL_TO_API.get(name, name)
         prop = dict(_JSON_TYPE_MAP.get(rtype, {"type": "string"}))
+        if name == "synthetic_date":
+            prop["nullable"] = True
         properties[api_name] = prop
         if write and name in {"date", "optional_filter"}:
             required.append(api_name if name == "date" else name)
