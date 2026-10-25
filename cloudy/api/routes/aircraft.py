@@ -1,0 +1,124 @@
+from django.core.exceptions import ValidationError
+from django.http import HttpRequest
+from ninja import File, Router, UploadedFile
+from ninja.errors import HttpError
+from ninja.responses import Response
+
+from cloudy.aircrafts.models import Aircraft
+from cloudy.core.models import FileModel
+
+from ..auth import require_user
+from ..errors import invalid_payload, storage_quota
+from ..logbooks_access import get_owned_logbook
+from ..schemas.aircraft import AircraftIn, AircraftPatchIn
+from ..serialization import aircraft_to_dict
+from ._common import bearer_auth, resource_location
+
+router = Router(tags=["aircraft"])
+
+
+def _aircraft_location(request: HttpRequest, logbook_id: int, aircraft_id: int) -> str:
+    return resource_location(request, f"/api/v1/logbooks/{logbook_id}/aircraft/{aircraft_id}")
+
+
+@router.get("/logbooks/{logbook_id}/aircraft", response=list[dict], auth=bearer_auth)
+def list_aircraft(request: HttpRequest, logbook_id: int):
+    user = require_user(request)
+    logbook = get_owned_logbook(user, logbook_id)
+    return [aircraft_to_dict(a) for a in Aircraft.objects.filter(logbook=logbook)]
+
+
+@router.post("/logbooks/{logbook_id}/aircraft", response={201: dict}, auth=bearer_auth)
+def create_aircraft(request: HttpRequest, logbook_id: int, payload: AircraftIn):
+    user = require_user(request)
+    logbook = get_owned_logbook(user, logbook_id)
+    aircraft = Aircraft(
+        logbook=logbook,
+        imma=payload.registration,
+        type=payload.aircraft_type,
+        airport=payload.airport,
+    )
+    try:
+        aircraft.full_clean()
+        aircraft.save()
+    except ValidationError as exc:
+        raise HttpError(400, str(exc)) from exc
+    data = aircraft_to_dict(aircraft)
+    return Response(
+        data, status=201, headers={"Location": _aircraft_location(request, logbook_id, aircraft.pk)}
+    )
+
+
+@router.put("/logbooks/{logbook_id}/aircraft/{aircraft_id}", response=dict, auth=bearer_auth)
+def replace_aircraft(request: HttpRequest, logbook_id: int, aircraft_id: int, payload: AircraftIn):
+    user = require_user(request)
+    logbook = get_owned_logbook(user, logbook_id)
+    try:
+        aircraft = Aircraft.objects.get(pk=aircraft_id, logbook=logbook)
+    except Aircraft.DoesNotExist as exc:
+        raise HttpError(404, "Aircraft not found") from exc
+    aircraft.imma = payload.registration
+    aircraft.type = payload.aircraft_type
+    aircraft.airport = payload.airport
+    try:
+        aircraft.full_clean()
+        aircraft.save()
+    except ValidationError as exc:
+        raise HttpError(400, str(exc)) from exc
+    return aircraft_to_dict(aircraft)
+
+
+@router.patch("/logbooks/{logbook_id}/aircraft/{aircraft_id}", response=dict, auth=bearer_auth)
+def patch_aircraft(request: HttpRequest, logbook_id: int, aircraft_id: int, payload: AircraftPatchIn):
+    user = require_user(request)
+    logbook = get_owned_logbook(user, logbook_id)
+    patch = payload.dict(exclude_unset=True)
+    if not patch:
+        raise invalid_payload("Empty patch body")
+    try:
+        aircraft = Aircraft.objects.get(pk=aircraft_id, logbook=logbook)
+    except Aircraft.DoesNotExist as exc:
+        raise HttpError(404, "Aircraft not found") from exc
+    if "registration" in patch:
+        aircraft.imma = patch["registration"]
+    if "aircraft_type" in patch:
+        aircraft.type = patch["aircraft_type"]
+    if "airport" in patch:
+        aircraft.airport = patch["airport"]
+    try:
+        aircraft.full_clean()
+        aircraft.save()
+    except ValidationError as exc:
+        raise HttpError(400, str(exc)) from exc
+    return aircraft_to_dict(aircraft)
+
+
+@router.delete("/logbooks/{logbook_id}/aircraft/{aircraft_id}", response={204: None}, auth=bearer_auth)
+def delete_aircraft(request: HttpRequest, logbook_id: int, aircraft_id: int):
+    user = require_user(request)
+    logbook = get_owned_logbook(user, logbook_id)
+    deleted, _ = Aircraft.objects.filter(pk=aircraft_id, logbook=logbook).delete()
+    if not deleted:
+        raise HttpError(404, "Aircraft not found")
+    return 204, None
+
+
+@router.post("/logbooks/{logbook_id}/aircraft/{aircraft_id}/photo", response={201: dict}, auth=bearer_auth)
+def upload_aircraft_photo(
+    request: HttpRequest,
+    logbook_id: int,
+    aircraft_id: int,
+    file: UploadedFile = File(...),
+):
+    user = require_user(request)
+    logbook = get_owned_logbook(user, logbook_id)
+    if not user.userprofile.can_upload_media():
+        raise storage_quota()
+    try:
+        aircraft = Aircraft.objects.get(pk=aircraft_id, logbook=logbook)
+    except Aircraft.DoesNotExist as exc:
+        raise HttpError(404, "Aircraft not found") from exc
+    fobject = FileModel(owner=user, file=file)
+    fobject.save()
+    aircraft.pictures.add(fobject)
+    return Response({"id": fobject.pk, "url": fobject.file.url}, status=201)

@@ -8,6 +8,9 @@ from django.urls import include, path, register_converter
 from django.urls.converters import SlugConverter
 from django.views.generic import RedirectView, TemplateView
 
+from cloudy.api.api import api as cloudy_api
+from cloudy.api.mcp_view import mcp_endpoint
+from cloudy.api.views import api_root
 from cloudy.core import admin_views
 from cloudy.core import views as core_views
 
@@ -48,7 +51,10 @@ urlpatterns = [
     path("alerts/", include("cloudy.alerts.urls")),
     path("notices/", TemplateView.as_view(template_name="support.html"), name="notices"),
     path("profile/", RedirectView.as_view(pattern_name="profile", permanent=False)),
-    path("api/", TemplateView.as_view(template_name="support.html"), name="api_gone"),
+    path("api/", api_root, name="api_root"),
+    path("api/v1/", cloudy_api.urls),
+    path("mcp", mcp_endpoint),
+    path("mcp/", mcp_endpoint),
     path("search/", RedirectView.as_view(url="/faq/", permanent=False), name="search"),
     path("zendesk/", TemplateView.as_view(template_name="support.html"), name="zendesk_gone"),
     path("coupons/", TemplateView.as_view(template_name="support.html"), name="coupons_gone"),

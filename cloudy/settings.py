@@ -2,8 +2,6 @@
 Django settings for cloudy project.
 """
 
-from __future__ import annotations
-
 import os
 import sys
 from pathlib import Path
@@ -42,6 +40,18 @@ if not DEBUG and (not SECRET_KEY or _using_dev_secret):
 ALLOWED_HOSTS = env(
     "DJANGO_ALLOWED_HOSTS", "www.cloudy.fr,cloudy.fr,api.cloudy.fr,localhost,127.0.0.1"
 ).split(",")
+
+# Mobile API / MCP JWT (HS256, signed with SECRET_KEY).
+API_JWT_EXPIRY_SECONDS = int(env("API_JWT_EXPIRY_SECONDS", str(60 * 60 * 24 * 30)))
+
+CORS_ALLOWED_ORIGINS = frozenset(
+    origin.strip()
+    for origin in env(
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:5173,https://natim.github.io",
+    ).split(",")
+    if origin.strip()
+)
 
 ADMINS = ["contact@cloudy.fr"]
 MANAGERS = ["contact@cloudy.fr"]
@@ -86,6 +96,7 @@ INSTALLED_APPS = [
     "cloudy.FCL1080",
     "cloudy.FFPLUM_ulm_logbook",
     "cloudy.FFP_logbook",
+    "cloudy.api",
 ]
 
 ACCOUNT_ACTIVATION_DAYS = 7
@@ -101,6 +112,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "cloudy.api.middleware.ApiCorsMiddleware",
+    "cloudy.api.middleware.ClearApiUserMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
