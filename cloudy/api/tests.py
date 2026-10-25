@@ -215,8 +215,9 @@ class ApiLogbookTests(TestCase):
             "arrival_time": "09:00",
             "aircraft_type": "C172",
             "aircraft_registration": "F-GABC",
-            "single_pilot_se": 1,
-            "single_pilot_me": 0,
+            "single_pilot_se": True,
+            "single_pilot_me": False,
+            "single_pilot_time": 47,
             "total_time_flight": 60,
             "pilot_in_command_name": "Ada Pilot",
             "passengers": ["Anasthasia Beaujot"],
@@ -229,6 +230,9 @@ class ApiLogbookTests(TestCase):
         )
         self.assertEqual(resp.status_code, 201, resp.content)
         self.assertEqual(resp.json()["passengers"], ["Anasthasia Beaujot"])
+        self.assertEqual(resp.json()["single_pilot_time"], 47)
+        self.assertIs(resp.json()["single_pilot_se"], True)
+        self.assertIs(resp.json()["single_pilot_me"], False)
         self.assertEqual(resp.json()["departure_time"], "08:00")
         self.assertEqual(resp.json()["arrival_time"], "09:00")
 
