@@ -54,6 +54,17 @@ class StaticViewsTestCase(TestCase):
         resp = self.c.get(url)
         self.assertEqual(resp.status_code, 200)
 
+    def test_mcp_guide(self):
+        url = reverse("mcp_guide")
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 200)
+        body = resp.content.decode()
+        self.assertIn("Claude", body)
+        self.assertIn("ChatGPT", body)
+        self.assertIn("/mcp", body)
+        self.assertIn("Bearer", body)
+        self.assertIn("list_logbooks", body)
+
     def test_press(self):
         url = reverse("press")
         resp = self.c.get(url)
