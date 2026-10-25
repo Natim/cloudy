@@ -78,6 +78,11 @@ class StaticViewsTestCase(TestCase):
         self.assertIn("mûrissement", body)
         self.assertIn("parcourez l’Europe à deux", body)
         self.assertIn("https://www.fly-green-aviation.com/", body)
+        self.assertIn("france-ga-pilot-maps", body)
+        self.assertIn("https://natim.github.io/france-ga-pilot-maps/landing.html", body)
+        self.assertIn("https://natim.github.io/france-ga-pilot-maps/prix.html", body)
+        self.assertIn("https://natim.github.io/france-ga-pilot-maps/", body)
+        self.assertIn("AVGAS", body)
 
     def test_air_avion(self):
         url = reverse("landing", kwargs={"aeronef": "avion"})
