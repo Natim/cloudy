@@ -8178,3 +8178,53 @@ img#ajax-loading {
 .qq-upload-fail .qq-upload-failed-text {
     display: inline;
 }
+
+/* Aircraft list delete control: keep the 9px icon, not the form submit button. */
+div.col-on-left div.content form.aircraft-delete-form {
+    display: block;
+    float: none;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    text-align: right;
+}
+
+div.col-on-left div.content form.aircraft-delete-form button.icon-delete {
+    display: inline-block;
+    float: none;
+    width: 9px;
+    height: 9px;
+    margin: 5px 0 0 0;
+    padding: 0;
+    border: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    text-shadow: none;
+    background-color: transparent;
+    background-image: url('/static/img/carnet/icon-delete.png') !important;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    font-size: 0;
+    line-height: 0;
+    color: transparent;
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+div.col-on-left div.content form.aircraft-delete-form button.icon-delete:hover,
+div.col-on-left div.content form.aircraft-delete-form button.icon-delete:active {
+    margin: 5px 0 0 0;
+    padding: 0;
+    border: 0;
+    color: transparent;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    text-shadow: none;
+    background-color: transparent;
+}
