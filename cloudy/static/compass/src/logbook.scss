@@ -517,9 +517,15 @@ form#tooltip-form-time {
 
    .total-black-left-4 {
       margin-top: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
       .col-total {
+          float: none;
           font-size: 13px;
-           width:  130px;
+          width: auto;
+          margin: 0;
+          white-space: nowrap;
       }
 
    }

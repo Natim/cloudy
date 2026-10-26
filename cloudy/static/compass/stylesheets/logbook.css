@@ -7961,12 +7961,18 @@ div.alert-list div.alert .btn {
 /* line 518, ../src/logbook.scss */
 .total-line .total-blue-long .bottom-line .total-black-left-4 {
     margin-top: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
 }
 
 /* line 520, ../src/logbook.scss */
 .total-line .total-blue-long .bottom-line .total-black-left-4 .col-total {
+    float: none;
     font-size: 13px;
-    width: 130px;
+    width: auto;
+    margin: 0;
+    white-space: nowrap;
 }
 
 /* line 2004, ../src/logbook.scss */

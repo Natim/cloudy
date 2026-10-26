@@ -210,8 +210,8 @@ cloudyStats.TotalsPieChart = function (targetContainer, map, totalsList, filters
           dataType: "json",
           success: function(json_data){
               var allEmpty = true;
-              $.each(json_data, function(i, val) {
-                  if (val!==0) {
+              $.each(json_data, function(i, item) {
+                  if (item && item.data) {
                     allEmpty = false;
                   }
               });
@@ -543,10 +543,15 @@ function drawPieChart(container_id, data, no_format) {
     }
     var cleaned_data = [];
      $.each(data, function(i, item) {
-         if (data[i][1] !== 0) {
+         if (item && item[1]) {
              cleaned_data.push(item);
          }
       });
+
+    if (cleaned_data.length === 0) {
+        $("#" + container_id).html("Aucune donnée à afficher pour le moment.");
+        return;
+    }
 
     var labels = [];
     var values = [];

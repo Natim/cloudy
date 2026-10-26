@@ -44,6 +44,9 @@ class FormatTotalNode(template.Node):
         elif self.formatting == "decorated":
             return context["logbook"].time_formatter.output(int(value), decorated=True)
 
+        elif self.formatting == "plain":
+            return formatted
+
         # When in doubt
         return ""
 
