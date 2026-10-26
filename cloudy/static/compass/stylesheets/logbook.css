@@ -7776,6 +7776,29 @@ div.alert-list div.alert .btn {
 /* line 380, ../src/logbook.scss */
 .total-line .total-blue-long .total-box-main-single-row {
     height: 234px;
+    display: flex;
+    flex-direction: column;
+}
+
+.total-line .total-blue-long .total-box-main-single-row .title-box,
+.total-line .total-blue-long .total-box-main-single-row .bottom-line,
+.total-line .total-blue-long .total-box-main-single-row .total {
+    flex: 0 0 auto;
+}
+
+.total-line .total-blue-long .total-box-main-single-row .total {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.total-line .total-blue-long .total-box-main-single-row .bottom-line {
+    float: none;
+    margin-top: 0;
+    height: auto;
+}
+
+.total-line .total-blue-long .total-box-main-single-row .bottom-line .total-black-left-4 {
+    margin-top: 0;
 }
 
 /* line 383, ../src/logbook.scss */

@@ -379,6 +379,25 @@ form#tooltip-form-time {
 	}
 	 .total-box-main-single-row {
       height: 234px;
+      display: flex;
+      flex-direction: column;
+      .title-box,
+      .bottom-line,
+      .total {
+        flex: 0 0 auto;
+      }
+      .total {
+        margin-top: auto;
+        margin-bottom: auto;
+      }
+      .bottom-line {
+        float: none;
+        margin-top: 0;
+        height: auto;
+        .total-black-left-4 {
+          margin-top: 0;
+        }
+      }
     }
 	.title-box {
 		color: $dark-blue;
