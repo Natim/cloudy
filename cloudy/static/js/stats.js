@@ -194,8 +194,11 @@ cloudyStats.FlyTimeBarGraph = function (totalStr, groupByStr) {
     });
 };
 
-/* Totals Pie chart */
-cloudyStats.TotalsPieChart = function (targetContainer, map, totalsList, filtersList) {
+/* Totals Pie chart
+ * remainder: optional {of, subtract, label}. The slice is
+ * of - sum(subtract), so a chart can show the time that is in neither part.
+ */
+cloudyStats.TotalsPieChart = function (targetContainer, map, totalsList, filtersList, remainder) {
      var payload = {
        begin_date: this.beginDate,
        end_date: this.endDate,
@@ -209,8 +212,27 @@ cloudyStats.TotalsPieChart = function (targetContainer, map, totalsList, filters
           data: {payload:myJSONPayload},
           dataType: "json",
           success: function(json_data){
+              var slices = json_data;
+              if (remainder) {
+                  var byLabel = {};
+                  $.each(json_data, function(i, item) {
+                      byLabel[item.label] = item.data || 0;
+                  });
+                  var rest = byLabel[remainder.of] || 0;
+                  $.each(remainder.subtract, function(i, key) {
+                      rest -= byLabel[key] || 0;
+                  });
+                  if (rest < 0) {
+                      rest = 0;
+                  }
+                  slices = [];
+                  $.each(remainder.subtract, function(i, key) {
+                      slices.push({label: key, data: byLabel[key] || 0});
+                  });
+                  slices.push({label: remainder.label, data: rest});
+              }
               var allEmpty = true;
-              $.each(json_data, function(i, item) {
+              $.each(slices, function(i, item) {
                   if (item && item.data) {
                     allEmpty = false;
                   }
@@ -220,7 +242,7 @@ cloudyStats.TotalsPieChart = function (targetContainer, map, totalsList, filters
                   return false;
               }
               var pieData = [];
-              $.each(json_data, function(i, item) {
+              $.each(slices, function(i, item) {
                   pieData[i]= [map[item.label], item.data];
               });
               drawPieChart(targetContainer, pieData);

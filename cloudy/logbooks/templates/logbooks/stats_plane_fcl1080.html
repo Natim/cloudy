@@ -95,16 +95,21 @@
     </script>
   </div>
   <div class="pie-chart">
-    <h2>Durée condition opérationnelle</h2>
+    <h2>Condition Opérationnelle</h2>
     <div id="pie_day_night" class="pie">
       Chargement...
     </div>
     <script type="text/javascript" charset="utf-8">
       var map = {
         "total_op_time_night": "Nuit",
-        "total_op_time_ifr": "IFR"
+        "total_op_time_ifr": "IFR",
+        "vfr": "VFR"
       };
-      cloudyStats.TotalsPieChart("pie_day_night", map, ["total_op_time_night", "total_op_time_ifr"]);
+      cloudyStats.TotalsPieChart("pie_day_night", map, ["total_op_time_night", "total_op_time_ifr", "total_total_time_flight"], null, {
+        of: "total_total_time_flight",
+        subtract: ["total_op_time_night", "total_op_time_ifr"],
+        label: "vfr"
+      });
     </script>
   </div>
 
