@@ -2,6 +2,10 @@
 
 Online pilot logbooks ([cloudy.fr](https://www.cloudy.fr/)).
 
+## API
+
+[elm-cloudy](https://github.com/Natim/elm-cloudy) is an example client for `/api/v1`: an Elm HTTP package and an [offline-first PWA](https://natim.github.io/elm-cloudy/).
+
 ## License
 
 Application source code is released under the **GNU Affero General Public License v3.0 only** ([LICENSE](LICENSE)). Copyright SAS CLOUDY.
