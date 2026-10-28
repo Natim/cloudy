@@ -3,6 +3,7 @@ import hashlib
 import hmac
 import random
 from datetime import date, datetime, timedelta
+from posixpath import join as posixpath_join
 
 from constance import config
 from django.conf import settings
@@ -25,8 +26,12 @@ PLAN_CHOICES = (
 )
 
 
-def _avatar_path():
-    return datetime.utcnow().strftime("avatars/%Y/%b/%d")
+def _avatar_path(instance, filename):
+    """Date-based avatar path. Django calls upload_to(instance, filename)."""
+    from cloudy.core.utils import get_valid_name
+
+    directory = timezone.now().strftime("avatars/%Y/%b/%d")
+    return posixpath_join(directory, get_valid_name(filename))
 
 
 class UserProfile(models.Model):
@@ -49,7 +54,6 @@ class UserProfile(models.Model):
     fplan_switch_date = models.DateTimeField("Switch to firstclass pack", blank=True, null=True)
 
     aerodrom = models.CharField("Aérodrome", max_length=70, blank=True)
-    # avatar = models.ImageField(upload_to=upload_to(_avatar_path), blank=True, null=True)  # DELETE
     avatar = models.ImageField(upload_to=_avatar_path, blank=True, null=True)
     api_key = models.CharField(max_length=50, unique=True, blank=True, null=True)
 

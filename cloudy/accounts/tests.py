@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from cloudy.accounts.models import UserProfile
+from cloudy.accounts.models import _avatar_path, UserProfile
 from cloudy.DGAC_avion_logbook.models import DGACAvionLogBook
 from cloudy.DGAC_planeur_logbook.models import DGACPlaneurLogBook
 
@@ -22,3 +22,10 @@ class UserProfileLogbookTypeTestCase(TestCase):
         glider.save()
 
         self.assertTrue(profile.has_logbook_of_type("glider_dgac"))
+
+
+def test_avatar_path_accepts_filefield_upload_to_signature():
+    name = UserProfile._meta.get_field("avatar").generate_filename(None, "Avatar Photo.JPG")
+    assert name.startswith("avatars/")
+    assert name.endswith("avatar_photo.JPG")
+    assert _avatar_path(None, "avatar.jpg").endswith("avatar.jpg")
