@@ -9,7 +9,7 @@
     {% if not request.user.get_profile.has_payed_plan %}
     Votre pack Cloudy Economy Class ne vous permet de choisir <span style="background-color: #ffdcdc;">qu'un seul
       carnet.</span>
-    <a href="{#TODO # url 'payment:pcloudy' #}" class="standard-link">Cliquez ici</a> pour changer de pack.
+    <a href="{% url 'payment:pcloudy' %}" class="standard-link">Cliquez ici</a> pour changer de pack.
     {% else %}
     Vous pourrez, à tout moment, une fois votre compte créé, rajouter ou supprimer des carnets de vol
     {% endif %}

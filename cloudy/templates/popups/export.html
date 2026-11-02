@@ -20,7 +20,7 @@
       {% if not request.user.get_profile.has_payed_plan %}
       <a href="#" class="btn disable">Exporter en PDF</a>
       <div class="cont">
-        <p>Le module d'export au format PDF est une fonction du pack <a href="{#TODO # url 'payment:pcloudy' #}">First
+        <p>Le module d'export au format PDF est une fonction du pack <a href="{% url 'payment:pcloudy' %}">First
             Class</a>.<br />
           Téléchargez un exemple <a href="{% static 'pdf/exemple_export_dgac.pdf' %}" target="_blank">d'export PDF</a>
           DGAC avion.</p>

@@ -6,7 +6,7 @@
   <li>
     <form method="post" action="{{ impersonate_url }}">
       {% csrf_token %}
-      <button type="submit" class="historylink">Voir le site en tant que cet utilisateur</button>
+      <a href="{{ impersonate_url }}" class="addlink" onclick="this.closest('form').submit(); return false;">Voir le site en tant que cet utilisateur</a>
     </form>
   </li>
   {% endif %}

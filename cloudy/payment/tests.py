@@ -40,20 +40,68 @@ class StripeCheckoutSecurityTestCase(TestCase):
         self.client = Client()
         self.client.login(username="paytest", password="secret")
 
+    @patch("cloudy.payment.views.stripe.Price.retrieve")
     @patch("cloudy.payment.views.stripe.checkout.Session.create")
-    def test_checkout_ignores_client_price_id(self, mock_create):
-        mock_create.return_value = MagicMock(id="cs_test")
+    def test_checkout_ignores_client_price_id(self, mock_create, mock_price):
+        mock_price.return_value = MagicMock(recurring={"interval": "year"})
+        mock_create.return_value = MagicMock(id="cs_test", url="https://checkout.stripe.com/c/pay/cs_test")
         response = self.client.post(
             reverse("payment:create_checkout_session"),
             data='{"priceId": "price_cheap"}',
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["url"], "https://checkout.stripe.com/c/pay/cs_test")
         mock_create.assert_called_once()
+        self.assertEqual(mock_create.call_args.kwargs["mode"], "subscription")
         self.assertEqual(
             mock_create.call_args.kwargs["line_items"],
             [{"price": "price_first_class", "quantity": 1}],
         )
+
+    @patch("cloudy.payment.views.stripe.Price.retrieve")
+    @patch("cloudy.payment.views.stripe.checkout.Session.create")
+    def test_checkout_uses_payment_mode_for_one_time_price(self, mock_create, mock_price):
+        mock_price.return_value = MagicMock(recurring=None)
+        mock_create.return_value = MagicMock(id="cs_once", url="https://checkout.stripe.com/c/pay/cs_once")
+        response = self.client.post(
+            reverse("payment:create_checkout_session"),
+            data="{}",
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mock_create.call_args.kwargs["mode"], "payment")
+
+    @patch("cloudy.payment.views.stripe.Price.retrieve")
+    @patch("cloudy.payment.views.stripe.checkout.Session.create")
+    def test_checkout_forces_https_on_production_host(self, mock_create, mock_price):
+        mock_price.return_value = MagicMock(recurring=None)
+        mock_create.return_value = MagicMock(id="cs_test", url="https://checkout.stripe.com/pay/cs_test")
+        self.client.post(
+            reverse("payment:create_checkout_session"),
+            data="{}",
+            content_type="application/json",
+            HTTP_HOST="cloudy.fr",
+        )
+        success_url = mock_create.call_args.kwargs["success_url"]
+        self.assertTrue(success_url.startswith("https://cloudy.fr/"))
+        self.assertIn("{CHECKOUT_SESSION_ID}", success_url)
+
+    @patch("cloudy.payment.views.stripe.Price.retrieve")
+    @patch("cloudy.payment.views.stripe.checkout.Session.create")
+    def test_checkout_reports_stripe_error(self, mock_create, mock_price):
+        import stripe
+
+        mock_price.return_value = MagicMock(recurring={"interval": "year"})
+        mock_create.side_effect = stripe.error.InvalidRequestError("No such price", "line_items")
+        response = self.client.post(
+            reverse("payment:create_checkout_session"),
+            data="{}",
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("No such price", response.json()["error"]["message"])
+        self.assertNotIn("sessionId", response.json())
 
     @override_settings(STRIPE_FIRST_CLASS_SUBSCRIPTION="")
     def test_checkout_fails_when_price_not_configured(self):

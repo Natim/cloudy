@@ -31,31 +31,61 @@ def cloudy_pack(request):
     )
 
 
+def _checkout_return_url(request, path: str) -> str:
+    """Stripe live mode rejects http return URLs. Behind the production proxy the
+    request looks like plain HTTP, so force https for the public hosts."""
+    url = request.build_absolute_uri(path)
+    # Django percent-encodes the braces; Stripe only substitutes the literal placeholder.
+    url = url.replace("%7BCHECKOUT_SESSION_ID%7D", "{CHECKOUT_SESSION_ID}")
+    host = request.get_host().split(":")[0]
+    if host in {"cloudy.fr", "www.cloudy.fr"} and url.startswith("http://"):
+        return "https://" + url[len("http://") :]
+    return url
+
+
 @require_POST
 @login_required
 def create_checkout_session(request):
-    price_id = settings.STRIPE_FIRST_CLASS_SUBSCRIPTION
+    price_id = (settings.STRIPE_FIRST_CLASS_SUBSCRIPTION or "").strip()
     if not price_id:
         return JsonResponse(
-            {"error": {"message": "First Class subscription is not configured."}},
+            {"error": {"message": "L'abonnement First Class n'est pas configuré."}},
             status=500,
         )
 
     try:
-        checkout_session = stripe.checkout.Session.create(
-            success_url=request.build_absolute_uri("/payment/pack/payed/?session_id={CHECKOUT_SESSION_ID}"),
-            cancel_url=request.build_absolute_uri("/payment/pack/closed/"),
-            payment_method_types=["card"],
-            customer_email=request.user.email,
-            client_reference_id=str(request.user.id),
-            mode="subscription",
-            line_items=[{"price": price_id, "quantity": 1}],
+        price = stripe.Price.retrieve(price_id)
+        mode = "subscription" if price.recurring else "payment"
+        params = {
+            "success_url": _checkout_return_url(
+                request, "/payment/pack/payed/?session_id={CHECKOUT_SESSION_ID}"
+            ),
+            "cancel_url": _checkout_return_url(request, "/payment/pack/closed/"),
+            "client_reference_id": str(request.user.id),
+            "mode": mode,
+            "line_items": [{"price": price_id, "quantity": 1}],
+        }
+        if request.user.email:
+            params["customer_email"] = request.user.email
+        checkout_session = stripe.checkout.Session.create(**params)
+        if not checkout_session.url:
+            logger.error("Stripe checkout session %s has no redirect url", checkout_session.id)
+            return JsonResponse(
+                {"error": {"message": "Impossible de démarrer le paiement."}},
+                status=400,
+            )
+        return JsonResponse({"sessionId": checkout_session.id, "url": checkout_session.url})
+    except stripe.error.StripeError as exc:
+        logger.exception("Stripe checkout session creation failed")
+        detail = exc.user_message or "Veuillez réessayer plus tard."
+        return JsonResponse(
+            {"error": {"message": f"Impossible de démarrer le paiement. {detail}"}},
+            status=400,
         )
-        return JsonResponse({"sessionId": checkout_session.id})
     except Exception:
         logger.exception("Stripe checkout session creation failed")
         return JsonResponse(
-            {"error": {"message": "Unable to start checkout. Please try again later."}},
+            {"error": {"message": "Impossible de démarrer le paiement."}},
             status=400,
         )
 
