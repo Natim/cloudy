@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils.encoding import smart_str
 from django.utils.html import format_html, format_html_join
 
+from cloudy.accounts.impersonation import can_impersonate
 from cloudy.alerts.models import Alert, Qualification
 
 from .models import PLAN_CHOICES, UserProfile
@@ -51,6 +52,7 @@ export_csv.short_description = "Export CSV"
 
 
 class UserProfileAdmin(admin.ModelAdmin):
+    change_form_template = "admin/accounts/userprofile/change_form.html"
     list_display = (
         "user",
         "u_email",
@@ -67,6 +69,13 @@ class UserProfileAdmin(admin.ModelAdmin):
     search_fields = ["user__first_name", "user__last_name", "user__email"]
     readonly_fields = ("cgv_date",)
     actions = [export_csv]
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        extra_context = extra_context or {}
+        profile = self.get_object(request, object_id)
+        if profile is not None and can_impersonate(request.user, profile.user):
+            extra_context["impersonate_url"] = reverse("impersonate", args=[profile.user_id])
+        return super().change_view(request, object_id, form_url, extra_context)
 
     def u_email(self, obj):
         return "%s" % (obj.user.email)

@@ -1,0 +1,9 @@
+{% if impersonator_id %}
+<div id="impersonation-banner" style="background:#b45309;color:#fff;padding:8px 16px;text-align:center;font:14px/1.4 sans-serif;position:relative;z-index:10000;">
+  Session administrateur : vous voyez le site en tant que {{ user.get_full_name|default:user.username }} ({{ user.email }}).
+  <form method="post" action="{% url 'stop_impersonate' %}" style="display:inline">
+    {% csrf_token %}
+    <button type="submit" style="margin-left:8px;cursor:pointer">Revenir à l'administration</button>
+  </form>
+</div>
+{% endif %}

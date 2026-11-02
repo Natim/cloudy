@@ -24,6 +24,7 @@ from django.contrib.auth.views import (
 )
 from django.urls import include, path
 
+from cloudy.accounts.impersonation import impersonate, stop_impersonation
 from cloudy.accounts.views import (
     account_admin,
     account_admin_passwd,
@@ -35,6 +36,8 @@ from cloudy.accounts.views import (
 
 urlpatterns = [
     path("login/", login, {"template_name": "accounts/login.html"}, name="auth_login"),
+    path("impersonate/<int:user_id>/", impersonate, name="impersonate"),
+    path("stop-impersonate/", stop_impersonation, name="stop_impersonate"),
     path("logout/", LogoutView.as_view(next_page="/"), name="auth_logout"),
     path("profile/", profile, name="profile"),
     path("account/", account_admin, name="account_admin"),
