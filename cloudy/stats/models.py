@@ -185,8 +185,7 @@ class StatsModelBase(models.Model):
 
             if reports is True:
                 for rule in rules:
-                    # local_res["__sum__"] += reports_dict.get(rule.replace(".", "__"), 0)
-                    pass  # TODO
+                    local_res["__sum__"] += int(reports_dict.get(rule.replace(".", "__"), 0) or 0)
 
             i = -1
             for log in logs:
