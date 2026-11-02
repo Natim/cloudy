@@ -46,11 +46,6 @@ class HoneypotField(Field):
 from django import forms
 from django.core import exceptions
 from django.db import models
-from django.forms.utils import flatatt
-from django.utils.html import conditional_escape
-from django.utils.safestring import mark_safe
-
-# from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import gettext as _
 
 
@@ -111,18 +106,23 @@ class DictionaryField(models.Field):
 # add_introspection_rules([], [r"^cloudy\.core\.fields\.DictionaryField"])
 
 
-class DictionaryWidget(forms.widgets.TextInput):
-    def render(self, name, value, attrs=None):
+class DictionaryWidget(forms.Textarea):
+    """Textarea that shows a dict as JSON.
+
+    Django passes ``renderer`` into ``Widget.render``. The previous override
+    rejected that argument and called ``build_attrs`` with the Django 1
+    ``name=`` keyword, so the admin change page for a logbook crashed.
+    """
+
+    def format_value(self, value):
         if value is None:
-            value = ""
+            return ""
+        if isinstance(value, str):
+            return value
         try:
-            value = json.dumps(value)
-        except:
-            pass
-        final_attrs = flatatt(self.build_attrs(attrs, name=name))
-        final_value = conditional_escape(str(value))
-        final_html = f"<textarea{final_attrs}>{final_value}</textarea>"
-        return mark_safe(final_html)
+            return json.dumps(value)
+        except TypeError, ValueError:
+            return str(value)
 
 
 # }}}
