@@ -7,7 +7,6 @@ from django.utils.encoding import smart_str
 from django.utils.html import format_html, format_html_join
 
 from cloudy.alerts.models import Alert, Qualification
-from cloudy.logbooks.models import LogBookBase
 
 from .models import PLAN_CHOICES, UserProfile
 
@@ -77,20 +76,12 @@ class UserProfileAdmin(admin.ModelAdmin):
 
     @admin.display(description="Logbooks link")
     def logbooks_link(self, obj):
-        link_logbooks = ""
-        if LogBookBase.objects.filter(ownr_id=obj.user.id, deleted=False):
-            url = reverse(
-                "admin_user_logbooks",
-                kwargs={
-                    "user_id": obj.user.id,
-                },
-            )
-            link_logbooks = format_html("<a href='{}'>logbooks</a>", url)
+        active_logbooks = obj.active_logbooks()
+        if not active_logbooks:
+            return "Aucun logbook actif"
 
-        if not link_logbooks:
-            link_logbooks = "Aucun logbook actif"
-
-        return link_logbooks
+        url = reverse("logbooks:logbook", kwargs={"logbook_id": active_logbooks[0].pk})
+        return format_html("<a href='{}'>logbooks</a>", url)
 
     @admin.display(description="Alerts link")
     def alerts_link(self, obj):
