@@ -538,9 +538,8 @@ class LogBookBase(StatsModelBase):  # TODO
             name = f"{name}({inc})"
         return name
 
-    # @models.permalink
     def get_absolute_url(self):
-        return reverse("logbooks:home", args=[self.id])
+        return reverse("logbooks:logbook", args=[self.id])
 
     @property
     def time_format_str(self):

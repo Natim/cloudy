@@ -53,3 +53,22 @@ def test_admin_dgac_logbook_change_renders_reports():
 
     assert response.status_code == 200
     assert b"mono_ncdb" in response.content
+
+
+@pytest.mark.django_db
+def test_admin_view_on_site_redirects_to_logbook():
+    User.objects.create_superuser("staff", "staff@example.com", "secret")
+    owner = User.objects.create_user("pilot", "pilot@example.com", "secret")
+    UserProfile.objects.create(user=owner, dob="1990-01-01")
+    logbook = DGACAvionLogBook(ownr=owner, name="Carnet", cat="helicopter_dgac", update=timezone.now())
+    logbook.save()
+
+    assert logbook.get_absolute_url() == f"/logbooks/{logbook.pk}/"
+
+    client = Client()
+    client.login(username="staff", password="secret")
+    content_type_id = logbook.content_type_id
+    response = client.get(f"/admin/r/{content_type_id}/{logbook.pk}/")
+
+    assert response.status_code == 302
+    assert response.url.endswith(f"/logbooks/{logbook.pk}/")
