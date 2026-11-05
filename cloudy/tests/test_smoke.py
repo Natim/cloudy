@@ -348,6 +348,23 @@ def test_graphs_map_returns_json_array(user_with_profile):
     assert data[0][0] == "49.0097"
 
 
+@pytest.mark.django_db
+def test_graphs_airports_rejects_malformed_begin_date(user_with_profile):
+    import json
+
+    from cloudy.DGAC_avion_logbook.models import DGACAvionLogBook
+
+    logbook = DGACAvionLogBook(ownr=user_with_profile, name="airports-test", cat="plane_dgac")
+    logbook.save()
+    payload = json.dumps({"begin_date": "2026/05/02#", "end_date": "none", "logbook_id": str(logbook.pk)})
+    client = Client()
+    client.login(username="smoke", password="secret")
+    response = client.get(reverse("stats:airports"), {"payload": payload})
+
+    assert response.status_code == 400
+    assert response.json()["msg"] == "invalid date"
+
+
 def test_logbooks_home_renders_for_logged_in_user(user_with_profile):
     """Renders the logbook list, which reads LogBookBase and site_base_logbook.html.
 

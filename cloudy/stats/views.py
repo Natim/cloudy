@@ -17,11 +17,10 @@ from datetime import datetime
 
 # }}}
 # Third-party apps {{{
-from dateutil.parser import parse as parse_dateutil
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 
 # }}}
 # Django imports {{{
@@ -33,7 +32,8 @@ from cloudy.logbooks.models import LogBookBase
 
 # }}}
 # Cloudy {{{
-from cloudy.stats._common import airport_for_place, END_DAY_TIME, place_field_names, smart_date_slotifier
+from cloudy.stats._common import airport_for_place, place_field_names, smart_date_slotifier
+from cloudy.stats.service import InvalidStatsDate, parse_time_slice
 
 # }}}
 
@@ -65,6 +65,20 @@ def _logbook_from_payload(request, request_payload):
     return _logbook_for_request(request, logbook_id)
 
 
+def _time_slice_from_payload(request_payload):
+    try:
+        return parse_time_slice(request_payload)
+    except InvalidStatsDate:
+        return None
+
+
+def _invalid_date_response():
+    return HttpResponseBadRequest(
+        json.dumps({"success": False, "msg": "invalid date"}),
+        content_type="application/json",
+    )
+
+
 @login_required
 @require_GET
 def airports(request, maximum=5):
@@ -86,23 +100,10 @@ def airports(request, maximum=5):
 
     actual_logbook = _logbook_from_payload(request, request_payload)
 
-    # Compute the string representation of the time_slice because totals are
-    # indexed by repr of time_slice and filters in database.
-    first = (
-        None
-        if request_payload["begin_date"] in ["none", ""]
-        else parse_dateutil(request_payload["begin_date"], dayfirst=True)
-    )
-    last = (
-        None
-        if request_payload["end_date"] in ["none", ""]
-        else parse_dateutil(request_payload["end_date"], dayfirst=True)
-    )
-    # last date include the whole day so we stretch the range
-    if last:
-        last = datetime(day=last.day, month=last.month, year=last.year, **END_DAY_TIME)
+    time_slice = _time_slice_from_payload(request_payload)
+    if time_slice is None:
+        return _invalid_date_response()
 
-    time_slice = (first, last)
     logs = actual_logbook.logs_qs(time_slice)
     results = {}
 
@@ -135,20 +136,9 @@ def map_places(request):
 
     actual_logbook = _logbook_from_payload(request, request_payload)
 
-    first = (
-        None
-        if request_payload["begin_date"] in ["none", ""]
-        else parse_dateutil(request_payload["begin_date"], dayfirst=True)
-    )
-    last = (
-        None
-        if request_payload["end_date"] in ["none", ""]
-        else parse_dateutil(request_payload["end_date"], dayfirst=True)
-    )
-    if last:
-        last = datetime(day=last.day, month=last.month, year=last.year, **END_DAY_TIME)
-
-    time_slice = (first, last)
+    time_slice = _time_slice_from_payload(request_payload)
+    if time_slice is None:
+        return _invalid_date_response()
 
     if settings.CACHING:
         key_values = {"logbook_id": actual_logbook.id, "str_timeslice": time_slice_to_string(time_slice)}
@@ -195,21 +185,9 @@ def count_foo(request, max_res=None):
 
     actual_logbook = _logbook_from_payload(request, request_payload)
 
-    # Compute the string representation of the time_slice because totals are
-    # indexed by repr of time_slice and filters in database.
-    first = (
-        None
-        if request_payload["begin_date"] in ["none", ""]
-        else parse_dateutil(request_payload["begin_date"], dayfirst=True)
-    )
-    last = (
-        None
-        if request_payload["end_date"] in ["none", ""]
-        else parse_dateutil(request_payload["end_date"], dayfirst=True)
-    )
-    # last date include the whole day so we stretch the range
-    if last:
-        last = datetime(day=last.day, month=last.month, year=last.year, **END_DAY_TIME)
+    time_slice = _time_slice_from_payload(request_payload)
+    if time_slice is None:
+        return _invalid_date_response()
 
     # Check that total & group_by keys are presend in payload
     request_totals = request_payload.get("total", None)
@@ -219,7 +197,6 @@ def count_foo(request, max_res=None):
     if not request_totals or not request_groupby:
         return HttpResponse(json.dumps({"success": False, "msg": "wrong params"}))
 
-    time_slice = (first, last)
     res = actual_logbook.get_totals([request_totals], time_slice, group_by=request_groupby, reports=False)
     data = res[request_totals]
     del data["__sum__"]
@@ -250,24 +227,9 @@ def get_choices(request):
 
     actual_logbook = _logbook_from_payload(request, request_payload)
 
-    # Compute the string representation of the time_slice because totals are
-    # indexed by repr of time_slice and filters in database.
-    first = (
-        None
-        if request_payload["begin_date"] in ["none", ""]
-        else parse_dateutil(request_payload["begin_date"], dayfirst=True)
-    )
-    last = (
-        None
-        if request_payload["end_date"] in ["none", ""]
-        else parse_dateutil(request_payload["end_date"], dayfirst=True)
-    )
-
-    # last date include the whole day so we stretch the range
-    if last:
-        last = datetime(day=last.day, month=last.month, year=last.year, **END_DAY_TIME)
-
-    time_slice = (first, last)
+    time_slice = _time_slice_from_payload(request_payload)
+    if time_slice is None:
+        return _invalid_date_response()
 
     logs = actual_logbook.logs_qs(time_slice)
 
@@ -314,27 +276,14 @@ def graphs_data(request):
 
     actual_logbook = _logbook_from_payload(request, request_payload)
 
-    # Compute the string representation of the time_slice because totals are
-    # indexed by repr of time_slice and filters in database.
-    first = (
-        None
-        if request_payload["begin_date"] in ["none", ""]
-        else parse_dateutil(request_payload["begin_date"], dayfirst=True)
-    )
-    last = (
-        None
-        if request_payload["end_date"] in ["none", ""]
-        else parse_dateutil(request_payload["end_date"], dayfirst=True)
-    )
+    time_slice = _time_slice_from_payload(request_payload)
+    if time_slice is None:
+        return _invalid_date_response()
 
-    # last date include the whole day so we stretch the range
-    if last:
-        last = datetime(day=last.day, month=last.month, year=last.year, **END_DAY_TIME)
-
+    first, last = time_slice
     if request.GET.get("select", "") == "lifetime":
         first = None
-
-    time_slice = (first, last)
+        time_slice = (first, last)
 
     filters = request_payload.get("filters", {})
     group_by = request_payload.get("group_by", None)

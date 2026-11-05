@@ -6,6 +6,24 @@ from django.utils import timezone
 
 from cloudy.accounts.models import UserProfile
 from cloudy.DGAC_avion_logbook.models import DGACAvionLog, DGACAvionLogBook
+from cloudy.stats._common import END_DAY_TIME
+from cloudy.stats.service import InvalidStatsDate, parse_time_slice
+
+
+class ParseTimeSliceTest(TestCase):
+    def test_rejects_malformed_begin_date(self):
+        with self.assertRaises(InvalidStatsDate):
+            parse_time_slice({"begin_date": "2026/05/02#", "end_date": "none"})
+
+    def test_accepts_slash_begin_date(self):
+        first, last = parse_time_slice({"begin_date": "2026/05/02", "end_date": "none"})
+        self.assertEqual(first, datetime(2026, 5, 2))
+        self.assertIsNone(last)
+
+    def test_iso_custom_range_is_not_dayfirst_swapped(self):
+        first, last = parse_time_slice({"begin_date": "2026-10-01", "end_date": "2026-10-30"})
+        self.assertEqual(first, datetime(2026, 10, 1))
+        self.assertEqual(last, datetime(2026, 10, 30, **END_DAY_TIME))
 
 
 class GetTotalsReportsTest(TestCase):

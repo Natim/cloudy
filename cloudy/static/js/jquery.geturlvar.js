@@ -2,7 +2,14 @@
 $.extend({
   getUrlVars: function(){
     var vars = [], hash;
-    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    var query = window.location.search;
+    if (query.charAt(0) === '?') {
+      query = query.slice(1);
+    }
+    if (!query) {
+      return vars;
+    }
+    var hashes = query.split('&');
     for(var i = 0; i < hashes.length; i++)
     {
       hash = hashes[i].split('=');

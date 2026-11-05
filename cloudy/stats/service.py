@@ -4,13 +4,12 @@ import json
 from datetime import datetime
 from typing import Any
 
-from dateutil.parser import parse as parse_dateutil
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
 from redis import Redis
 
-from cloudy.core.utils import time_slice_to_string, traversal
+from cloudy.core.utils import parse_stats_range_date, time_slice_to_string, traversal
 from cloudy.logbooks.models import LogBookBase
 
 from ._common import airport_for_place, END_DAY_TIME, place_field_names, smart_date_slotifier
@@ -20,6 +19,10 @@ redis = Redis(**settings.CONSTANCE_REDIS_CONNECTION)
 
 class LogbookAccessError(Exception):
     """Raised when the user may not access the logbook."""
+
+
+class InvalidStatsDate(ValueError):
+    """Raised when begin_date or end_date in a stats payload cannot be parsed."""
 
 
 def logbook_for_user(user: User, logbook_id: int) -> LogBookBase:
@@ -34,17 +37,18 @@ def logbook_for_user(user: User, logbook_id: int) -> LogBookBase:
     return logbook
 
 
+def _parse_payload_bound(raw: Any) -> datetime | None:
+    if raw in (None, "none", ""):
+        return None
+    try:
+        return parse_stats_range_date(str(raw))
+    except ValueError as exc:
+        raise InvalidStatsDate(str(raw)) from exc
+
+
 def parse_time_slice(payload: dict[str, Any]) -> tuple[datetime | None, datetime | None]:
-    first = (
-        None
-        if payload.get("begin_date") in (None, "none", "")
-        else parse_dateutil(payload["begin_date"], dayfirst=True)
-    )
-    last = (
-        None
-        if payload.get("end_date") in (None, "none", "")
-        else parse_dateutil(payload["end_date"], dayfirst=True)
-    )
+    first = _parse_payload_bound(payload.get("begin_date"))
+    last = _parse_payload_bound(payload.get("end_date"))
     if last:
         last = datetime(day=last.day, month=last.month, year=last.year, **END_DAY_TIME)
     return first, last

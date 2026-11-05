@@ -122,6 +122,16 @@ def traversal(original_object, path):
 _RANGE_DATE_FORMATS = ("%Y/%m/%d", "%Y-%m-%d", "%d/%m/%Y")
 
 
+def parse_stats_range_date(value: str) -> datetime:
+    """Parse stats graph payload dates using fixed formats (no dateutil fallback)."""
+    for date_format in _RANGE_DATE_FORMATS:
+        try:
+            return datetime.strptime(value, date_format)
+        except ValueError:
+            continue
+    raise ValueError("invalid date")
+
+
 def _parse_range_date(value):
     if value == "none":
         return None

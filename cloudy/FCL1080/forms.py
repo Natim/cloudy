@@ -307,8 +307,36 @@ class FCL1080LogForm(LogForm):
         if is_synthetic and not date:
             self.cleaned_data["date"] = synthetic_date
 
+        if not is_synthetic:
+            self._validate_flight_time_splits()
+
         cleaned_data = self.cleaned_data
         return cleaned_data
+
+    def _minutes(self, field_name):
+        value = self.cleaned_data.get(field_name)
+        if value in (None, ""):
+            return 0
+        return int(value)
+
+    def _validate_flight_time_splits(self):
+        total = self._minutes("total_time_flight")
+        aircraft_split = self._minutes("single_pilot_time") + self._minutes("multi_pilot_time")
+        role_split = (
+            self._minutes("pilot_time_in_cmd")
+            + self._minutes("pilot_timpe_cop")
+            + self._minutes("pilot_time_dual")
+            + self._minutes("pilot_time_inst")
+        )
+        if aircraft_split != total:
+            raise forms.ValidationError(
+                "La durée mono pilote et multi pilote doit être égale au total général."
+            )
+        if role_split != total:
+            raise forms.ValidationError(
+                "La somme des temps par fonction (Cdb, co-pilote, double, instructeur) "
+                "doit être égale au total général."
+            )
 
     def initialize_form_fields(self, log):
         """
