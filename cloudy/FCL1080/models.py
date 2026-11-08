@@ -59,6 +59,16 @@ class FCL1080Log(LogBase):
     def __unicode__(self):
         return "%s" % self.aircraft_imma
 
+    @property
+    def single_pilot_se_time(self):
+        minutes = int(self.single_pilot_time or 0)
+        return minutes if self.single_pilot_se else 0
+
+    @property
+    def single_pilot_me_time(self):
+        minutes = int(self.single_pilot_time or 0)
+        return minutes if self.single_pilot_me else 0
+
     # }}}
 
     def json_rules(self):
@@ -119,6 +129,8 @@ class FCL1080LogBook(LogBookBase):
 
         rules = {
             "total_single_pilot_time": ["single_pilot_time"],
+            "total_single_pilot_se_time": ["single_pilot_se_time"],
+            "total_single_pilot_me_time": ["single_pilot_me_time"],
             "total_multi_pilot_time": ["multi_pilot_time"],
             "total_total_time_flight": ["total_time_flight"],
             "total_landing": ["landing_day", "landing_night"],
@@ -147,6 +159,8 @@ class FCL1080LogBook(LogBookBase):
     def totals_page_totals(self):
         return [
             "total_single_pilot_time",
+            "total_single_pilot_se_time",
+            "total_single_pilot_me_time",
             "total_multi_pilot_time",
             "total_total_time_flight",
             "total_take_off",
@@ -168,6 +182,19 @@ class FCL1080LogBook(LogBookBase):
 
     def home_page_totals(self):
         return self.totals_page_totals()
+
+    def get_totals(self, totals, time_slice=(None, None), filters={}, group_by=None, reports=True):
+        if reports is True:
+            reports_backup = self.reports
+            merged = dict(reports_backup or {})
+            if merged.get("single_pilot_time") and "single_pilot_se_time" not in merged:
+                merged["single_pilot_se_time"] = merged["single_pilot_time"]
+            self.reports = merged
+            try:
+                return super().get_totals(totals, time_slice, filters, group_by, reports)
+            finally:
+                self.reports = reports_backup
+        return super().get_totals(totals, time_slice, filters, group_by, reports)
 
     def csv_rules(self):
         return [

@@ -87,12 +87,14 @@
               <div class="foot-text-leftpage">TOTAL TIME</div>
             </td>
 
-            <td></td>
-            <td></td>
-
-            <td sum-field="single_pilot_time_hour" class="reports-foot" type-field="int"></td>
-            <td sum-field="single_pilot_time_min" class="reports-foot" type-field="int_min"
-              rel="single_pilot_time_hour"></td>
+            <td rowspan="3" class="foot-sp-row-label">SE</td>
+            <td rowspan="3" class="foot-sp-row-label">ME</td>
+            <td sum-field="single_pilot_se_time_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field="single_pilot_se_time_min" class="reports-foot" type-field="int_min"
+              rel="single_pilot_se_time_hour"></td>
+            <td sum-field="single_pilot_me_time_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field="single_pilot_me_time_min" class="reports-foot" type-field="int_min"
+              rel="single_pilot_me_time_hour"></td>
             <td sum-field="multi_pilot_time_hour" class="reports-foot" type-field="int"></td>
             <td sum-field="multi_pilot_time_min" class="reports-foot" type-field="int_min" rel="multi_pilot_time_hour">
             </td>
@@ -106,13 +108,18 @@
             <td sum-field="landing_night" class="reports-foot" type-field="int"></td>
           </tr>
           <tr class="foot">
-            {% format_total_as totals total_single_pilot_time report as total %}
-            <td></td>
-            <td></td>
-            <td report-data-field="single_pilot_time" rel="single_pilot_time_hour" class="reports-info">
+            {% format_total_as totals total_single_pilot_se_time report as total %}
+            <td report-data-field="single_pilot_se_time" rel="single_pilot_se_time_hour" class="reports-info">
               {{ total|hour_part }}
             </td>
-            <td report-data-field="single_pilot_time" rel="single_pilot_time_min" class="reports-info">
+            <td report-data-field="single_pilot_se_time" rel="single_pilot_se_time_min" class="reports-info">
+              {{ total|min_part }}
+            </td>
+            {% format_total_as totals total_single_pilot_me_time report as total %}
+            <td report-data-field="single_pilot_me_time" rel="single_pilot_me_time_hour" class="reports-info">
+              {{ total|hour_part }}
+            </td>
+            <td report-data-field="single_pilot_me_time" rel="single_pilot_me_time_min" class="reports-info">
               {{ total|min_part }}
             </td>
             {% format_total_as totals total_multi_pilot_time report as total %}
@@ -144,11 +151,12 @@
             </td>
           </tr>
           <tr class="foot">
-            <td></td>
-            <td></td>
-            <td sum-field-with-report="single_pilot_time_hour" class="reports-foot" type-field="int"></td>
-            <td sum-field-with-report="single_pilot_time_min" class="reports-foot" type-field="int_min"
-              rel="single_pilot_time_hour"></td>
+            <td sum-field-with-report="single_pilot_se_time_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="single_pilot_se_time_min" class="reports-foot" type-field="int_min"
+              rel="single_pilot_se_time_hour"></td>
+            <td sum-field-with-report="single_pilot_me_time_hour" class="reports-foot" type-field="int"></td>
+            <td sum-field-with-report="single_pilot_me_time_min" class="reports-foot" type-field="int_min"
+              rel="single_pilot_me_time_hour"></td>
             <td sum-field-with-report="multi_pilot_time_hour" class="reports-foot" type-field="int"></td>
             <td sum-field-with-report="multi_pilot_time_min" class="reports-foot" type-field="int_min"
               rel="multi_pilot_time_hour"></td>

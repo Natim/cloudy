@@ -852,6 +852,15 @@ table.cright.fcl1080 {
     tr.foot {
       height: 35px;
     }
+    td.foot-sp-row-label {
+      font-weight: normal;
+      font-style: italic;
+      font-size: 9px;
+      text-align: center;
+      color: #666;
+      vertical-align: middle;
+      padding: 0;
+    }
     div.foot-text-leftpage {
        margin-top: 2px;
        display: block;

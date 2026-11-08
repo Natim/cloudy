@@ -4396,6 +4396,17 @@ table.cright.fcl1080 tfoot tr.foot {
     height: 35px;
 }
 
+table.cleft.fcl1080 tfoot td.foot-sp-row-label,
+table.cright.fcl1080 tfoot td.foot-sp-row-label {
+    font-weight: normal;
+    font-style: italic;
+    font-size: 9px;
+    text-align: center;
+    color: #666;
+    vertical-align: middle;
+    padding: 0;
+}
+
 /* line 830, ../src/logbook.scss */
 table.cleft.fcl1080 tfoot div.foot-text-leftpage,
 table.cright.fcl1080 tfoot div.foot-text-leftpage {

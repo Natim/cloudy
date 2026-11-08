@@ -52,6 +52,8 @@ default_totals = {
     "landing_night": 0,
     "pilot_timpe_cop": 0,
     "single_pilot_time": 0,
+    "single_pilot_se_time": 0,
+    "single_pilot_me_time": 0,
     "take_off_night": 0,
     "multi_pilot_time": 0,
     "total_time_flight": 0,
@@ -91,6 +93,20 @@ def min_to_str(minutes):
     if minutes == 0:
         return EMPTY_STR
     return f"{minutes // 60:02d}:{minutes % 60:02d}"
+
+
+def _single_pilot_se_minutes(log):
+    minutes = int(getattr(log, "single_pilot_time", 0) or 0)
+    if getattr(log, "single_pilot_se", False):
+        return minutes
+    return 0
+
+
+def _single_pilot_me_minutes(log):
+    minutes = int(getattr(log, "single_pilot_time", 0) or 0)
+    if getattr(log, "single_pilot_me", False):
+        return minutes
+    return 0
 
 
 def _min_format(minutes):
@@ -135,6 +151,12 @@ def gen_carnet_de_vol(http_response=None, title="", show_cuts=True, logs=[], rep
             prev_totals["pilot_timpe_cop"] = reports["pilot_timpe_cop"]
         if "single_pilot_time" in reports:
             prev_totals["single_pilot_time"] = reports["single_pilot_time"]
+        if "single_pilot_se_time" in reports:
+            prev_totals["single_pilot_se_time"] = reports["single_pilot_se_time"]
+        elif "single_pilot_time" in reports:
+            prev_totals["single_pilot_se_time"] = reports["single_pilot_time"]
+        if "single_pilot_me_time" in reports:
+            prev_totals["single_pilot_me_time"] = reports["single_pilot_me_time"]
         if "take_off_night" in reports:
             prev_totals["take_off_night"] = reports["take_off_night"]
         if "multi_pilot_time" in reports:
@@ -215,6 +237,8 @@ def _calculate_page_totals(logs):
 
         tmp_totals["pilot_timpe_cop"] += int(log.pilot_timpe_cop)
         tmp_totals["single_pilot_time"] += int(log.single_pilot_time)
+        tmp_totals["single_pilot_se_time"] += _single_pilot_se_minutes(log)
+        tmp_totals["single_pilot_me_time"] += _single_pilot_me_minutes(log)
 
         tmp_totals["multi_pilot_time"] += int(log.multi_pilot_time)
         tmp_totals["total_time_flight"] += int(log.total_time_flight)
@@ -853,7 +877,8 @@ def gen_footer_left(prev={}, page={}, total={}):
     }
 
     for k, v in data.items():
-        _footer_hmin_cell_helper(totals_list=v["totals"], report_val=v["source"]["single_pilot_time"])
+        _footer_hmin_cell_helper(totals_list=v["totals"], report_val=v["source"]["single_pilot_se_time"])
+        _footer_hmin_cell_helper(totals_list=v["totals"], report_val=v["source"]["single_pilot_me_time"])
         _footer_hmin_cell_helper(totals_list=v["totals"], report_val=v["source"]["multi_pilot_time"])
         _footer_hmin_cell_helper(totals_list=v["totals"], report_val=v["source"]["total_time_flight"])
         v["totals"].append("")
@@ -873,6 +898,8 @@ def gen_footer_left(prev={}, page={}, total={}):
         style=FOOTER_TABLE_STYLE,
         colWidths=[
             12.15 * cm,
+            0.8 * cm,
+            0.8 * cm,
             0.8 * cm,
             0.8 * cm,
             0.8 * cm,

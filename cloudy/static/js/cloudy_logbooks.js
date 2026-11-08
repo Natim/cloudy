@@ -348,6 +348,34 @@ height_formatting[1] = feets;
 
 height_formatting.output = height_formatting[HEIGHT_FORMAT].output;
 height_formatting.input = height_formatting[HEIGHT_FORMAT].input;
+
+function fcl1080_single_pilot_se_me_page_minutes() {
+    var table = $('table.cleft.fcl1080');
+    if (!table.length) {
+        return null;
+    }
+    var se = 0;
+    var me = 0;
+    table.find('tbody tr[alt]').each(function () {
+        var $row = $(this);
+        var hourCell = $row.find('[data-field=single_pilot_time_hour]');
+        var minCell = $row.find('[data-field=single_pilot_time_min]');
+        if (!hourCell.length || !minCell.length) {
+            return;
+        }
+        var hours = parseInt($.trim(hourCell.text()), 10) || 0;
+        var mins = parseInt($.trim(minCell.text()), 10) || 0;
+        var totalMinutes = hours * 60 + mins;
+        if ($.trim($row.find('[data-field=single_pilot_se]').text()) === 'X') {
+            se += totalMinutes;
+        }
+        if ($.trim($row.find('[data-field=single_pilot_me]').text()) === 'X') {
+            me += totalMinutes;
+        }
+    });
+    return {se: se, me: me};
+}
+
 /* Update report times */
 function report_times_update() {
 
@@ -376,6 +404,14 @@ function report_times_update() {
             }
         }
     });
+
+    var seMe = fcl1080_single_pilot_se_me_page_minutes();
+    if (seMe) {
+        sums.single_pilot_se_time_hour = 0;
+        sums.single_pilot_se_time_min = seMe.se;
+        sums.single_pilot_me_time_hour = 0;
+        sums.single_pilot_me_time_min = seMe.me;
+    }
 
     // Compute the full field
     var full = 0;

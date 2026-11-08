@@ -16,6 +16,8 @@ class FCL1080ReportForm(LogForm):
     """
 
     timefields = {
+        "single_pilot_se_time": ("Durée mono pilote SE", False),
+        "single_pilot_me_time": ("Durée mono pilote ME", False),
         "single_pilot_time": ("Durée mono pilote", False),
         "multi_pilot_time": ("Durée multi pilote", False),
         "total_time_flight": ("Total général", False),
@@ -29,6 +31,8 @@ class FCL1080ReportForm(LogForm):
     }
 
     field_order = [
+        "single_pilot_se_time",
+        "single_pilot_me_time",
         "single_pilot_time",
         "multi_pilot_time",
         "total_time_flight",
