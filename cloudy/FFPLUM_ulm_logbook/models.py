@@ -156,7 +156,7 @@ class FFPLUMUlmLogBook(LogBookBase):
 
     # }}}
 
-    def attach_pdf_to_http_response(self, http_response, title, show_cuts=True):
+    def attach_pdf_to_http_response(self, http_response, title, show_cuts=True, include_images=False):
         """
         Attaches the logbook pdf as the http response object (if passed)
         """

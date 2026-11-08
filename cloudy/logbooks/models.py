@@ -325,7 +325,7 @@ class LogBookBase(StatsModelBase):  # TODO
         for log in self.logs_qs():
             writer.writerow(self.create_row_from_log(log))
 
-    def attach_pdf_to_http_response(self, http_response, title, show_cuts=False):
+    def attach_pdf_to_http_response(self, http_response, title, show_cuts=False, include_images=False):
         """
         Attaches the logbook pdf as the http response object (if passed)
         """
