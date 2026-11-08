@@ -1,9 +1,11 @@
+import base64
 import json
 from datetime import datetime
 
 import jwt
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 
@@ -103,6 +105,27 @@ class ApiAuthTests(TestCase):
         del payload["jti"]
         bad = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
         self.assertIsNone(user_from_access_token(bad))
+
+    def test_profile_includes_avatar_url(self):
+        missing = self.client.get("/api/v1/me")
+        self.assertEqual(missing.status_code, 401)
+
+        empty = self.client.get("/api/v1/me", **bearer_headers(self.pilot))
+        self.assertEqual(empty.status_code, 200)
+        self.assertEqual(empty.json()["id"], self.pilot.pk)
+        self.assertEqual(empty.json()["email"], "pilot@example.com")
+        self.assertIsNone(empty.json()["avatar_url"])
+
+        self.pilot.userprofile.avatar.save("avatar.png", ContentFile(_TINY_PNG), save=True)
+        filled = self.client.get("/api/v1/me", **bearer_headers(self.pilot))
+        self.assertEqual(filled.status_code, 200)
+        self.assertTrue(filled.json()["avatar_url"].startswith("/media/"))
+        self.assertTrue(filled.json()["avatar_url"].endswith("avatar.png"))
+
+
+_TINY_PNG = base64.b64decode(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg=="
+)
 
 
 class ApiLogbookTests(TestCase):
@@ -393,6 +416,57 @@ class ApiLogbookTests(TestCase):
         )
         self.assertEqual(second.status_code, 200)
         self.assertEqual(len(second.json()["items"]), 1)
+
+    def test_log_list_updated_since(self):
+        from datetime import timedelta
+        from urllib.parse import quote
+
+        from django.utils import timezone
+
+        from cloudy.logbooks.models import LogBase
+
+        book = self._create_book("plane_dgac")
+        older = self.client.post(
+            f"/api/v1/logbooks/{book['id']}/logs",
+            data=json.dumps(self._dgac_payload(flight_date="2011-07-04T12:00:00")),
+            content_type="application/json",
+            **self.headers,
+        )
+        newer = self.client.post(
+            f"/api/v1/logbooks/{book['id']}/logs",
+            data=json.dumps(self._dgac_payload(flight_date="2011-07-06T12:00:00")),
+            content_type="application/json",
+            **self.headers,
+        )
+        self.assertEqual(older.status_code, 201, older.content)
+        self.assertEqual(newer.status_code, 201, newer.content)
+        old_row = LogBase.objects.get(pk=older.json()["id"])
+        old_row.update = timezone.now() - timedelta(days=2)
+        old_row.save(update_fields=["update"])
+        new_row = LogBase.objects.get(pk=newer.json()["id"])
+        since = quote((new_row.update - timedelta(minutes=1)).isoformat())
+        changed = self.client.get(
+            f"/api/v1/logbooks/{book['id']}/logs?updated_since={since}",
+            **self.headers,
+        )
+        self.assertEqual(changed.status_code, 200, changed.content)
+        self.assertEqual([item["id"] for item in changed.json()["items"]], [new_row.id])
+
+        new_row.update = timezone.now() - timedelta(days=1)
+        new_row.save(update_fields=["update"])
+        old_row.deleted = True
+        old_row.update = timezone.now()
+        old_row.save(update_fields=["deleted", "update"])
+        deleted_since = quote((old_row.update - timedelta(seconds=1)).isoformat())
+        removed = self.client.get(
+            f"/api/v1/logbooks/{book['id']}/logs?updated_since={deleted_since}",
+            **self.headers,
+        )
+        self.assertEqual(removed.status_code, 200, removed.content)
+        self.assertEqual(
+            [(item["id"], item["deleted"]) for item in removed.json()["items"]],
+            [(old_row.id, True)],
+        )
 
     def test_plan_required_for_second_logbook(self):
         simple = User.objects.get(email="simple@example.com")

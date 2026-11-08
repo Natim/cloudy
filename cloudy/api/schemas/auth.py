@@ -11,3 +11,9 @@ class TokenOut(Schema):
     token_type: str = "bearer"
     expires_in: int
     user_id: int
+
+
+class ProfileOut(Schema):
+    id: int
+    email: str
+    avatar_url: str | None = None

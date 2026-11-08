@@ -1,5 +1,5 @@
 from .aircraft import AircraftIn
-from .auth import TokenIn, TokenOut
+from .auth import ProfileOut, TokenIn, TokenOut
 from .common import ErrorOut
 from .logbooks import LogbookCreateIn, LogbookPatchIn
 
@@ -8,6 +8,7 @@ __all__ = [
     "ErrorOut",
     "LogbookCreateIn",
     "LogbookPatchIn",
+    "ProfileOut",
     "TokenIn",
     "TokenOut",
 ]

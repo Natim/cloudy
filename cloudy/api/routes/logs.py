@@ -1,5 +1,6 @@
 from django.db.models import Prefetch
 from django.http import HttpRequest
+from django.utils import timezone
 from ninja import Body, File, Router, UploadedFile
 from ninja.errors import HttpError
 from ninja.responses import Response
@@ -35,14 +36,19 @@ def list_logs(
     page_token: str | None = None,
     date_from: str | None = None,
     date_to: str | None = None,
+    updated_since: str | None = None,
 ):
     user = require_user(request)
     logbook = get_owned_logbook(user, logbook_id)
     start = parse_optional_iso_datetime(date_from, "date_from")
     end = parse_optional_iso_datetime(date_to, "date_to")
-    qs = logbook.logs_qs(time_slice=(start, end)).prefetch_related(
-        Prefetch("files", queryset=FileModel.objects.filter(deleted=False))
-    )
+    since = parse_optional_iso_datetime(updated_since, "updated_since")
+    if since is not None:
+        # Include hidden and deleted rows so a client can drop them.
+        qs = logbook._log_model().objects.filter(lbook=logbook, update__gte=since)
+    else:
+        qs = logbook.logs_qs(time_slice=(start, end))
+    qs = qs.prefetch_related(Prefetch("files", queryset=FileModel.objects.filter(deleted=False)))
     rows, next_token = paginate_logs_queryset(qs, limit=limit, page_token=page_token)
     items = [log_instance_to_api_dict(log) for log in rows]
     return log_list_response(items, next_token)
@@ -99,7 +105,8 @@ def delete_log(request: HttpRequest, logbook_id: int, log_id: int):
     if log is None or log.lbook_id != logbook.id:
         raise HttpError(404, "Log not found")
     log.deleted = True
-    log.save()
+    log.update = timezone.now()
+    log.save(update_fields=["deleted", "update"])
     return 204, None
 
 

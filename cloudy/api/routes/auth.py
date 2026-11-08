@@ -1,10 +1,14 @@
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from django.http import HttpRequest
 from ninja import Router
 from ninja.errors import HttpError
 
-from ..auth import issue_access_token
-from ..schemas.auth import TokenIn, TokenOut
+from cloudy.accounts.models import UserProfile
+
+from ..auth import issue_access_token, require_user
+from ..schemas.auth import ProfileOut, TokenIn, TokenOut
+from ._common import bearer_auth
 
 router = Router(tags=["auth"])
 
@@ -21,3 +25,15 @@ def auth_token(request: HttpRequest, payload: TokenIn):
         "expires_in": expires_in,
         "user_id": user.pk,
     }
+
+
+@router.get("/me", response=ProfileOut, auth=bearer_auth)
+def me(request: HttpRequest):
+    user = require_user(request)
+    return profile_out(user)
+
+
+def profile_out(user: User) -> dict:
+    profile = UserProfile.objects.filter(user=user).first()
+    avatar_url = profile.avatar.url if profile is not None and profile.avatar else None
+    return {"id": user.pk, "email": user.email, "avatar_url": avatar_url}
