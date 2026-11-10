@@ -1,3 +1,4 @@
+import json
 import uuid
 from unittest.mock import MagicMock, patch
 
@@ -192,10 +193,19 @@ class StripeCheckoutSecurityTestCase(TestCase):
         self.assertEqual(self.user.userprofile.plan, 2)
 
 
+def _signed_stripe_body(event: dict, secret: str = "whsec_test") -> tuple[bytes, str]:
+    import stripe
+
+    payload = json.dumps(event, separators=(",", ":"))
+    signature = stripe.WebhookSignature.generate_signature_header(payload, secret)
+    return payload.encode(), signature
+
+
 @override_settings(
     STRIPE_FIRST_CLASS_SUBSCRIPTION="price_first_class",
     STRIPE_API_KEY="sk_test",
     STRIPE_WEBHOOK_SECRET="whsec_test",
+    EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
 )
 class StripeWebhookIdempotencyTestCase(TestCase):
     @patch("cloudy.payment.views.stripe.Webhook.construct_event")
@@ -244,3 +254,118 @@ class StripeWebhookIdempotencyTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(ProcessedStripeEvent.objects.filter(event_id="evt_fail").count(), 1)
+
+    @patch("cloudy.payment.views.stripe.checkout.Session.list_line_items")
+    def test_webhook_accepts_stripe_sdk_checkout_event(self, mock_list):
+        user = User.objects.create_user("hookuser", "hook@test.com", "secret")
+        UserProfile.objects.create(user=user, dob="1990-01-01")
+        mock_list.return_value = MagicMock(data=[MagicMock(price=MagicMock(id="price_first_class"))])
+        body, signature = _signed_stripe_body(
+            {
+                "id": "evt_sdk_checkout",
+                "object": "event",
+                "type": "checkout.session.completed",
+                "data": {
+                    "object": {
+                        "id": "cs_sdk",
+                        "object": "checkout.session",
+                        "client_reference_id": str(user.id),
+                        "customer": "cus_sdk",
+                        "subscription": "sub_sdk",
+                        "payment_status": "paid",
+                    }
+                },
+            }
+        )
+        response = Client().post(
+            reverse("payment:stripe_webhook"),
+            data=body,
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE=signature,
+        )
+        self.assertEqual(response.status_code, 200)
+        user.userprofile.refresh_from_db()
+        self.assertEqual(user.userprofile.plan, 2)
+        self.assertEqual(user.userprofile.stripe_customer_id, "cus_sdk")
+        self.assertEqual(user.userprofile.stripe_subscription_id, "sub_sdk")
+        self.assertEqual(ProcessedStripeEvent.objects.filter(event_id="evt_sdk_checkout").count(), 1)
+
+    def test_webhook_invoice_paid_reads_current_price_details(self):
+        user = User.objects.create_user("hookinvoice", "invoice@test.com", "secret")
+        profile = UserProfile.objects.create(
+            user=user, dob="1990-01-01", stripe_customer_id="cus_sdk_invoice"
+        )
+        body, signature = _signed_stripe_body(
+            {
+                "id": "evt_sdk_invoice",
+                "object": "event",
+                "type": "invoice.paid",
+                "data": {
+                    "object": {
+                        "id": "in_sdk",
+                        "object": "invoice",
+                        "customer": "cus_sdk_invoice",
+                        "lines": {
+                            "object": "list",
+                            "data": [
+                                {
+                                    "id": "il_sdk",
+                                    "object": "line_item",
+                                    "pricing": {
+                                        "type": "price_details",
+                                        "price_details": {
+                                            "price": "price_first_class",
+                                            "product": "prod_x",
+                                        },
+                                    },
+                                }
+                            ],
+                        },
+                    }
+                },
+            }
+        )
+        response = Client().post(
+            reverse("payment:stripe_webhook"),
+            data=body,
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE=signature,
+        )
+        self.assertEqual(response.status_code, 200)
+        profile.refresh_from_db()
+        self.assertEqual(profile.plan, 2)
+        self.assertEqual(ProcessedStripeEvent.objects.filter(event_id="evt_sdk_invoice").count(), 1)
+
+    def test_webhook_subscription_deleted_accepts_stripe_sdk_object(self):
+        user = User.objects.create_user("hookcancel", "cancel@test.com", "secret")
+        profile = UserProfile.objects.create(
+            user=user,
+            dob="1990-01-01",
+            plan=2,
+            stripe_customer_id="cus_del",
+            stripe_subscription_id="sub_del",
+        )
+        body, signature = _signed_stripe_body(
+            {
+                "id": "evt_sdk_deleted",
+                "object": "event",
+                "type": "customer.subscription.deleted",
+                "data": {
+                    "object": {
+                        "id": "sub_del",
+                        "object": "subscription",
+                        "customer": "cus_del",
+                    }
+                },
+            }
+        )
+        response = Client().post(
+            reverse("payment:stripe_webhook"),
+            data=body,
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE=signature,
+        )
+        self.assertEqual(response.status_code, 200)
+        profile.refresh_from_db()
+        self.assertEqual(profile.plan, 1)
+        self.assertEqual(profile.stripe_subscription_id, "")

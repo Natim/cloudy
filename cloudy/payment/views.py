@@ -101,14 +101,12 @@ def stripe_webhook(request):
     except ValueError, stripe.error.SignatureVerificationError:
         return HttpResponse(status=400)
 
-    if isinstance(event, dict):
-        event_id = event["id"]
-        event_type = event["type"]
-        data_object = event["data"]["object"]
-    else:
-        event_id = event.id
-        event_type = event.type
-        data_object = event.data.object
+    # stripe-python 12+ returns StripeObject instances. They are not dicts:
+    # calling .get() raises AttributeError and the webhook 500s.
+    event = _event_as_dict(event)
+    event_id = event["id"]
+    event_type = event["type"]
+    data_object = event["data"]["object"]
 
     if ProcessedStripeEvent.objects.filter(event_id=event_id).exists():
         return HttpResponse(status=200)
@@ -166,15 +164,37 @@ def _session_has_first_class_price(session: dict) -> bool:
     return False
 
 
-def _price_id_from_line(line: dict) -> str | None:
-    price = line.get("price")
-    if price is None:
-        return None
+def _event_as_dict(event) -> dict:
+    if isinstance(event, dict):
+        return event
+    return event.to_dict()
+
+
+def _price_id_from_value(price) -> str | None:
     if isinstance(price, str):
-        return price
+        return price or None
     if isinstance(price, dict):
-        return price.get("id")
-    return getattr(price, "id", None)
+        price_id = price.get("id")
+        return price_id if isinstance(price_id, str) and price_id else None
+    price_id = getattr(price, "id", None)
+    return price_id if isinstance(price_id, str) and price_id else None
+
+
+def _price_id_from_line(line: dict) -> str | None:
+    if not isinstance(line, dict):
+        line = line.to_dict() if hasattr(line, "to_dict") else {}
+    price_id = _price_id_from_value(line.get("price"))
+    if price_id:
+        return price_id
+    # Invoice line items on current Stripe API versions expose the price under
+    # pricing.price_details instead of the removed top-level price field.
+    pricing = line.get("pricing") or {}
+    if not isinstance(pricing, dict):
+        return None
+    details = pricing.get("price_details") or {}
+    if not isinstance(details, dict):
+        return None
+    return _price_id_from_value(details.get("price"))
 
 
 def _invoice_has_first_class_price(invoice: dict) -> bool:
