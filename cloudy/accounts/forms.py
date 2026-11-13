@@ -247,7 +247,7 @@ class CloudyAccountForm(forms.Form):
         label="Numéro de mobile",
         help_text=" ",
         widget=forms.TextInput(attrs={"class": "input-medium"}),
-        max_length=12,
+        max_length=20,
     )
 
     aerodrom = forms.CharField(

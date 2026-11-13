@@ -42,7 +42,7 @@ class UserProfile(models.Model):
     postcode = models.CharField(max_length=10, blank=True)
     city = models.CharField(max_length=60, blank=True)
     address = models.CharField(max_length=200, blank=True)
-    phone = models.CharField(max_length=12, blank=True)  # Must be in the
+    phone = models.CharField(max_length=20, blank=True)  # Must be in the
     # international format
     miles_balance = models.IntegerField(default=0)
     month_balance = models.IntegerField(default=0)
@@ -56,6 +56,8 @@ class UserProfile(models.Model):
     aerodrom = models.CharField("Aérodrome", max_length=70, blank=True)
     avatar = models.ImageField(upload_to=_avatar_path, blank=True, null=True)
     api_key = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    # Bumped on password change: mobile API tokens carrying an older value are refused.
+    api_token_version = models.PositiveIntegerField(default=0)
 
     stripe_customer_id = models.CharField(max_length=255, blank=True, default="")
     stripe_subscription_id = models.CharField(max_length=255, blank=True, default="")
@@ -206,6 +208,35 @@ class ProfileSettings(models.Model):
 
     def __str__(self):
         return f"{self.user}: {self.mail_on_notification}"
+
+
+class EmailCode(models.Model):
+    """Six-digit code mailed to prove an address, for mobile sign-up and password reset.
+
+    Only an HMAC of the code is stored. A new request for the same address and purpose
+    replaces the previous code.
+    """
+
+    SIGNUP = "signup"
+    PASSWORD_RESET = "password_reset"
+    PURPOSE_CHOICES = (
+        (SIGNUP, "Sign-up"),
+        (PASSWORD_RESET, "Password reset"),
+    )
+
+    email = models.EmailField(db_index=True)
+    purpose = models.CharField(max_length=20, choices=PURPOSE_CHOICES)
+    code_hash = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    attempts = models.PositiveSmallIntegerField(default=0)
+    used_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.email} ({self.purpose})"
 
 
 class Sponsorship(models.Model):
