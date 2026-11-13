@@ -6,7 +6,7 @@ from ninja.errors import HttpError
 
 from cloudy.accounts.models import UserProfile
 
-from ..auth import issue_access_token, require_user
+from ..auth import require_user, token_response
 from ..schemas.auth import ProfileOut, TokenIn, TokenOut
 from ._common import bearer_auth
 
@@ -18,13 +18,13 @@ def auth_token(request: HttpRequest, payload: TokenIn):
     user = authenticate(request, username=payload.email, password=payload.password)
     if user is None:
         raise HttpError(401, "Invalid credentials")
-    access_token, expires_in = issue_access_token(user)
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "expires_in": expires_in,
-        "user_id": user.pk,
-    }
+    return token_response(user)
+
+
+@router.post("/auth/refresh", response=TokenOut, auth=bearer_auth)
+def auth_refresh(request: HttpRequest):
+    """Trade a still-valid token for a fresh one."""
+    return token_response(require_user(request))
 
 
 @router.get("/me", response=ProfileOut, auth=bearer_auth)

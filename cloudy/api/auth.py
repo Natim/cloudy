@@ -5,9 +5,12 @@ from datetime import datetime, timedelta, UTC
 import jwt
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db.models import F
 from django.http import HttpRequest
 from ninja.errors import HttpError
 from ninja.security import HttpBearer
+
+from cloudy.accounts.models import UserProfile
 
 _api_user: contextvars.ContextVar[User | None] = contextvars.ContextVar("api_user", default=None)
 
@@ -24,6 +27,11 @@ def get_api_user() -> User | None:
     return _api_user.get()
 
 
+def _token_version(user: User) -> int:
+    profile = getattr(user, "userprofile", None)
+    return profile.api_token_version if profile else 0
+
+
 def issue_access_token(user: User) -> tuple[str, int]:
     expires_in = settings.API_JWT_EXPIRY_SECONDS
     now = datetime.now(tz=UTC)
@@ -34,6 +42,7 @@ def issue_access_token(user: User) -> tuple[str, int]:
         "iat": now,
         "exp": now + timedelta(seconds=expires_in),
         "jti": str(uuid.uuid4()),
+        "ver": _token_version(user),
     }
     token = jwt.encode(payload, settings.SECRET_KEY, algorithm=JWT_ALGORITHM)
     if isinstance(token, bytes):
@@ -59,8 +68,22 @@ def user_from_access_token(token: str) -> User | None:
         user_id = int(payload["sub"])
     except KeyError, TypeError, ValueError:
         return None
-    user = User.objects.filter(pk=user_id, is_active=True).first()
+    user = User.objects.select_related("userprofile").filter(pk=user_id, is_active=True).first()
+    if user is None:
+        return None
+    # Tokens issued before the version claim existed count as version 0.
+    if payload.get("ver", 0) != _token_version(user):
+        return None
     return user
+
+
+def revoke_access_tokens(user: User) -> None:
+    """Refuse every token issued so far for this user (after a password change)."""
+    profile = getattr(user, "userprofile", None)
+    if profile is None:
+        return
+    UserProfile.objects.filter(pk=profile.pk).update(api_token_version=F("api_token_version") + 1)
+    profile.refresh_from_db(fields=["api_token_version"])
 
 
 def authenticate_bearer(request: HttpRequest) -> User | None:
@@ -77,6 +100,16 @@ class JwtBearer(HttpBearer):
             return None
         set_api_user(user)
         return user
+
+
+def token_response(user: User) -> dict:
+    access_token, expires_in = issue_access_token(user)
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expires_in": expires_in,
+        "user_id": user.pk,
+    }
 
 
 def require_user(request: HttpRequest) -> User:
