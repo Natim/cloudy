@@ -9,9 +9,11 @@ from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 
+from cloudy.accounts.models import UserProfile
 from cloudy.api.auth import issue_access_token, JWT_AUDIENCE, JWT_ISSUER, set_api_user, user_from_access_token
 from cloudy.api.mcp_server import get_logbook, get_totals, list_aircraft, list_logs
 from cloudy.api.serialization import log_to_api_dict
+from cloudy.core.models import FileModel
 from cloudy.DGAC_avion_logbook.models import DGACAvionLogBook
 from cloudy.stats.service import get_named_totals, LogbookAccessError
 
@@ -392,6 +394,38 @@ class ApiLogbookTests(TestCase):
         body = resp.json()
         self.assertIn("url", body)
         self.assertIn("id", body)
+
+    def test_file_upload_and_delete_update_storage_usage(self):
+        book = self._create_book("plane_dgac")
+        log = self.client.post(
+            f"/api/v1/logbooks/{book['id']}/logs",
+            data=json.dumps(self._dgac_payload(flight_date="2011-07-05T12:00:00")),
+            content_type="application/json",
+            **self.headers,
+        )
+        log_id = log.json()["id"]
+        content = b"fake-image-bytes"
+        before = UserProfile.objects.get(user=self.user).disk_space_balance
+
+        upload = self.client.post(
+            f"/api/v1/logbooks/{book['id']}/logs/{log_id}/files",
+            data={"file": SimpleUploadedFile("scan.jpg", content, content_type="image/jpeg")},
+            **self.headers,
+        )
+        self.assertEqual(upload.status_code, 201, upload.content)
+        self.assertEqual(UserProfile.objects.get(user=self.user).disk_space_balance, before + len(content))
+
+        deleted = self.client.delete(
+            f"/api/v1/logbooks/{book['id']}/logs/{log_id}/files/{upload.json()['id']}",
+            **self.headers,
+        )
+        self.assertEqual(deleted.status_code, 204, deleted.content)
+        self.assertEqual(UserProfile.objects.get(user=self.user).disk_space_balance, before)
+
+    def test_file_of_user_without_pilot_profile_saves(self):
+        staff = User.objects.create_user("staff-no-profile", "staff@example.com", "x")
+        FileModel.objects.create(owner=staff, file=ContentFile(b"data", name="note.txt"))
+        self.assertFalse(UserProfile.objects.filter(user=staff).exists())
 
     def test_log_list_page_token(self):
         book = self._create_book("plane_dgac")

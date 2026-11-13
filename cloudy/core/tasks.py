@@ -30,9 +30,13 @@ def update_storage_balance(sender, instance, **kwargs):
     """
 
     user = instance.owner
-    user_files = FileModel.objects.filter(owner=user, deleted=False)
-    user_profile = user.userprofile
+    # Staff accounts can own files without a pilot profile: there is no quota to update.
+    user_profile = getattr(user, "userprofile", None)
+    if user_profile is None:
+        return
 
-    used = sum(fo.file.size for fo in user_files)
+    user_files = FileModel.objects.filter(owner=user, deleted=False)
+    # filesize() counts a file missing from storage as 0 instead of raising.
+    used = sum(fo.filesize() for fo in user_files)
     user_profile.disk_space_balance = used
-    user_profile.save()
+    user_profile.save(update_fields=["disk_space_balance"])
