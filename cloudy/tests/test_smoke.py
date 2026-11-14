@@ -603,6 +603,52 @@ def test_fcl1080_pdf_annex_skips_logs_without_images(tmp_path):
         assert _pdf_page_count(buf_annex.getvalue()) == _pdf_page_count(buf_plain.getvalue())
 
 
+def test_fcl1080_pdf_annex_per_spread_not_trailing(monkeypatch, tmp_path):
+    from datetime import datetime, timedelta
+    from io import BytesIO
+
+    from PIL import Image as PILImage
+
+    import cloudy.FCL1080.fcl1080_pdfgen as pdfgen
+    from cloudy.FCL1080.fcl1080_pdfgen import gen_carnet_de_vol
+
+    png_path = tmp_path / "cahier.png"
+    PILImage.new("RGB", (120, 90), color="blue").save(png_path)
+    attached = _MockAttachedFile(png_path)
+
+    logs = []
+    for i in range(13):
+        overrides = {"date": datetime(2025, 1, 1) + timedelta(days=i)}
+        if i in (0, 12):
+            overrides["files"] = _MockLogFiles([attached])
+        logs.append(_fcl1080_sample_log(**overrides))
+
+    calls = []
+    real_append = pdfgen.append_annex_pages
+
+    def tracking_append(elements, chunk):
+        calls.append(list(chunk))
+        return real_append(elements, chunk)
+
+    monkeypatch.setattr(pdfgen, "append_annex_pages", tracking_append)
+
+    buf = BytesIO()
+    gen_carnet_de_vol(
+        http_response=buf,
+        title="test",
+        show_cuts=False,
+        logs=logs,
+        reports={},
+        include_images=True,
+    )
+
+    assert len(calls) == 2
+    assert len(calls[0]) == 12
+    assert len(calls[1]) == 1
+    assert calls[0][0] is logs[0]
+    assert calls[1][0] is logs[12]
+
+
 def test_logbook_pdfs_do_not_require_text_outlines(monkeypatch):
     """Transparent label strokes used to force ReportLab text-to-path, which needs FreeType."""
     from io import BytesIO

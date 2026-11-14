@@ -193,13 +193,14 @@ def gen_carnet_de_vol(
 
             # add new page every 12 entries
             for i in range(0, len(logs_for_year), ROWS_PER_PAGE):
+                chunk = logs_for_year[i : i + ROWS_PER_PAGE]
                 # if not first page we add a break
                 if page_count != 1:
                     elements.append(PageBreak())
                 # keep track of the totals from the previous page
                 bottom_totals = append_new_page(
                     year_str=year,
-                    logs=logs_for_year[i : i + ROWS_PER_PAGE],
+                    logs=chunk,
                     prev_totals=prev_totals,
                     show_cuts=show_cuts,
                     elements=elements,
@@ -208,13 +209,12 @@ def gen_carnet_de_vol(
                 # remember totals
                 prev_totals = bottom_totals
                 page_count += 2
+                if include_images:
+                    append_annex_pages(elements, chunk)
 
     else:
         # no data
         append_new_page(show_cuts=show_cuts, elements=elements)
-
-    if include_images:
-        append_annex_pages(elements, logs)
 
     doc.pagesize = landscape(A4)
 
@@ -281,22 +281,10 @@ def append_annex_pages(elements, logs):
         fontSize=11,
         leading=14,
     )
-    title_style = ParagraphStyle(
-        "AnnexTitle",
-        parent=styles["Heading1"],
-        fontName=HAND_FONT,
-        fontSize=16,
-        leading=20,
-        spaceAfter=8,
-    )
-
     elements.append(PageBreak())
     for index, (log, paths) in enumerate(logs_with_images):
         if index > 0:
             elements.append(PageBreak())
-
-        if index == 0:
-            elements.append(Paragraph("Annexes", title_style))
 
         date_str = log.date.strftime("%d/%m/%Y")
         header = f"{date_str} - {log.aircraft_imma} - {log.aircraft_type}"
