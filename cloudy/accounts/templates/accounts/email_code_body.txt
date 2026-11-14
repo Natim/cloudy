@@ -1,0 +1,11 @@
+Bonjour,
+
+{% if purpose == "password_reset" %}Voici le code pour choisir un nouveau mot de passe sur Cloudy :{% else %}Voici le code pour terminer votre inscription sur Cloudy :{% endif %}
+
+    {{ code }}
+
+Ce code est valable {{ minutes }} minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.
+
+--
+Cloudy - https://cloudy.fr/
+Besoin d'aide ? contact@cloudy.fr
