@@ -478,3 +478,38 @@ class AccountDeletionTests(ApiTestCase):
         self.assertEqual(resp.status_code, 502)
         self.assertEqual(resp.json()["code"], "subscription_cancel_failed")
         self.assertTrue(User.objects.filter(pk=self.pilot.pk).exists())
+
+
+class LogbookDeleteAndCategoryTests(ApiTestCase):
+    def setUp(self):
+        super().setUp()
+        self.simple = User.objects.get(email="simple@example.com")
+        self.headers = bearer(self.simple)
+
+    def test_delete_frees_the_economy_slot(self):
+        book = self.post("/logbooks", {"category": "parachute_cloudy"}, **self.headers).json()
+        self.assertEqual(self.post("/logbooks", {"category": "plane_dgac"}, **self.headers).status_code, 403)
+
+        resp = self.delete(f"/logbooks/{book['id']}", **self.headers)
+        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(self.client.get(f"/api/v1/logbooks/{book['id']}", **self.headers).status_code, 404)
+        self.assertEqual(self.client.get("/api/v1/logbooks", **self.headers).json(), [])
+        self.assertEqual(self.post("/logbooks", {"category": "plane_dgac"}, **self.headers).status_code, 201)
+
+    def test_cannot_delete_someone_elses_logbook(self):
+        book = self.post("/logbooks", {"category": "plane_dgac"}, **self.headers).json()
+        pilot = User.objects.get(email="pilot@example.com")
+        self.assertEqual(self.delete(f"/logbooks/{book['id']}", **bearer(pilot)).status_code, 404)
+
+    def test_category_change(self):
+        book = self.post("/logbooks", {"category": "plane_dgac"}, **self.headers).json()
+        resp = self.patch(f"/logbooks/{book['id']}", {"category": "helicopter_dgac"}, **self.headers)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json()["category"], "helicopter_dgac")
+
+        refused = self.patch(f"/logbooks/{book['id']}", {"category": "glider_dgac"}, **self.headers)
+        self.assertEqual(refused.status_code, 409)
+        self.assertEqual(refused.json()["code"], "category_change_unsupported")
+
+        unknown = self.patch(f"/logbooks/{book['id']}", {"category": "rocket"}, **self.headers)
+        self.assertEqual(unknown.status_code, 400)
