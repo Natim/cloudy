@@ -55,6 +55,7 @@ set -a && source .env && set +a
 | `GOOGLE_ANALYTICS_PROPERTY_ID` | Optional `UA-…` property; leave empty to disable |
 | `GAUGES_SITE_ID` | Optional Gauges site id; leave empty to disable |
 | `EMAIL_HOST` | SMTP host; if unset, emails are printed to the console |
+| `DJANGO_BEHIND_TLS_PROXY`, `DJANGO_CSRF_TRUSTED_ORIGINS`, `DJANGO_SERVE_MEDIA` | Proxy and media options, see [Docker](#docker) |
 | `IMPORT_DEFAULT_OWNER_EMAIL` | Staff user who receives manual logbook uploads |
 
 ## Run
@@ -80,3 +81,19 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.
 
 `deploy.sh` runs `uv sync`, `collectstatic`, compressor, and a gunicorn HUP.
 WSGI entrypoint: `cloudy.wsgi:application`.
+
+### Docker
+
+`docker-compose.yml` runs the site with PostgreSQL and Redis on one server. The
+image builds static files at build time and applies migrations when it starts.
+It works as is with Coolify's Docker Compose build pack, which generates the
+`SERVICE_*` secrets and routes the domain to the `web` service on port 8000.
+
+| Variable | Purpose |
+|---|---|
+| `DJANGO_BEHIND_TLS_PROXY` | Trust `X-Forwarded-Proto` from the proxy that terminates TLS |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | Comma-separated `https://` origins allowed to post forms |
+| `DJANGO_SERVE_MEDIA` | Serve uploads from Django when no web server does |
+
+Without `EMAIL_HOST`, emails (including sign-up and password-reset codes) are
+written to the container logs.

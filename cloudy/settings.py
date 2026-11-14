@@ -127,6 +127,13 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = int(env("DJANGO_SECURE_HSTS_SECONDS", "31536000"))
     SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", True)
 
+# Behind a proxy that terminates TLS and sets X-Forwarded-Proto (Traefik in Coolify, nginx).
+if env_bool("DJANGO_BEHIND_TLS_PROXY", False):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip() for origin in env("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if origin.strip()
+]
+
 ROOT_URLCONF = "cloudy.urls"
 WSGI_APPLICATION = "cloudy.wsgi.application"
 
@@ -232,6 +239,8 @@ COMPRESS_URL = STATIC_URL
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+# Let Django serve uploads when no web server in front of it does (single-container deployments).
+SERVE_MEDIA = env_bool("DJANGO_SERVE_MEDIA", False)
 
 STORAGES = {
     "default": {
