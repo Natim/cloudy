@@ -19,6 +19,10 @@ class PasswordChangeIn(Schema):
     new_password: str
 
 
+class AccountDeleteIn(Schema):
+    password: str
+
+
 class SettingsPatchIn(Schema):
     email_notifications: bool | None = None
 

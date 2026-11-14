@@ -13,6 +13,7 @@ from ..profiles import (
     clean_birth_date,
     clean_name,
     clean_phone,
+    delete_account,
     email_taken,
     FieldErrors,
     invalid_credentials,
@@ -21,7 +22,14 @@ from ..profiles import (
     save_email_notifications,
     settings_to_dict,
 )
-from ..schemas.account import AvatarOut, PasswordChangeIn, ProfilePatchIn, SettingsOut, SettingsPatchIn
+from ..schemas.account import (
+    AccountDeleteIn,
+    AvatarOut,
+    PasswordChangeIn,
+    ProfilePatchIn,
+    SettingsOut,
+    SettingsPatchIn,
+)
 from ..schemas.auth import ProfileOut, TokenOut
 from ._common import bearer_auth
 
@@ -133,6 +141,16 @@ def change_password(request: HttpRequest, payload: PasswordChangeIn):
     user.save(update_fields=["password"])
     revoke_access_tokens(user)
     return token_response(user)
+
+
+@router.delete("/me", response={204: None}, auth=bearer_auth)
+def delete_me(request: HttpRequest, payload: AccountDeleteIn):
+    """Delete the account and its data for good. Asks for the password again."""
+    user = require_user(request)
+    if not user.check_password(payload.password):
+        raise invalid_credentials()
+    delete_account(user)
+    return 204, None
 
 
 @router.get("/me/settings", response=SettingsOut, auth=bearer_auth)

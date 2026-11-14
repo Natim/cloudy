@@ -2,12 +2,16 @@ import io
 import json
 import re
 from datetime import date, timedelta
+from unittest import mock
 
 import jwt
+import stripe
 from constance.test import override_config
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.utils import timezone
@@ -17,6 +21,10 @@ from PIL import Image
 from cloudy.accounts.models import EmailCode, ProfileSettings, UserProfile
 from cloudy.api.auth import issue_access_token, JWT_ALGORITHM, revoke_access_tokens
 from cloudy.api.email_codes import _hash as hash_code
+from cloudy.core.models import FileModel
+from cloudy.imports.models import Import
+from cloudy.logbooks.models import LogBookBase
+from cloudy.payment.models import PaymentOrder
 
 STRONG_PASSWORD = "Altimetre-Calage-1013"
 
@@ -399,3 +407,74 @@ class ProfileTests(ApiTestCase):
         resp = self.patch("/me/settings", {"email_notifications": False}, **self.headers)
         self.assertEqual(resp.json(), {"email_notifications": False})
         self.assertFalse(ProfileSettings.objects.get(user=self.pilot).mail_on_notification)
+
+
+class AccountDeletionTests(ApiTestCase):
+    def setUp(self):
+        super().setUp()
+        self.pilot = User.objects.get(email="pilot@example.com")
+        self.headers = bearer(self.pilot)
+
+    def test_wrong_password_keeps_the_account(self):
+        resp = self.delete("/me", {"password": "nope"}, **self.headers)
+        self.assertEqual(resp.status_code, 401)
+        self.assertTrue(User.objects.filter(pk=self.pilot.pk).exists())
+
+    def test_delete_account(self):
+        self.post("/logbooks", {"category": "plane_dgac"}, **self.headers)
+        FileModel.objects.create(owner=self.pilot, file="upload/scan.jpg")
+        order = PaymentOrder.objects.create(uuid="order-1", user=self.pilot, state=3, amount=3500)
+
+        resp = self.delete("/me", {"password": "azeaze"}, **self.headers)
+        self.assertEqual(resp.status_code, 204, resp.content)
+        self.assertFalse(User.objects.filter(pk=self.pilot.pk).exists())
+        self.assertFalse(UserProfile.objects.filter(user_id=self.pilot.pk).exists())
+        self.assertFalse(LogBookBase.objects.filter(ownr_id=self.pilot.pk).exists())
+        self.assertFalse(FileModel.objects.filter(owner_id=self.pilot.pk).exists())
+        order.refresh_from_db()
+        self.assertIsNone(order.user)
+        self.assertEqual(self.client.get("/api/v1/me", **self.headers).status_code, 401)
+
+    def test_delete_account_removes_the_files(self):
+        book = self.post("/logbooks", {"category": "plane_dgac"}, **self.headers).json()
+        scan = FileModel.objects.create(owner=self.pilot, file=ContentFile(b"scan", name="scan.jpg"))
+        csv = Import.objects.create(
+            owner=User.objects.create_user("import-staff", "staff@example.com", "x", is_staff=True),
+            user=self.pilot,
+            logbook=LogBookBase.objects.get(pk=book["id"]),
+            import_state=1,
+            logbook_state=0,
+            original_file=ContentFile(b"date;type", name="flights.csv"),
+        )
+        self.pilot.userprofile.avatar.save("me.png", ContentFile(png_bytes()), save=True)
+        names = [scan.file.name, csv.original_file.name, self.pilot.userprofile.avatar.name]
+        self.assertTrue(all(default_storage.exists(name) for name in names))
+
+        with self.captureOnCommitCallbacks(execute=True):
+            resp = self.delete("/me", {"password": "azeaze"}, **self.headers)
+        self.assertEqual(resp.status_code, 204, resp.content)
+        self.assertFalse(any(default_storage.exists(name) for name in names))
+
+    def test_running_subscription_is_cancelled_first(self):
+        UserProfile.objects.filter(user=self.pilot).update(stripe_subscription_id="sub_123")
+        with (
+            self.settings(STRIPE_API_KEY="sk_test_x"),
+            mock.patch("cloudy.api.profiles.stripe.Subscription.cancel") as cancel,
+        ):
+            resp = self.delete("/me", {"password": "azeaze"}, **self.headers)
+        self.assertEqual(resp.status_code, 204)
+        cancel.assert_called_once_with("sub_123", api_key="sk_test_x")
+
+    def test_failed_cancellation_keeps_the_account(self):
+        UserProfile.objects.filter(user=self.pilot).update(stripe_subscription_id="sub_123")
+        with (
+            self.settings(STRIPE_API_KEY="sk_test_x"),
+            mock.patch(
+                "cloudy.api.profiles.stripe.Subscription.cancel",
+                side_effect=stripe.APIConnectionError("down"),
+            ),
+        ):
+            resp = self.delete("/me", {"password": "azeaze"}, **self.headers)
+        self.assertEqual(resp.status_code, 502)
+        self.assertEqual(resp.json()["code"], "subscription_cancel_failed")
+        self.assertTrue(User.objects.filter(pk=self.pilot.pk).exists())

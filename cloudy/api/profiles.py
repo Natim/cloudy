@@ -1,23 +1,32 @@
-"""Account data for the mobile API: validation, serialization and creation."""
+"""Account data for the mobile API: validation, serialization, creation and deletion."""
 
+import logging
 import re
 from datetime import date
 from typing import Any
 
+import stripe
 from constance import config
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.core.files.storage import default_storage
 from django.db import transaction
 from django_registration.signals import user_registered
 
 from cloudy.accounts.forms import generate_username, validate_minimum_pilot_age
 from cloudy.accounts.models import ProfileSettings, UserProfile
+from cloudy.alerts.models import Qualification
+from cloudy.core.models import FileModel
+from cloudy.imports.models import Import
 from cloudy.notifications.models import NoticeSetting, NoticeType
+from cloudy.payment.models import PaymentOrder
 
 from .errors import ApiHttpError, invalid_payload
+
+logger = logging.getLogger(__name__)
 
 NAME_MAX_LENGTH = 30
 AERODROME_MAX_LENGTH = 30
@@ -183,3 +192,61 @@ def create_account(
 
     user_registered.send(sender=create_account, user=user, request=request)
     return user
+
+
+def _user_media_names(user: User) -> list[str]:
+    names = [name for name in FileModel.objects.filter(owner=user).values_list("file", flat=True) if name]
+    names += [
+        name for name in Qualification.objects.filter(ownr=user).values_list("photo", flat=True) if name
+    ]
+    names += [
+        name for name in Import.objects.filter(user=user).values_list("original_file", flat=True) if name
+    ]
+    profile = getattr(user, "userprofile", None)
+    if profile is not None and profile.avatar:
+        names.append(profile.avatar.name)
+    return names
+
+
+def _cancel_subscription(profile: UserProfile | None) -> None:
+    subscription_id = (profile.stripe_subscription_id if profile else "") or ""
+    if not subscription_id:
+        return
+    if not settings.STRIPE_API_KEY:
+        raise ApiHttpError(502, "The subscription could not be cancelled", code="subscription_cancel_failed")
+    try:
+        stripe.Subscription.cancel(subscription_id, api_key=settings.STRIPE_API_KEY)
+    except stripe.InvalidRequestError as exc:
+        # Already cancelled or unknown to Stripe: nothing left to bill.
+        if getattr(exc, "code", None) != "resource_missing":
+            raise ApiHttpError(
+                502, "The subscription could not be cancelled", code="subscription_cancel_failed"
+            ) from exc
+    except stripe.StripeError as exc:
+        raise ApiHttpError(
+            502, "The subscription could not be cancelled", code="subscription_cancel_failed"
+        ) from exc
+
+
+def delete_account(user: User) -> None:
+    """Delete the account and everything it owns.
+
+    Payment orders are kept for accounting, detached from the account. Any
+    running Stripe subscription is cancelled first, so nobody keeps paying for
+    an account that no longer exists.
+    """
+    profile = getattr(user, "userprofile", None)
+    _cancel_subscription(profile)
+    media_names = _user_media_names(user)
+    with transaction.atomic():
+        PaymentOrder.objects.filter(user=user).update(user=None)
+        user.delete()
+
+    def _remove_files():
+        for name in media_names:
+            try:
+                default_storage.delete(name)
+            except OSError:
+                logger.warning("Could not delete media file %s", name)
+
+    transaction.on_commit(_remove_files)
