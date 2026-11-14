@@ -1,0 +1,66 @@
+{% extends "site_base_public.html" %}
+
+{% load static %}
+{% load compress %}
+{% load quotes_tags %}
+
+{% block title %}Sail with Me{% endblock %}
+{% block body_id %}sail-with-me{% endblock %}
+
+{% block head %}
+<link href="{% static 'compass/stylesheets/features.css' %}" media="screen, projection" rel="stylesheet"
+  type="text/css" />
+<script type="text/javascript" src="{% static 'js/cloudy_home.js' %}"></script>
+{% endblock %}
+
+{% block main %}
+<div id="main">
+  <div id="features-top">
+    <div class="buttons">
+      <a id="signup-button" href="# TODO {# url 'register' #}"><span class="txt"></span></a>
+    </div>
+    <div class="buttons"></div>
+    <div id="paper-plane"></div>
+  </div>
+
+  <div id="features-third">
+    <div class="box-top"></div>
+    <div class="box-main">
+      <div class="content">
+        <h2>Sail with Me, un service Cloudy</h2>
+        <p>
+          Sail with Me met en relation skippers et équipiers pour des navigations au long cours, sur
+          <a href="https://www.sailwithme.net/" rel="noopener noreferrer">www.sailwithme.net</a>.
+          Ce service est édité par SAS CLOUDY, la même société que le carnet de vol
+          <a href="/">www.cloudy.fr</a>.
+        </p>
+
+        <h2>Trouver un équipage</h2>
+        <p>
+          Un skipper publie une place à bord. Un équipier cherche une traversée. Les annonces se filtrent
+          par port de départ, par programme et par semaines. La messagerie du site sert à préparer l’équipage,
+          et un avis croisé après la navigation aide les suivants à se faire une idée.
+        </p>
+        <ul style="font-size: 14px; color: #454545; padding-left: 25px;">
+          <li>
+            <strong>Les programmes</strong> : transatlantique, transpacifique, Méditerranée, convoyage,
+            navigation côtière ou saison complète.
+          </li>
+          <li>
+            <strong>Les annonces</strong> : un skipper qui cherche de l’équipage, ou un équipier qui cherche une place.
+          </li>
+          <li>
+            <strong>Le partage des frais</strong> : la participation annoncée reste un partage des dépenses du bord,
+            sans but lucratif. Sail with Me n’organise pas de transport commercial de passagers.
+          </li>
+        </ul>
+        <p>
+          Pour parcourir les annonces ou proposer une place, rendez-vous sur
+          <a href="https://www.sailwithme.net/" rel="noopener noreferrer">Sail with Me</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="box-bottom"></div>
+</div>
+{% endblock %}

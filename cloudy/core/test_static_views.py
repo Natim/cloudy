@@ -95,6 +95,18 @@ class StaticViewsTestCase(TestCase):
         self.assertIn("https://natim.github.io/france-ga-pilot-maps/", body)
         self.assertIn("AVGAS", body)
 
+    def test_sail_with_me(self):
+        url = reverse("sail_with_me")
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 200)
+        body = resp.content.decode()
+        self.assertIn("Sail with Me", body)
+        self.assertIn("https://www.sailwithme.net/", body)
+        self.assertIn("transatlantique", body)
+        self.assertIn("partage des frais", body)
+        footer = self.c.get(reverse("home"))
+        self.assertIn(url, footer.content.decode())
+
     def test_air_avion(self):
         url = reverse("landing", kwargs={"aeronef": "avion"})
         resp = self.c.get(url)

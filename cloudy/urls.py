@@ -32,6 +32,11 @@ urlpatterns = [
         TemplateView.as_view(template_name="fly_green_aviation.html"),
         name="fly_green_aviation",
     ),
+    path(
+        "sail-with-me/",
+        TemplateView.as_view(template_name="sail_with_me.html"),
+        name="sail_with_me",
+    ),
     path("features/", TemplateView.as_view(template_name="features.html"), name="features"),
     path("support/", TemplateView.as_view(template_name="support.html"), name="support"),
     path("connecteurs/", TemplateView.as_view(template_name="mcp_guide.html"), name="mcp_guide"),
