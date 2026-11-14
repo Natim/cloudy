@@ -1,9 +1,12 @@
-"""Account data for the mobile API: validation and creation."""
+"""Account data for the mobile API: validation, serialization and creation."""
 
 import re
 from datetime import date
+from typing import Any
 
+from constance import config
 from django import forms
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -11,7 +14,8 @@ from django.db import transaction
 from django_registration.signals import user_registered
 
 from cloudy.accounts.forms import generate_username, validate_minimum_pilot_age
-from cloudy.accounts.models import UserProfile
+from cloudy.accounts.models import ProfileSettings, UserProfile
+from cloudy.notifications.models import NoticeSetting, NoticeType
 
 from .errors import ApiHttpError, invalid_payload
 
@@ -36,6 +40,10 @@ class FieldErrors:
 
 def email_taken() -> ApiHttpError:
     return ApiHttpError(409, "An account already exists with this email", code="EMAIL_TAKEN")
+
+
+def invalid_credentials() -> ApiHttpError:
+    return ApiHttpError(401, "Invalid credentials", code="invalid_credentials")
 
 
 def active_user_for_email(email: str) -> User | None:
@@ -82,6 +90,59 @@ def check_password(password: str, user: User | None, errors: FieldErrors, field:
     except ValidationError as exc:
         for item in exc.error_list:
             errors.add(field, " ".join(item.messages), item.code or "invalid")
+
+
+def pilot_profile(user: User) -> UserProfile:
+    profile = getattr(user, "userprofile", None)
+    if profile is None:
+        raise ApiHttpError(409, "This account has no pilot profile", code="profile_missing")
+    return profile
+
+
+def storage_to_dict(profile: UserProfile) -> dict[str, Any]:
+    """Space used and the quota it counts against; First Class storage is unlimited."""
+    free_limit = int(config.DISKSPACE_FREE_MAXMB) * 1024 * 1024
+    return {
+        "used_bytes": max(0, profile.disk_space_balance),
+        "limit_bytes": None if profile.has_payed_plan() else free_limit,
+    }
+
+
+def profile_to_dict(user: User) -> dict[str, Any]:
+    profile = pilot_profile(user)
+    return {
+        "id": user.pk,
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "birth_date": profile.dob.isoformat() if profile.dob else None,
+        "phone": profile.phone,
+        "base_aerodrome": profile.aerodrom,
+        "avatar_url": profile.avatar.url if profile.avatar else None,
+        "plan": "first" if profile.has_payed_plan() else "economy",
+        "plan_since": profile.fplan_switch_date.isoformat()
+        if profile.has_payed_plan() and profile.fplan_switch_date
+        else None,
+        "date_joined": user.date_joined.isoformat(),
+        "storage": storage_to_dict(profile),
+    }
+
+
+def settings_to_dict(user: User) -> dict[str, Any]:
+    prefs = ProfileSettings.objects.filter(user=user).first()
+    return {"email_notifications": prefs.mail_on_notification if prefs else True}
+
+
+def save_email_notifications(user: User, enabled: bool) -> None:
+    """Same effect as the web account settings form (ProfileSettingsForm.save)."""
+    for notice_type in NoticeType.objects.all():
+        if notice_type.label not in settings.NOTICE_TYPE_IGNORE:
+            notice_setting = NoticeSetting.for_user(user, notice_type, 0)
+            notice_setting.send = enabled
+            notice_setting.save()
+    prefs, _created = ProfileSettings.objects.get_or_create(user=user)
+    prefs.mail_on_notification = enabled
+    prefs.save()
 
 
 @transaction.atomic

@@ -16,10 +16,25 @@ class TokenOut(Schema):
     user_id: int
 
 
+class StorageOut(Schema):
+    used_bytes: int
+    limit_bytes: int | None = None
+
+
 class ProfileOut(Schema):
     id: int
     email: str
     avatar_url: str | None = None
+    # Pilot profile fields: null for an account without a pilot profile (staff).
+    first_name: str | None = None
+    last_name: str | None = None
+    birth_date: str | None = None
+    phone: str | None = None
+    base_aerodrome: str | None = None
+    plan: str | None = None
+    plan_since: str | None = None
+    date_joined: str | None = None
+    storage: StorageOut | None = None
 
 
 class EmailIn(Schema):

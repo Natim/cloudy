@@ -7,7 +7,7 @@ from django.http import HttpRequest
 from ninja import Router
 from ninja.errors import HttpError
 
-from cloudy.accounts.models import EmailCode, UserProfile
+from cloudy.accounts.models import EmailCode
 
 from .. import email_codes
 from ..auth import require_user, revoke_access_tokens, token_response
@@ -27,7 +27,6 @@ from ..schemas.auth import (
     CodeIn,
     CompleteRegistrationIn,
     EmailIn,
-    ProfileOut,
     ResetPasswordIn,
     TokenIn,
     TokenOut,
@@ -149,15 +148,3 @@ def auth_reset_password(request: HttpRequest, payload: ResetPasswordIn):
     revoke_access_tokens(user)
     email_codes.consume(code)
     return token_response(user)
-
-
-@router.get("/me", response=ProfileOut, auth=bearer_auth)
-def me(request: HttpRequest):
-    user = require_user(request)
-    return profile_out(user)
-
-
-def profile_out(user: User) -> dict:
-    profile = UserProfile.objects.filter(user=user).first()
-    avatar_url = profile.avatar.url if profile is not None and profile.avatar else None
-    return {"id": user.pk, "email": user.email, "avatar_url": avatar_url}

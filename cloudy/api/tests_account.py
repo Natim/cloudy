@@ -1,3 +1,4 @@
+import io
 import json
 import re
 from datetime import date, timedelta
@@ -7,11 +8,13 @@ from constance.test import override_config
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.utils import timezone
 from django.utils.html import escape
+from PIL import Image
 
-from cloudy.accounts.models import EmailCode
+from cloudy.accounts.models import EmailCode, ProfileSettings, UserProfile
 from cloudy.api.auth import issue_access_token, JWT_ALGORITHM, revoke_access_tokens
 from cloudy.api.email_codes import _hash as hash_code
 
@@ -23,6 +26,12 @@ def bearer(user: User) -> dict[str, str]:
     return {"HTTP_AUTHORIZATION": f"Bearer {token}"}
 
 
+def png_bytes() -> bytes:
+    buffer = io.BytesIO()
+    Image.new("RGB", (4, 4), "red").save(buffer, format="PNG")
+    return buffer.getvalue()
+
+
 class ApiTestCase(TestCase):
     fixtures = ["testing_data.json"]
 
@@ -31,6 +40,16 @@ class ApiTestCase(TestCase):
 
     def post(self, path, body=None, **headers):
         return self.client.post(
+            f"/api/v1{path}", data=json.dumps(body or {}), content_type="application/json", **headers
+        )
+
+    def patch(self, path, body, **headers):
+        return self.client.patch(
+            f"/api/v1{path}", data=json.dumps(body), content_type="application/json", **headers
+        )
+
+    def delete(self, path, body=None, **headers):
+        return self.client.delete(
             f"/api/v1{path}", data=json.dumps(body or {}), content_type="application/json", **headers
         )
 
@@ -256,3 +275,127 @@ class PasswordResetTests(ApiTestCase):
         )
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(resp.json()["code"], "OTP_EXPIRED")
+
+
+class ProfileTests(ApiTestCase):
+    def setUp(self):
+        super().setUp()
+        self.pilot = User.objects.get(email="pilot@example.com")
+        self.headers = bearer(self.pilot)
+
+    def test_get_me(self):
+        resp = self.client.get("/api/v1/me", **self.headers)
+        self.assertEqual(resp.status_code, 200)
+        body = resp.json()
+        self.assertEqual(body["email"], "pilot@example.com")
+        self.assertEqual(body["first_name"], "Ada")
+        self.assertEqual(body["plan"], "first")
+        self.assertIsNone(body["avatar_url"])
+        self.assertEqual(self.client.get("/api/v1/me").status_code, 401)
+
+    def test_account_without_pilot_profile_gets_the_account_fields(self):
+        staff = User.objects.create_user("staff-no-profile", "staff@example.com", "x")
+        resp = self.client.get("/api/v1/me", **bearer(staff))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json()["email"], "staff@example.com")
+        self.assertIsNone(resp.json()["plan"])
+
+    @override_config(DISKSPACE_FREE_MAXMB=25)
+    def test_economy_storage_reports_the_configured_quota(self):
+        UserProfile.objects.filter(user=self.pilot).update(plan=1, disk_space_balance=3 * 1024 * 1024)
+        body = self.client.get("/api/v1/me", **self.headers).json()
+        self.assertEqual(body["plan"], "economy")
+        self.assertEqual(body["storage"], {"used_bytes": 3 * 1024 * 1024, "limit_bytes": 25 * 1024 * 1024})
+
+    def test_first_class_storage_is_unlimited(self):
+        body = self.client.get("/api/v1/me", **self.headers).json()
+        self.assertEqual(body["plan"], "first")
+        self.assertEqual(body["storage"], {"used_bytes": 0, "limit_bytes": None})
+
+    def test_a_drifted_disk_counter_is_reported_as_zero(self):
+        UserProfile.objects.filter(user=self.pilot).update(plan=1, disk_space_balance=-5)
+        body = self.client.get("/api/v1/me", **self.headers).json()
+        self.assertEqual(body["storage"]["used_bytes"], 0)
+
+    def test_patch_me(self):
+        resp = self.patch(
+            "/me",
+            {"first_name": "grace", "phone": "+33 6 12 34 56 78", "base_aerodrome": "lfpt"},
+            **self.headers,
+        )
+        self.assertEqual(resp.status_code, 200, resp.content)
+        body = resp.json()
+        self.assertEqual(body["first_name"], "Grace")
+        self.assertEqual(body["last_name"], "Pilot")
+        self.assertEqual(body["phone"], "+33612345678")
+        self.assertEqual(body["base_aerodrome"], "LFPT")
+        self.assertEqual(body["storage"], {"used_bytes": 0, "limit_bytes": None})
+
+    def test_patch_me_validates(self):
+        resp = self.patch("/me", {"first_name": "", "birth_date": "2020-01-01"}, **self.headers)
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(set(resp.json()["errors"]), {"first_name", "birth_date"})
+
+    def test_email_change_needs_the_password(self):
+        resp = self.patch("/me", {"email": "ada@example.com"}, **self.headers)
+        self.assertEqual(resp.status_code, 401)
+        taken = self.patch(
+            "/me", {"email": "simple@example.com", "current_password": "azeaze"}, **self.headers
+        )
+        self.assertEqual(taken.status_code, 409)
+        self.assertEqual(taken.json()["code"], "EMAIL_TAKEN")
+        ok = self.patch("/me", {"email": "Ada@Example.com", "current_password": "azeaze"}, **self.headers)
+        self.assertEqual(ok.status_code, 200)
+        self.assertEqual(ok.json()["email"], "ada@example.com")
+
+    def test_avatar_upload_and_delete(self):
+        upload = SimpleUploadedFile("me.png", png_bytes(), content_type="image/png")
+        resp = self.client.post("/api/v1/me/avatar", data={"file": upload}, **self.headers)
+        self.assertEqual(resp.status_code, 201, resp.content)
+        self.assertTrue(resp.json()["avatar_url"].startswith("/media/avatars/"))
+        self.assertIsNotNone(self.client.get("/api/v1/me", **self.headers).json()["avatar_url"])
+
+        gone = self.delete("/me/avatar", **self.headers)
+        self.assertEqual(gone.status_code, 204)
+        self.assertIsNone(self.client.get("/api/v1/me", **self.headers).json()["avatar_url"])
+
+    def test_avatar_must_be_an_image(self):
+        upload = SimpleUploadedFile("me.png", b"not an image", content_type="image/png")
+        resp = self.client.post("/api/v1/me/avatar", data={"file": upload}, **self.headers)
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("file", resp.json()["errors"])
+
+    def test_damaged_image_is_refused(self):
+        damaged = bytearray(png_bytes())
+        damaged[-20] ^= 0xFF
+        upload = SimpleUploadedFile("me.png", bytes(damaged), content_type="image/png")
+        resp = self.client.post("/api/v1/me/avatar", data={"file": upload}, **self.headers)
+        self.assertEqual(resp.status_code, 400)
+
+    def test_change_password(self):
+        wrong = self.post(
+            "/me/password", {"current_password": "nope", "new_password": STRONG_PASSWORD}, **self.headers
+        )
+        self.assertEqual(wrong.status_code, 401)
+        self.assertEqual(wrong.json()["detail"], "Invalid credentials")
+
+        weak = self.post(
+            "/me/password", {"current_password": "azeaze", "new_password": "123"}, **self.headers
+        )
+        self.assertEqual(weak.status_code, 400)
+        self.assertIn("new_password", weak.json()["errors"])
+
+        ok = self.post(
+            "/me/password", {"current_password": "azeaze", "new_password": STRONG_PASSWORD}, **self.headers
+        )
+        self.assertEqual(ok.status_code, 200)
+        self.assertEqual(self.client.get("/api/v1/me", **self.headers).status_code, 401)
+        new_headers = {"HTTP_AUTHORIZATION": f"Bearer {ok.json()['access_token']}"}
+        self.assertEqual(self.client.get("/api/v1/me", **new_headers).status_code, 200)
+
+    def test_notification_settings(self):
+        resp = self.client.get("/api/v1/me/settings", **self.headers)
+        self.assertEqual(resp.json(), {"email_notifications": True})
+        resp = self.patch("/me/settings", {"email_notifications": False}, **self.headers)
+        self.assertEqual(resp.json(), {"email_notifications": False})
+        self.assertFalse(ProfileSettings.objects.get(user=self.pilot).mail_on_notification)
