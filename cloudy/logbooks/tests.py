@@ -496,3 +496,77 @@ class ReportPageTests(TestCase):
         self.assertContains(response, 'value="30"')
         self.assertContains(response, 'name="nbrto"')
         self.assertContains(response, 'value="4"')
+
+
+class LogDeleteAttachedFilesSignalTest(TestCase):
+    def setUp(self):
+        from datetime import date
+
+        from cloudy.DGAC_avion_logbook.models import DGACAvionLogBook
+
+        user = User.objects.create_user("file-pilot", "fp@example.com", "secret")
+        UserProfile.objects.create(user=user, dob=date(1990, 1, 1))
+        self.user = user
+        self.logbook = DGACAvionLogBook(ownr=user, name="Files", cat="plane_dgac")
+        self.logbook.save()
+
+    def _make_log(self):
+        now = timezone.now()
+        return DGACAvionLog(
+            lbook=self.logbook,
+            date=now,
+            cdate=now,
+            update=now,
+            aeronef_type="T1",
+            aeronef_imma="F-AAA",
+            fctbrd="EP",
+            natvol="",
+            mbr_equipage_jour=0,
+            mbr_equipage_nuit=0,
+            mono_jdbl=0,
+            mono_jcdb=0,
+            mono_ndbl=0,
+            mono_ncdb=0,
+            mul_jdbl=0,
+            mul_jcdb=0,
+            mul_jcplt=0,
+            mul_ndbl=0,
+            mul_ncdb=0,
+            mul_ncplt=0,
+            vai_dbl=0,
+            vai_plt=0,
+            simu=0,
+            ifr=0,
+            obs="",
+            cmmts="",
+            nbrto=0,
+            nbrla=0,
+            airpdep="LFRN",
+            airpar="LFPG",
+            staffob="",
+            optional_filter="",
+        )
+
+    def test_deleting_one_log_does_not_soft_delete_other_logs_files(self):
+        from django.core.files.base import ContentFile
+
+        from cloudy.core.models import FileModel
+
+        log_a = self._make_log()
+        log_a.save()
+        log_b = self._make_log()
+        log_b.save()
+        file_a = FileModel(owner=self.user, file=ContentFile(b"x", name="a.jpg"))
+        file_a.save()
+        file_b = FileModel(owner=self.user, file=ContentFile(b"y", name="b.jpg"))
+        file_b.save()
+        log_a.files.add(file_a)
+        log_b.files.add(file_b)
+
+        log_a.deleted = True
+        log_a.save()
+
+        file_a.refresh_from_db()
+        file_b.refresh_from_db()
+        self.assertTrue(file_a.deleted)
+        self.assertFalse(file_b.deleted)

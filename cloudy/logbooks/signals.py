@@ -2,7 +2,6 @@ from django.db.models import Q
 from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 
-from cloudy.core.models import FileModel
 from cloudy.logbooks import paginator
 from cloudy.logbooks.models import LogBase, LogBookBase
 from cloudy.stats.models import Airport
@@ -70,14 +69,9 @@ def update_delete_status_attached_files(sender, instance, **kwargs):
             unmodified_object = sender.objects.get(pk=instance.pk)
             if not unmodified_object.deleted == instance.deleted:
                 state = instance.deleted
-                filters = {
-                    "owner": instance.lbook.ownr,
-                    "deleted": not state,
-                }
-                failing_files = FileModel.objects.filter(**filters)
-                for fo in failing_files:
+                for fo in instance.files.filter(deleted=not state):
                     fo.deleted = state
-                    fo.save()
+                    fo.save(update_fields=["deleted"])
 
         except sender.DoesNotExist:
             return  # Avoid problems with fixtures.
