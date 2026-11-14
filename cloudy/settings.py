@@ -53,9 +53,9 @@ CORS_ALLOWED_ORIGINS = frozenset(
     if origin.strip()
 )
 
-ADMINS = ["contact@cloudy.fr"]
-MANAGERS = ["contact@cloudy.fr"]
-UNKNOWN_AIRPORTS_CONTACTS = ["contact@cloudy.fr"]
+ADMINS = ["hesedtayawelba@gmail.com"]
+MANAGERS = ["hesedtayawelba@gmail.com"]
+UNKNOWN_AIRPORTS_CONTACTS = ["hesedtayawelba@gmail.com"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
