@@ -8,5 +8,6 @@ class LogbookCreateIn(Schema):
 
 class LogbookPatchIn(Schema):
     name: str | None = None
+    category: str | None = None
     time_format: int | None = None
     height_format: int | None = None

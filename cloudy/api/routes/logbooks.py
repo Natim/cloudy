@@ -7,13 +7,14 @@ from ninja.errors import HttpError
 from ninja.responses import Response
 
 from cloudy.logbooks import settings as book_settings
-from cloudy.logbooks.forms import EditLbookNameForm
+from cloudy.logbooks.forms import DeleteLbookForm, EditLbookNameForm
 from cloudy.logbooks.models import LogBookBase
 
 from ..auth import require_user
-from ..errors import invalid_payload, plan_required
+from ..errors import ApiHttpError, invalid_payload, plan_required
 from ..form_data import form_errors_to_api
 from ..logbooks_access import get_owned_logbook, logbook_to_dict
+from ..profiles import pilot_profile
 from ..schemas.logbooks import LogbookCreateIn, LogbookPatchIn
 from ._common import bearer_auth, resource_location
 
@@ -63,6 +64,18 @@ def get_logbook(request: HttpRequest, logbook_id: int):
 def patch_logbook(request: HttpRequest, logbook_id: int, payload: LogbookPatchIn):
     user = require_user(request)
     logbook = get_owned_logbook(user, logbook_id)
+    if payload.category is not None and payload.category != logbook.cat:
+        if payload.category not in book_settings.MAP:
+            raise HttpError(400, "Unknown logbook category")
+        # Categories that share a storage model (plane_dgac / helicopter_dgac) can be
+        # swapped in place. Others store flights in different tables.
+        if book_settings.MAP[payload.category] is not type(logbook):
+            raise ApiHttpError(
+                409,
+                "This category stores flights differently; create a new logbook instead",
+                code="category_change_unsupported",
+            )
+        logbook.cat = payload.category
     if payload.name is not None:
         form = EditLbookNameForm(
             {"name": payload.name, "time_format": logbook.time_format, "height_format": logbook.height_format}
@@ -76,3 +89,12 @@ def patch_logbook(request: HttpRequest, logbook_id: int, payload: LogbookPatchIn
         logbook.height_format = payload.height_format
     logbook.save()
     return logbook_to_dict(logbook)
+
+
+@router.delete("/logbooks/{logbook_id}", response={204: None}, auth=bearer_auth)
+def delete_logbook(request: HttpRequest, logbook_id: int):
+    """Same soft delete as the website: the logbook and its flights disappear for the pilot."""
+    user = require_user(request)
+    logbook = get_owned_logbook(user, logbook_id)
+    DeleteLbookForm().delete(logbook, pilot_profile(user))
+    return 204, None

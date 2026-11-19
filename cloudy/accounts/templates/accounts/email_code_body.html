@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>{{ subject }}</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f7f9;">
+<div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">Ce code est valable {{ minutes }} minutes.</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f7f9;">
+  <tr>
+    <td align="center" style="padding:24px 12px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px; background-color:#ffffff; border:1px solid #e0e0e0; border-radius:12px;">
+        <tr>
+          <td align="center" style="padding:28px 24px 20px; border-bottom:4px solid #9a1c20;">
+            <a href="https://cloudy.fr/"><img src="https://cloudy.fr/static/img/logo.png" width="144" height="60" alt="Cloudy" style="display:block; border:0;"></a>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:32px 32px 8px; font-family:Arial, Helvetica, sans-serif;">
+            <h1 style="margin:0 0 16px; font-size:22px; line-height:28px; font-weight:bold; color:#073150;">{% if purpose == "password_reset" %}Nouveau mot de passe{% else %}Bienvenue sur Cloudy{% endif %}</h1>
+            <p style="margin:0 0 8px; font-size:16px; line-height:24px; color:#555555;">Bonjour,</p>
+            <p style="margin:0; font-size:16px; line-height:24px; color:#555555;">{% if purpose == "password_reset" %}Voici le code pour choisir un nouveau mot de passe :{% else %}Voici le code pour terminer votre inscription :{% endif %}</p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:24px 32px;">
+            <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="padding:14px 28px; background-color:#f4f7f9; border:1px dashed #9a1c20; border-radius:8px; font-family:'Courier New', Courier, monospace; font-size:34px; line-height:40px; font-weight:bold; letter-spacing:6px; color:#9a1c20;">{{ code }}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:0 32px 32px; font-family:Arial, Helvetica, sans-serif;">
+            <p style="margin:0 0 8px; font-size:14px; line-height:20px; color:#555555;">Ce code est valable {{ minutes }} minutes.</p>
+            <p style="margin:0; font-size:13px; line-height:20px; color:#848484;">Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.</p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:20px 32px; border-top:1px solid #e0e0e0; font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:18px; color:#848484;">
+            Besoin d'aide ? <a href="mailto:contact@cloudy.fr" style="color:#9a1c20; text-decoration:none;">contact@cloudy.fr</a><br>
+            <a href="https://cloudy.fr/" style="color:#9a1c20; text-decoration:none;">cloudy.fr</a><br>
+            SAS CLOUDY - 22 rue du Temple de Blosne, 35136 Saint-Jacques-de-la-Lande
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

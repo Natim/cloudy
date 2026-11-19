@@ -1,12 +1,15 @@
 """cloudy URL Configuration."""
 
+import re
+
 from constance import config
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path, register_converter
+from django.urls import include, path, re_path, register_converter
 from django.urls.converters import SlugConverter
 from django.views.generic import RedirectView, TemplateView
+from django.views.static import serve
 
 from cloudy.api.api import api as cloudy_api
 from cloudy.api.mcp_view import mcp_endpoint
@@ -86,3 +89,11 @@ if settings.DEBUG:
         path("__debug__/", include("debug_toolbar.urls")),
     ] + urlpatterns
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+elif settings.SERVE_MEDIA:
+    urlpatterns += [
+        re_path(
+            r"^%s(?P<path>.*)$" % re.escape(settings.MEDIA_URL.lstrip("/")),
+            serve,
+            {"document_root": settings.MEDIA_ROOT},
+        ),
+    ]
