@@ -3,10 +3,12 @@ import uuid
 from unittest.mock import MagicMock, patch
 
 from django.contrib.auth.models import User
+from django.core import mail
 from django.test import Client, override_settings, TestCase
 from django.urls import reverse
 
 from cloudy.accounts.models import UserProfile
+from cloudy.notifications.models import NoticeSetting, NoticeType
 from cloudy.payment.models import PaymentOrder, ProcessedStripeEvent
 from cloudy.payment.views import _handle_checkout_completed, _handle_invoice_paid
 
@@ -289,6 +291,54 @@ class StripeWebhookIdempotencyTestCase(TestCase):
         self.assertEqual(user.userprofile.stripe_customer_id, "cus_sdk")
         self.assertEqual(user.userprofile.stripe_subscription_id, "sub_sdk")
         self.assertEqual(ProcessedStripeEvent.objects.filter(event_id="evt_sdk_checkout").count(), 1)
+
+    @patch("cloudy.payment.views.stripe.checkout.Session.list_line_items")
+    def test_webhook_checkout_sends_payed_notice_for_legacy_label(self, mock_list):
+        user = User.objects.create_user(
+            "brice", "brice.pages@gmail.com", "secret", first_name="Brice", last_name="PAGES"
+        )
+        UserProfile.objects.create(user=user, dob="1979-07-18")
+        notice_type = NoticeType.objects.create(
+            label="fistclass_payed",
+            display="Paiement effectué! Bons vols",
+            description="You just bought a first class pack",
+            default=2,
+        )
+        NoticeSetting.objects.create(user=user, notice_type=notice_type, medium="1", send=True)
+        mock_list.return_value = MagicMock(data=[MagicMock(price=MagicMock(id="price_first_class"))])
+        body, signature = _signed_stripe_body(
+            {
+                "id": "evt_brice_checkout",
+                "object": "event",
+                "type": "checkout.session.completed",
+                "data": {
+                    "object": {
+                        "id": "cs_brice",
+                        "object": "checkout.session",
+                        "client_reference_id": str(user.id),
+                        "customer": "cus_brice",
+                        "subscription": "sub_brice",
+                        "payment_status": "paid",
+                    }
+                },
+            }
+        )
+        response = Client().post(
+            reverse("payment:stripe_webhook"),
+            data=body,
+            content_type="application/json",
+            HTTP_STRIPE_SIGNATURE=signature,
+        )
+        self.assertEqual(response.status_code, 200)
+        user.userprofile.refresh_from_db()
+        self.assertEqual(user.userprofile.plan, 2)
+        self.assertEqual(user.userprofile.month_balance, 12)
+        self.assertEqual(ProcessedStripeEvent.objects.filter(event_id="evt_brice_checkout").count(), 1)
+        user_mail = [message for message in mail.outbox if user.email in message.to]
+        self.assertEqual(len(user_mail), 1)
+        self.assertIn("First Class", user_mail[0].subject)
+        self.assertIn("Brice PAGES", user_mail[0].body)
+        self.assertIn("12", user_mail[0].body)
 
     def test_webhook_invoice_paid_reads_current_price_details(self):
         user = User.objects.create_user("hookinvoice", "invoice@test.com", "secret")

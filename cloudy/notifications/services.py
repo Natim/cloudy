@@ -4,6 +4,11 @@ from django.template.loader import render_to_string
 
 from cloudy.notifications.models import Notice, NoticeSetting, NoticeType
 
+# The stored label predates the template directory and drops an "r".
+_TEMPLATE_LABELS = {
+    "fistclass_payed": "firstclass_payed",
+}
+
 
 def create_notice_type(label: str, display: str, description: str, default: int = 2) -> NoticeType:
     notice_type, _ = NoticeType.objects.get_or_create(
@@ -33,13 +38,14 @@ def send(users, notice_type_label: str, extra_context: dict | None = None) -> No
         setting = NoticeSetting.for_user(user, notice_type, medium=1)
         if not setting.send:
             continue
+        template_label = _TEMPLATE_LABELS.get(notice_type_label, notice_type_label)
         subject = render_to_string(
-            f"notification/{notice_type_label}/short.txt",
+            f"notification/{template_label}/short.txt",
             extra_context,
             using=None,
         ).strip()
         body = render_to_string(
-            f"notification/{notice_type_label}/full.txt",
+            f"notification/{template_label}/full.txt",
             extra_context,
             using=None,
         )

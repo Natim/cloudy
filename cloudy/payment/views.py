@@ -137,7 +137,16 @@ def _activate_first_class(profile: UserProfile, user) -> None:
         profile.month_balance += config.BETA_MONTH_BONUS
     profile.save()
     upgrade_plan_complete.send(sender=profile, user=user)
-    notification.send([user], "fistclass_payed", {"user": user})
+    # A missing template or notice row must not roll back the paid upgrade.
+    # Stripe would retry, and each attempt emails managers again.
+    try:
+        notification.send(
+            [user],
+            "fistclass_payed",
+            {"user": user, "month_earned": profile.month_balance},
+        )
+    except Exception:
+        logger.exception("First Class payment notification failed for user %s", user.pk)
 
 
 def _session_has_first_class_price(session: dict) -> bool:
