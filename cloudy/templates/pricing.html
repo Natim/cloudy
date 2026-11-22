@@ -1,6 +1,7 @@
 {% extends "site_base_public.html" %}
 {% load static %}
 {% load compress %}
+{% load core_tags %}
 
 {% block body_id %}pricing{% endblock %}
 
@@ -48,7 +49,7 @@
         <span class="value">2.99</span>
         <span class="frequency">
           <span>/ mois</span>
-          <p class="infos">soit {{ first_class_price }} euros par an</p>
+          <p class="infos">soit {% get_config_var 'FIRST_CLASS_PRICE' %} euros par an</p>
         </span>
       </h1>
       <div class="grey-box">
@@ -93,7 +94,7 @@
           <span class="value">2.99</span>
           <span class="frequency">
             <span>/ mois</span>
-            <p class="infos">soit {{ first_class_price }} euros par an</p>
+            <p class="infos">soit {% get_config_var 'FIRST_CLASS_PRICE' %} euros par an</p>
           </span>
         </span>
       </div>

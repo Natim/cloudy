@@ -48,6 +48,7 @@ class StaticViewsTestCase(TestCase):
         url = reverse("pricing")
         resp = self.c.get(url)
         self.assertEqual(resp.status_code, 200)
+        self.assertIn("soit 35 euros par an", resp.content.decode())
 
     def test_support(self):
         url = reverse("support")

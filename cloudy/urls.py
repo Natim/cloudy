@@ -1,6 +1,5 @@
 """cloudy URL Configuration."""
 
-from constance import config
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -42,10 +41,7 @@ urlpatterns = [
     path("connecteurs/", TemplateView.as_view(template_name="mcp_guide.html"), name="mcp_guide"),
     path(
         "pricing/",
-        TemplateView.as_view(
-            template_name="pricing.html",
-            extra_context={"first_class_price": config.FIRST_CLASS_PRICE},
-        ),
+        TemplateView.as_view(template_name="pricing.html"),
         name="pricing",
     ),
     path("logbooks/", include("cloudy.logbooks.urls")),
