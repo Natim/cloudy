@@ -176,7 +176,9 @@ REDIS_PORT = int(env("REDIS_PORT", "6379"))
 REDIS_DB = int(env("REDIS_DB", "4"))
 REDIS_PASSWORD = env("REDIS_PASSWORD") or None
 
-CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
+# Production stores these values in PostgreSQL (constance_constance). The Redis
+# backend ignores that table and serves CONSTANCE_CONFIG defaults instead.
+CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_REDIS_CONNECTION = {
     "host": REDIS_SERVER,
     "port": REDIS_PORT,

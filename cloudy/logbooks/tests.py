@@ -5,12 +5,13 @@ import tempfile
 import unittest
 from datetime import datetime
 from pathlib import Path
+from unittest.mock import patch
 
 import redis
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import connection
-from django.test import TestCase
+from django.test import override_settings, TestCase
 from django.test.client import Client
 from django.urls import reverse
 from django.utils import timezone
@@ -38,6 +39,24 @@ class CsvEncodingTests(unittest.TestCase):
         rows = list(UnicodeReader(io.BytesIO(raw), delimiter=";"))
         self.assertEqual(rows[0][1], "Aérodrome")
         self.assertEqual(rows[1][1], "Orléans")
+
+
+class PaginationCacheTests(TestCase):
+    @override_settings(CACHING=False)
+    @patch("cloudy.logbooks.paginator.REDIS")
+    def test_clear_cache_skips_redis_when_caching_is_off(self, mock_redis):
+        from cloudy.logbooks.paginator import clear_cache
+
+        clear_cache(type("Book", (), {"id": 1091})())
+        mock_redis.delete.assert_not_called()
+
+    @override_settings(CACHING=True)
+    @patch("cloudy.logbooks.paginator.REDIS")
+    def test_clear_cache_deletes_paging_key_when_caching_is_on(self, mock_redis):
+        from cloudy.logbooks.paginator import clear_cache
+
+        clear_cache(type("Book", (), {"id": 1091})())
+        mock_redis.delete.assert_called_once_with("paging:1091")
 
 
 class LogBookTestCase(TestCase):

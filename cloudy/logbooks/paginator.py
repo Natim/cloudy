@@ -16,8 +16,10 @@ REDIS = Redis(
 
 def clear_cache(logbook):
     """
-    Clear the pagination cache for the given logbook
+    Clear the pagination cache for the given logbook.
     """
+    if not settings.CACHING:
+        return
     REDIS.delete("paging:%s" % logbook.id)
 
 

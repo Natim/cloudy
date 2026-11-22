@@ -28,7 +28,7 @@ legacy Django 1.4 / Python 2 stack.
 - [uv](https://docs.astral.sh/uv/)
 - Python 3.14 (see `.python-version`)
 - PostgreSQL 15+ (optional; SQLite is enough for local development)
-- Redis (django-constance; optional logbook pagination cache)
+- Redis (optional logbook pagination cache and short URLs; constance uses PostgreSQL)
 
 ## Setup
 
